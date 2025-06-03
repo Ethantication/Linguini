@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linguini - Technion Educational Site</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tone.js for sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -24,7 +26,7 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        input[type="text"], textarea {
+        input[type="text"], textarea, select {
             border: 1px solid #cbd5e1; /* border-gray-300 */
             border-radius: 0.375rem; /* rounded-md */
             padding: 0.75rem 1rem;
@@ -32,7 +34,7 @@
             font-size: 1rem;
             transition: border-color 0.2s;
         }
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #3b82f6; /* blue-500 */
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
@@ -147,17 +149,32 @@
         .bg-header-custom {
             background-color: #faeddb;
         }
+
+        /* Game specific styles */
+        .game-option-button {
+            @apply bg-blue-500 text-white py-3 px-6 rounded-lg text-xl font-semibold w-full transition-all duration-200 ease-in-out;
+        }
+        .game-option-button:hover {
+            @apply bg-blue-600 transform scale-105;
+        }
+        .game-option-button.correct {
+            @apply bg-emerald-500;
+        }
+        .game-option-button.incorrect {
+            @apply bg-red-500;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="bg-header-custom text-white p-4 shadow-lg">
         <div class="container flex flex-col items-center">
             <div class="flex justify-center mb-4 sm:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-28 w-28 rounded-full">
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-42 w-42 rounded-full">
             </div>
             <nav class="flex gap-4">
                 <button id="homeButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Home</button>
                 <button id="validatorAuthButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Validator Login</button>
+                <button id="letsPlayButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Let's play!</button>
             </nav>
         </div>
     </header>
@@ -165,6 +182,7 @@
     <main class="flex-grow container py-8">
         <div id="messageBoxContainer"></div>
 
+        <!-- Home View -->
         <div id="homeView" class="view">
             <div class="card">
                 <h2 class="text-2xl font-semibold mb-4 text-center">Welcome to Linguini!</h2>
@@ -192,6 +210,7 @@
             </div>
         </div>
 
+        <!-- Add Course View -->
         <div id="addCourseView" class="view hidden">
             <div class="card">
                 <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
@@ -208,6 +227,7 @@
             </div>
         </div>
 
+        <!-- Course Details View -->
         <div id="courseDetailsView" class="view hidden">
             <div class="card">
                 <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
@@ -225,6 +245,7 @@
             </div>
         </div>
 
+        <!-- Add Term View -->
         <div id="addTermView" class="view hidden">
             <div class="card">
                 <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
@@ -261,6 +282,39 @@
                 </form>
             </div>
         </div>
+
+        <!-- Game View -->
+        <div id="gameView" class="view hidden">
+            <div class="card text-center">
+                <h2 class="text-3xl font-bold mb-6 text-blue-700">Linguini Challenge!</h2>
+                <div id="gameStartScreen">
+                    <p class="text-lg mb-4">Choose your native language to start the game:</p>
+                    <select id="gameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                        <!-- Options populated by JS -->
+                    </select>
+                    <button id="startGameButton">Start Game</button>
+                </div>
+
+                <div id="gamePlayScreen" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-2xl font-semibold text-gray-700">Score: <span id="gameScore">0</span></div>
+                        <div class="text-2xl font-semibold text-red-500">Time: <span id="gameTimer">30</span>s</div>
+                    </div>
+                    <p class="text-4xl font-bold mb-8 text-gray-800" id="gameTermDisplay"></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="game-option-button" id="option1"></button>
+                        <button class="game-option-button" id="option2"></button>
+                    </div>
+                    <p id="gameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                </div>
+
+                <div id="gameOverScreen" class="hidden">
+                    <h3 class="text-3xl font-bold text-blue-700 mb-4">Game Over!</h3>
+                    <p class="text-xl mb-6">Your final score: <span id="finalScore" class="font-bold text-emerald-600"></span></p>
+                    <button id="playAgainButton">Play Again</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <div class="container flex justify-between items-center py-4 px-6">
@@ -278,7 +332,7 @@
     <script>
         // --- Data Storage and Management ---
         const STORAGE_KEY = 'linguiniDataV2';
-        const VALIDATOR_SECRET_KEY = 'v2025';
+        const VALIDATOR_SECRET_KEY = 'V2025'; // Updated validator key
 
         // Function to load data from localStorage
         function loadData() {
@@ -310,10 +364,12 @@
         const addCourseView = document.getElementById('addCourseView');
         const courseDetailsView = document.getElementById('courseDetailsView');
         const addTermView = document.getElementById('addTermView');
+        const gameView = document.getElementById('gameView'); // New game view
         const messageBoxContainer = document.getElementById('messageBoxContainer');
 
         const homeButton = document.getElementById('homeButton');
-        const validatorAuthButton = document.getElementById('validatorAuthButton'); // New validator button
+        const validatorAuthButton = document.getElementById('validatorAuthButton');
+        const letsPlayButton = document.getElementById('letsPlayButton'); // New "Let's play!" button
         const showAddCourseFormBtn = document.getElementById('showAddCourseFormBtn');
         const addCourseForm = document.getElementById('addCourseForm');
         const cancelAddCourseBtn = document.getElementById('cancelAddCourseBtn');
@@ -331,6 +387,35 @@
         const searchResultsList = document.getElementById('searchResultsList');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         const courseSearchInput = document.getElementById('courseSearchInput');
+
+        // Game UI Elements
+        const gameStartScreen = document.getElementById('gameStartScreen');
+        const gameLanguageSelect = document.getElementById('gameLanguageSelect');
+        const startGameButton = document.getElementById('startGameButton');
+        const gamePlayScreen = document.getElementById('gamePlayScreen');
+        const gameScoreDisplay = document.getElementById('gameScore');
+        const gameTimerDisplay = document.getElementById('gameTimer');
+        const gameTermDisplay = document.getElementById('gameTermDisplay');
+        const option1Button = document.getElementById('option1');
+        const option2Button = document.getElementById('option2');
+        const gameFeedbackDisplay = document.getElementById('gameFeedback');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const playAgainButton = document.getElementById('playAgainButton');
+
+        // Game State Variables
+        let gameScore = 0;
+        let gameTimeLeft = 30;
+        let gameTimerInterval;
+        let gameCurrentTerm = null;
+        let gameCorrectOptionKey = null;
+        let gameSelectedLanguage = null;
+
+        // Tone.js Synths for sound effects
+        const correctSynth = new Tone.Synth().toDestination();
+        const incorrectSynth = new Tone.Synth().toDestination();
+        const gameOverSynth = new Tone.MembraneSynth().toDestination();
+
 
         // --- Utility Functions ---
 
@@ -450,6 +535,20 @@
             } else {
                 return 'Pending';
             }
+        }
+
+        // Get a random element from an array
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
         // --- Render Functions ---
@@ -838,6 +937,208 @@
         };
 
 
+        // --- Game Logic ---
+
+        // Populate language selection dropdown for the game
+        function populateGameLanguageSelect() {
+            gameLanguageSelect.innerHTML = '';
+            LANGUAGES.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.key;
+                option.textContent = lang.name;
+                gameLanguageSelect.appendChild(option);
+            });
+        }
+
+        // Start the game
+        startGameButton.onclick = async () => {
+            // Initialize Tone.js context if not already running (required for sounds)
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+            }
+
+            gameSelectedLanguage = gameLanguageSelect.value;
+            if (!gameSelectedLanguage) {
+                showMessageBox('Please select your native language to start the game.', 'error');
+                return;
+            }
+
+            // Filter terms to only include those that have a translation in the selected native language
+            const availableTermsForGame = appData.terms.filter(term => term[gameSelectedLanguage] && term[gameSelectedLanguage].text);
+
+            if (availableTermsForGame.length < 2) { // Need at least two terms to generate a question with a distractor
+                showMessageBox('Not enough terms with translations in the selected language to play. Please add more terms!', 'error');
+                return;
+            }
+
+            gameScore = 0;
+            gameTimeLeft = 30;
+            gameScoreDisplay.textContent = gameScore;
+            gameTimerDisplay.textContent = gameTimeLeft;
+            gameFeedbackDisplay.textContent = '';
+
+            gameStartScreen.classList.add('hidden');
+            gamePlayScreen.classList.remove('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            startTimer();
+            generateQuestion();
+        };
+
+        // Timer functionality
+        function startTimer() {
+            clearInterval(gameTimerInterval); // Clear any existing timer
+            gameTimerInterval = setInterval(() => {
+                gameTimeLeft--;
+                gameTimerDisplay.textContent = gameTimeLeft;
+                if (gameTimeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Generate a new question
+        function generateQuestion() {
+            // Reset button styles
+            option1Button.classList.remove('correct', 'incorrect');
+            option2Button.classList.remove('correct', 'incorrect');
+            gameFeedbackDisplay.textContent = '';
+            option1Button.disabled = false;
+            option2Button.disabled = false;
+
+            const availableTermsForGame = appData.terms.filter(term => term[gameSelectedLanguage] && term[gameSelectedLanguage].text);
+
+            // 1. Pick a random term for the question
+            let randomTerm = getRandomElement(availableTermsForGame);
+            // Ensure the term has at least one other language translation to display
+            const languagesToDisplay = LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && randomTerm[lang.key] && randomTerm[lang.key].text);
+
+            if (languagesToDisplay.length === 0) {
+                // If the chosen term only has the native language translation, pick another one
+                // This is a fallback to ensure we can display a term in a *different* language.
+                // In a real app, you'd pre-filter terms that have at least 2 languages.
+                const fallbackTerms = availableTermsForGame.filter(term => {
+                    const otherLangs = LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && term[lang.key] && term[lang.key].text);
+                    return otherLangs.length > 0;
+                });
+                if (fallbackTerms.length > 0) {
+                    randomTerm = getRandomElement(fallbackTerms);
+                } else {
+                    // This case means no terms have translations in other languages besides the native.
+                    // The game cannot proceed.
+                    endGame('Game ended: Not enough diverse terms to create questions.');
+                    return;
+                }
+            }
+
+            gameCurrentTerm = randomTerm;
+
+            // Pick a random source language for the displayed term (not the native language)
+            const sourceLang = getRandomElement(LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && gameCurrentTerm[lang.key] && gameCurrentTerm[lang.key].text));
+            if (!sourceLang) {
+                // Should not happen if fallback logic above is robust, but good to check
+                endGame('Game ended: Could not find a source language for the term.');
+                return;
+            }
+
+            gameTermDisplay.textContent = gameCurrentTerm[sourceLang.key].text;
+            gameTermDisplay.dir = sourceLang.dir; // Set text direction
+
+            const correctTranslation = gameCurrentTerm[gameSelectedLanguage].text;
+
+            // 2. Generate an incorrect option
+            let incorrectTranslation = '';
+            let incorrectTerm = null;
+            // Loop until we find a term that is different and has a translation in the selected native language
+            do {
+                incorrectTerm = getRandomElement(availableTermsForGame);
+            } while (incorrectTerm.id === gameCurrentTerm.id || !incorrectTerm[gameSelectedLanguage] || !incorrectTerm[gameSelectedLanguage].text);
+
+            incorrectTranslation = incorrectTerm[gameSelectedLanguage].text;
+
+            // 3. Prepare options and shuffle them
+            const options = [
+                { text: correctTranslation, isCorrect: true, key: 'option1' },
+                { text: incorrectTranslation, isCorrect: false, key: 'option2' }
+            ];
+            shuffleArray(options);
+
+            option1Button.textContent = options[0].text;
+            option1Button.dir = LANGUAGES.find(l => l.key === gameSelectedLanguage).dir; // Set option text direction
+            option1Button.onclick = () => checkAnswer(options[0].isCorrect, 'option1');
+
+            option2Button.textContent = options[1].text;
+            option2Button.dir = LANGUAGES.find(l => l.key === gameSelectedLanguage).dir; // Set option text direction
+            option2Button.onclick = () => checkAnswer(options[1].isCorrect, 'option2');
+
+            gameCorrectOptionKey = options.find(opt => opt.isCorrect).key; // Store which option is correct
+        }
+
+        // Check the user's answer
+        function checkAnswer(isCorrect, clickedOptionKey) {
+            // Disable buttons to prevent multiple clicks
+            option1Button.disabled = true;
+            option2Button.disabled = true;
+
+            const clickedButton = document.getElementById(clickedOptionKey);
+            const correctButton = document.getElementById(gameCorrectOptionKey === 'option1' ? 'option1' : 'option2');
+
+            if (isCorrect) {
+                gameScore++;
+                gameScoreDisplay.textContent = gameScore;
+                gameFeedbackDisplay.textContent = 'Correct!';
+                gameFeedbackDisplay.classList.remove('text-red-500');
+                gameFeedbackDisplay.classList.add('text-emerald-500');
+                correctSynth.triggerAttackRelease('C5', '8n'); // Play a note for correct answer
+                clickedButton.classList.add('correct');
+            } else {
+                gameFeedbackDisplay.textContent = 'Incorrect!';
+                gameFeedbackDisplay.classList.remove('text-emerald-500');
+                gameFeedbackDisplay.classList.add('text-red-500');
+                incorrectSynth.triggerAttackRelease('C4', '8n'); // Play a different note for incorrect
+                clickedButton.classList.add('incorrect');
+                correctButton.classList.add('correct'); // Show the correct answer
+            }
+
+            // Wait a moment before generating the next question
+            setTimeout(() => {
+                if (gameTimeLeft > 0) { // Only generate next if time hasn't run out
+                    generateQuestion();
+                }
+            }, 1000); // 1 second delay
+        }
+
+        // End the game
+        function endGame(message = '') {
+            clearInterval(gameTimerInterval);
+            gameOverSynth.triggerAttackRelease('C2', '2n'); // Game over sound
+
+            gamePlayScreen.classList.add('hidden');
+            gameOverScreen.classList.remove('hidden');
+            finalScoreDisplay.textContent = gameScore;
+
+            if (message) {
+                showMessageBox(message, 'info', () => {
+                    showView(gameView); // Go back to game start screen
+                    gameStartScreen.classList.remove('hidden');
+                    gamePlayScreen.classList.add('hidden');
+                    gameOverScreen.classList.add('hidden');
+                });
+            }
+        }
+
+        // Play again button
+        playAgainButton.onclick = () => {
+            gameStartScreen.classList.remove('hidden');
+            gamePlayScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            gameScore = 0;
+            gameTimeLeft = 30;
+            gameScoreDisplay.textContent = gameScore;
+            gameTimerDisplay.textContent = gameTimeLeft;
+            gameFeedbackDisplay.textContent = '';
+        };
+
         // --- Navigation Logic ---
 
         // Function to view course details
@@ -861,6 +1162,7 @@
         // Initial render on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderCourses(); // Initial render to show courses (with or without delete buttons)
+            populateGameLanguageSelect(); // Populate language options for the game
             showView(homeView);
         });
 
@@ -896,6 +1198,15 @@
             }
         };
 
+        // "Let's play!" button click handler
+        letsPlayButton.onclick = () => {
+            showView(gameView);
+            gameStartScreen.classList.remove('hidden');
+            gamePlayScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            populateGameLanguageSelect(); // Ensure dropdown is fresh
+        };
+
         // --- Initial Data (for demonstration) ---
         // You can uncomment this to pre-populate some data for testing
         
@@ -922,7 +1233,7 @@
                         hebrew: { text: 'אינטגרל', status: 'Pending', validatedBy: null },
                         english: { text: 'Integral', status: 'Pending', validatedBy: null },
                         russian: null, // Not provided
-                        arabic: { text: 'תכלית', status: 'Pending', validatedBy: null }, // Arabic for 'purpose' as an example
+                        arabic: { text: 'تكامل', status: 'Pending', validatedBy: null }, // Arabic for 'integral'
                         french: null // Not provided
                     },
                     {
@@ -930,7 +1241,7 @@
                         hebrew: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Matrix', status: 'Validated', validatedBy: 'Admin' },
                         russian: { text: 'Матрица', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'מصفوفة', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'مصفوفة', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Matrice', status: 'Validated', validatedBy: 'Admin' }
                     },
                     {
@@ -945,9 +1256,33 @@
                         id: 't5', courseId: 'c4', definition: 'The powerhouse of the cell, responsible for cellular respiration.',
                         hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' }, // Example of Russian translation
-                        arabic: { text: 'الميتוكونדريا', status: 'Validated', validatedBy: 'Admin' },
+                        russian: { text: 'Митохондрии', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
+                    },
+                    {
+                        id: 't6', courseId: 'c1', definition: 'The process of finding the derivative of a function.',
+                        hebrew: { text: 'גזירה', status: 'Pending', validatedBy: null },
+                        english: { text: 'Differentiation', status: 'Pending', validatedBy: null },
+                        russian: { text: 'Дифференцирование', status: 'Pending', validatedBy: null },
+                        arabic: { text: 'التفاضل', status: 'Pending', validatedBy: null },
+                        french: { text: 'Différenciation', status: 'Pending', validatedBy: null }
+                    },
+                    {
+                        id: 't7', courseId: 'c3', definition: 'A sequence of characters.',
+                        hebrew: { text: 'מחרוזת', status: 'Validated', validatedBy: 'Admin' },
+                        english: { text: 'String', status: 'Validated', validatedBy: 'Admin' },
+                        russian: { text: 'Строка', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'سلسلة', status: 'Validated', validatedBy: 'Admin' },
+                        french: { text: 'Chaîne', status: 'Validated', validatedBy: 'Admin' }
+                    },
+                    {
+                        id: 't8', courseId: 'c5', definition: 'A chemical compound containing carbon, hydrogen, and oxygen, often with a ring structure.',
+                        hebrew: { text: 'בנזן', status: 'Validated', validatedBy: 'Admin' },
+                        english: { text: 'Benzene', status: 'Validated', validatedBy: 'Admin' },
+                        russian: { text: 'Бензол', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'بنزين', status: 'Validated', validatedBy: 'Admin' },
+                        french: { text: 'Benzène', status: 'Validated', validatedBy: 'Admin' }
                     }
                 ]
             };
