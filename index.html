@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linguini - Breaking The Language Barrier</title>
+    <title>Linguini - Technion Educational Site</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -65,6 +65,12 @@
         }
         .btn-validate:hover {
             background-color: #059669; /* emerald-600 */
+        }
+        .btn-edit {
+            background-color: #f97316; /* orange-500 */
+        }
+        .btn-edit:hover {
+            background-color: #ea580c; /* orange-600 */
         }
         .btn-delete {
             background-color: #ef4444; /* red-500 */
@@ -142,8 +148,8 @@
     <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg">
         <div class="container flex flex-col sm:flex-row justify-between items-center">
             <div class="flex items-center mb-4 sm:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-20 w-20">
-                <h1 class="text-3xl font-bold">  Linguini</h1>
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-20 w-20 rounded-full mr-3">
+                <h1 class="text-3xl font-bold">Linguini</h1>
             </div>
             <nav>
                 <button id="homeButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Home</button>
@@ -216,7 +222,7 @@
 
         <div id="addTermView" class="view hidden">
             <div class="card">
-                <h2 class="text-2xl font-semibold mb-6">Add New Term</h2>
+                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
                 <form id="addTermForm" class="space-y-4">
                     <div>
                         <label for="termHebrew" class="block text-sm font-medium text-gray-700 mb-1">Term (Hebrew) <span class="text-red-500">*</span></label>
@@ -244,7 +250,7 @@
                         <input type="text" id="termFrench" placeholder="Dérivée">
                     </div>
                     <div class="flex gap-4">
-                        <button type="submit">Add Term</button>
+                        <button type="submit" id="addTermSubmitBtn">Add Term</button>
                         <button type="button" id="cancelAddTermBtn" class="btn-secondary">Cancel</button>
                     </div>
                 </form>
@@ -260,8 +266,8 @@
 
     <script>
         // --- Data Storage and Management ---
-        const STORAGE_KEY = 'linguiniDataV2'; // Changed storage key to avoid conflicts with previous version
-        const VALIDATOR_SECRET_KEY = 'technion_linguini_validator_2025'; // Your secret validation key
+        const STORAGE_KEY = 'linguiniDataV2';
+        const VALIDATOR_SECRET_KEY = 'technion_linguini_validator_2025';
 
         // Function to load data from localStorage
         function loadData() {
@@ -276,14 +282,15 @@
 
         let appData = loadData();
         let currentCourseId = null; // Tracks the currently viewed course
+        let currentTermId = null;   // Tracks the term being edited (null for new term)
 
-        // Define the languages for iteration - Hebrew is now the primary display language
+        // Define the languages for iteration - Hebrew is the primary display language
         const LANGUAGES = [
-            { key: 'hebrew', name: 'Hebrew', dir: 'rtl' },
-            { key: 'english', name: 'English', dir: 'ltr' },
-            { key: 'russian', name: 'Russian', dir: 'ltr' },
-            { key: 'arabic', name: 'Arabic', dir: 'rtl' },
-            { key: 'french', name: 'French', dir: 'ltr' }
+            { key: 'hebrew', name: 'Hebrew', dir: 'rtl', inputId: 'termHebrew' },
+            { key: 'english', name: 'English', dir: 'ltr', inputId: 'termEnglish' },
+            { key: 'russian', name: 'Russian', dir: 'ltr', inputId: 'termRussian' },
+            { key: 'arabic', name: 'Arabic', dir: 'rtl', inputId: 'termArabic' },
+            { key: 'french', name: 'French', dir: 'ltr', inputId: 'termFrench' }
         ];
 
         // --- UI Elements ---
@@ -301,6 +308,8 @@
         const courseDetailsTitle = document.getElementById('courseDetailsTitle');
         const showAddTermFormBtn = document.getElementById('showAddTermFormBtn');
         const addTermForm = document.getElementById('addTermForm');
+        const addTermFormTitle = document.getElementById('addTermFormTitle');
+        const addTermSubmitBtn = document.getElementById('addTermSubmitBtn');
         const cancelAddTermBtn = document.getElementById('cancelAddTermBtn');
         const termList = document.getElementById('termList');
         const noTermsMessage = document.getElementById('noTermsMessage');
@@ -536,7 +545,10 @@
                         <span class="text-sm ${overallStatusClass}">
                             Overall Status: ${termOverallStatus}
                         </span>
-                        <button class="btn-delete px-3 py-1 text-sm" data-term-id="${term.id}">Delete Term</button>
+                        <div class="flex gap-2">
+                            <button class="btn-edit px-3 py-1 text-sm" data-term-id="${term.id}">Edit</button>
+                            <button class="btn-delete px-3 py-1 text-sm" data-term-id="${term.id}">Delete Term</button>
+                        </div>
                     </div>
                 `;
                 termList.appendChild(termCard);
@@ -549,6 +561,9 @@
                         validateTerm(termId, langKey);
                     };
                 });
+
+                // Add event listener for edit button
+                termCard.querySelector('.btn-edit').onclick = () => editTerm(term.id);
 
                 // Add event listener for delete button
                 termCard.querySelector('.btn-delete').onclick = () => deleteTerm(term.id);
@@ -613,84 +628,99 @@
             }
         };
 
-        // Handle adding a new term
+        // Handle adding or editing a term
         addTermForm.onsubmit = (e) => {
             e.preventDefault();
-            const termHebrew = document.getElementById('termHebrew').value.trim(); // Now Hebrew is required
+            const termHebrew = document.getElementById('termHebrew').value.trim();
             const termDefinition = document.getElementById('termDefinition').value.trim();
-            const termEnglish = document.getElementById('termEnglish').value.trim(); // English is now optional
-            const termRussian = document.getElementById('termRussian').value.trim();
-            const termArabic = document.getElementById('termArabic').value.trim();
-            const termFrench = document.getElementById('termFrench').value.trim();
 
             if (!termHebrew || !termDefinition || !currentCourseId) {
                 showMessageBox('Hebrew term and definition are required.', 'error');
                 return;
             }
 
-            const newTerm = {
-                id: generateId(),
-                courseId: currentCourseId,
-                definition: termDefinition,
-            };
+            let termToUpdate = null;
+            let termIndex = -1;
 
-            // Populate language fields, only if text is provided
-            // Ensure Hebrew is always present and marked as pending initially
-            newTerm.hebrew = {
-                text: termHebrew,
-                status: 'Pending',
-                validatedBy: null
-            };
-
-            // Process other languages as optional
-            if (termEnglish) {
-                newTerm.english = {
-                    text: termEnglish,
-                    status: 'Pending',
-                    validatedBy: null
-                };
-            } else {
-                newTerm.english = null;
+            if (currentTermId) { // Editing an existing term
+                termIndex = appData.terms.findIndex(t => t.id === currentTermId);
+                if (termIndex !== -1) {
+                    termToUpdate = appData.terms[termIndex];
+                }
             }
 
-            if (termRussian) {
-                newTerm.russian = {
-                    text: termRussian,
-                    status: 'Pending',
-                    validatedBy: null
+            if (!termToUpdate) { // Adding a new term
+                termToUpdate = {
+                    id: generateId(),
+                    courseId: currentCourseId,
                 };
-            } else {
-                newTerm.russian = null;
+                appData.terms.push(termToUpdate);
             }
 
-            if (termArabic) {
-                newTerm.arabic = {
-                    text: termArabic,
-                    status: 'Pending',
-                    validatedBy: null
-                };
-            } else {
-                newTerm.arabic = null;
-            }
+            termToUpdate.definition = termDefinition;
 
-            if (termFrench) {
-                newTerm.french = {
-                    text: termFrench,
-                    status: 'Pending',
-                    validatedBy: null
-                };
-            } else {
-                newTerm.french = null;
-            }
+            // Process all language fields
+            LANGUAGES.forEach(lang => {
+                const inputElement = document.getElementById(lang.inputId);
+                const newText = inputElement ? inputElement.value.trim() : ''; // Get current input value
 
+                const oldLangData = termToUpdate[lang.key];
+                const oldText = oldLangData ? oldLangData.text : '';
 
-            appData.terms.push(newTerm);
+                if (newText) { // If new text is provided
+                    if (!oldLangData || newText !== oldText) {
+                        // If it's a new translation or the text has changed, reset status to Pending
+                        termToUpdate[lang.key] = {
+                            text: newText,
+                            status: 'Pending',
+                            validatedBy: null
+                        };
+                    } else {
+                        // If text is provided and hasn't changed, keep existing status
+                        termToUpdate[lang.key] = {
+                            text: newText,
+                            status: oldLangData.status,
+                            validatedBy: oldLangData.validatedBy
+                        };
+                    }
+                } else { // If new text is empty (translation removed or not provided)
+                    termToUpdate[lang.key] = null;
+                }
+            });
+
             saveData(appData);
-            showMessageBox('Term added successfully! Individual translations are pending validation.', 'success', () => {
+            showMessageBox(currentTermId ? 'Term updated successfully!' : 'Term added successfully! Individual translations are pending validation.', 'success', () => {
                 addTermForm.reset();
+                currentTermId = null; // Clear editing state
                 viewCourseDetails(currentCourseId); // Go back to course details
             });
         };
+
+        // Function to prepare the form for editing a term
+        function editTerm(termId) {
+            currentTermId = termId;
+            const term = appData.terms.find(t => t.id === termId);
+
+            if (term) {
+                addTermFormTitle.textContent = 'Edit Term';
+                addTermSubmitBtn.textContent = 'Save Changes';
+
+                document.getElementById('termDefinition').value = term.definition;
+
+                LANGUAGES.forEach(lang => {
+                    const inputElement = document.getElementById(lang.inputId);
+                    if (inputElement) {
+                        inputElement.value = term[lang.key] && term[lang.key].text ? term[lang.key].text : '';
+                    }
+                });
+
+                showView(addTermView);
+            } else {
+                showMessageBox('Term not found for editing.', 'error');
+                currentTermId = null; // Reset if term not found
+            }
+        }
+
 
         // Validate a term for a specific language using the secret key
         function validateTerm(termId, langKey) {
@@ -802,15 +832,24 @@
             globalSearchInput.value = ''; // Clear global search
             searchResults.classList.add('hidden'); // Hide search results
             currentCourseId = null; // Reset current course ID
+            currentTermId = null; // Reset editing state
         };
         showAddCourseFormBtn.onclick = () => showView(addCourseView);
         cancelAddCourseBtn.onclick = () => {
             addCourseForm.reset();
             showView(homeView);
         };
-        showAddTermFormBtn.onclick = () => showView(addTermView);
+        showAddTermFormBtn.onclick = () => {
+            // Prepare form for adding a new term
+            addTermForm.reset();
+            addTermFormTitle.textContent = 'Add New Term';
+            addTermSubmitBtn.textContent = 'Add Term';
+            currentTermId = null; // Ensure we're in "add new" mode
+            showView(addTermView);
+        };
         cancelAddTermBtn.onclick = () => {
             addTermForm.reset();
+            currentTermId = null; // Clear editing state
             if (currentCourseId) {
                 viewCourseDetails(currentCourseId); // Go back to course details if a course was selected
             } else {
@@ -844,7 +883,7 @@
                         hebrew: { text: 'אינטגרל', status: 'Pending', validatedBy: null },
                         english: { text: 'Integral', status: 'Pending', validatedBy: null },
                         russian: null, // Not provided
-                        arabic: { text: 'تكامل', status: 'Pending', validatedBy: null },
+                        arabic: { text: 'תכלית', status: 'Pending', validatedBy: null }, // Arabic for 'purpose' as an example
                         french: null // Not provided
                     },
                     {
@@ -852,7 +891,7 @@
                         hebrew: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Matrix', status: 'Validated', validatedBy: 'Admin' },
                         russian: { text: 'Матрица', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'מصفوفة', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'مصفوفة', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Matrice', status: 'Validated', validatedBy: 'Admin' }
                     },
                     {
@@ -867,7 +906,7 @@
                         id: 't5', courseId: 'c4', definition: 'The powerhouse of the cell, responsible for cellular respiration.',
                         hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' }, // Example of Russian translation
+                        russian: { text: 'Митохондрии', status: 'Validated', validatedBy: 'Admin' },
                         arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
                     }
