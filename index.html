@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linguini - Cracking The Language Barrier</title>
+    <title>Linguini - Technion Educational Site</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -34,11 +34,11 @@
         }
         input[type="text"]:focus, textarea:focus {
             outline: none;
-            border-color: #3b82f6; /* blue-500 */
+            border-color: #faeddb; /* blue-500 */
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
         button {
-            background-color: #3b82f6; /* blue-500 */
+            background-color: #faeddb; /* blue-500 */
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem; /* rounded-lg */
@@ -146,10 +146,9 @@
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg">
-        <div class="container flex flex-col sm:flex-row justify-between items-center">
-            <div class="flex items-center mb-4 sm:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-20 w-20 rounded-full mr-3">
-                <h1 class="text-3xl font-bold">Linguini</h1>
+        <div class="container flex flex-col items-center">
+            <div class="flex justify-center mb-4 sm:mb-0">
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-20 w-20 rounded-full">
             </div>
             <nav class="flex gap-4">
                 <button id="homeButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Home</button>
@@ -268,7 +267,7 @@
     <script>
         // --- Data Storage and Management ---
         const STORAGE_KEY = 'linguiniDataV2';
-        const VALIDATOR_SECRET_KEY = 'validator25';
+        const VALIDATOR_SECRET_KEY = 'technion_linguini_validator_2025';
 
         // Function to load data from localStorage
         function loadData() {
@@ -936,7 +935,7 @@
                         hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
                         russian: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' }, // Example of Russian translation
-                        arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'الميتוكوندريا', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
                     }
                 ]
