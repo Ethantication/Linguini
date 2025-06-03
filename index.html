@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linguini - Technion Educational Site</title>
+    <title>Linguini - Cracking The Language Barrier</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -151,8 +151,9 @@
                 <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-20 w-20 rounded-full mr-3">
                 <h1 class="text-3xl font-bold">Linguini</h1>
             </div>
-            <nav>
+            <nav class="flex gap-4">
                 <button id="homeButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Home</button>
+                <button id="validatorAuthButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Validator Login</button>
             </nav>
         </div>
     </header>
@@ -283,6 +284,7 @@
         let appData = loadData();
         let currentCourseId = null; // Tracks the currently viewed course
         let currentTermId = null;   // Tracks the term being edited (null for new term)
+        let isValidatorMode = false; // New state variable for validator mode
 
         // Define the languages for iteration - Hebrew is the primary display language
         const LANGUAGES = [
@@ -301,6 +303,7 @@
         const messageBoxContainer = document.getElementById('messageBoxContainer');
 
         const homeButton = document.getElementById('homeButton');
+        const validatorAuthButton = document.getElementById('validatorAuthButton'); // New validator button
         const showAddCourseFormBtn = document.getElementById('showAddCourseFormBtn');
         const addCourseForm = document.getElementById('addCourseForm');
         const cancelAddCourseBtn = document.getElementById('cancelAddCourseBtn');
@@ -454,14 +457,18 @@
                 courseCard.innerHTML = `
                     <h3 class="text-xl font-semibold text-blue-700">${course.name}</h3>
                     <div class="flex gap-2">
-                        <button class="btn-delete px-3 py-1 text-sm" data-course-id="${course.id}">Delete</button>
+                        ${isValidatorMode ? `<button class="btn-delete px-3 py-1 text-sm" data-course-id="${course.id}">Delete</button>` : ''}
                     </div>
                 `;
                 courseCard.querySelector('h3').onclick = () => viewCourseDetails(course.id);
-                courseCard.querySelector('.btn-delete').onclick = (e) => {
-                    e.stopPropagation(); // Prevent card click
-                    deleteCourse(course.id);
-                };
+                // Only attach delete event listener if the button exists
+                const deleteBtn = courseCard.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation(); // Prevent card click
+                        deleteCourse(course.id);
+                    };
+                }
                 courseList.appendChild(courseCard);
             });
         }
@@ -606,6 +613,28 @@
         }
 
         // --- Event Handlers ---
+
+        // Handle validator login/logout
+        validatorAuthButton.onclick = () => {
+            if (isValidatorMode) {
+                // Logout
+                isValidatorMode = false;
+                validatorAuthButton.textContent = 'Validator Login';
+                showMessageBox('Logged out of Validator Mode.', 'info', renderCourses); // Re-render to hide buttons
+            } else {
+                // Login
+                showPromptBox('Enter validator secret key:', (key) => {
+                    if (key === VALIDATOR_SECRET_KEY) {
+                        isValidatorMode = true;
+                        validatorAuthButton.textContent = 'Validator Logout';
+                        showMessageBox('Successfully logged into Validator Mode!', 'success', renderCourses); // Re-render to show buttons
+                    } else {
+                        showMessageBox('Invalid secret key. Access denied.', 'error');
+                    }
+                });
+            }
+        };
+
 
         // Handle adding a new course
         addCourseForm.onsubmit = (e) => {
@@ -821,7 +850,7 @@
 
         // Initial render on page load
         document.addEventListener('DOMContentLoaded', () => {
-            renderCourses();
+            renderCourses(); // Initial render to show courses (with or without delete buttons)
             showView(homeView);
         });
 
@@ -891,7 +920,7 @@
                         hebrew: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Matrix', status: 'Validated', validatedBy: 'Admin' },
                         russian: { text: 'Матрица', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'مصفوفة', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'מصفوفة', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Matrice', status: 'Validated', validatedBy: 'Admin' }
                     },
                     {
@@ -906,7 +935,7 @@
                         id: 't5', courseId: 'c4', definition: 'The powerhouse of the cell, responsible for cellular respiration.',
                         hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'Митохондрии', status: 'Validated', validatedBy: 'Admin' },
+                        russian: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' }, // Example of Russian translation
                         arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
                     }
