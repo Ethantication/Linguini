@@ -169,7 +169,7 @@
     <header class="bg-header-custom text-white p-4 shadow-lg">
         <div class="container flex flex-col items-center">
             <div class="flex justify-center mb-4 sm:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-42 w-42 rounded-full">
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-42 w-42 md:h-28 md:w-28 rounded-full">
             </div>
             <nav class="flex gap-4">
                 <button id="homeButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition">Home</button>
@@ -942,6 +942,14 @@
         // Populate language selection dropdown for the game
         function populateGameLanguageSelect() {
             gameLanguageSelect.innerHTML = '';
+            // Add a default "select" option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select your native language';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            gameLanguageSelect.appendChild(defaultOption);
+
             LANGUAGES.forEach(lang => {
                 const option = document.createElement('option');
                 option.value = lang.key;
@@ -964,10 +972,17 @@
             }
 
             // Filter terms to only include those that have a translation in the selected native language
-            const availableTermsForGame = appData.terms.filter(term => term[gameSelectedLanguage] && term[gameSelectedLanguage].text);
+            // and have at least one other language translation to be the source term.
+            const playableTerms = appData.terms.filter(term => {
+                const hasNativeTranslation = term[gameSelectedLanguage] && term[gameSelectedLanguage].text;
+                const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
+                    lang.key !== gameSelectedLanguage && term[lang.key] && term[lang.key].text
+                );
+                return hasNativeTranslation && hasOtherLanguageTranslation;
+            });
 
-            if (availableTermsForGame.length < 2) { // Need at least two terms to generate a question with a distractor
-                showMessageBox('Not enough terms with translations in the selected language to play. Please add more terms!', 'error');
+            if (playableTerms.length < 2) { // Need at least two terms to generate a question with a distractor
+                showMessageBox('Not enough terms with translations in your selected language and another language to play. Please add more terms!', 'error');
                 return;
             }
 
@@ -1006,37 +1021,27 @@
             option1Button.disabled = false;
             option2Button.disabled = false;
 
-            const availableTermsForGame = appData.terms.filter(term => term[gameSelectedLanguage] && term[gameSelectedLanguage].text);
+            const playableTerms = appData.terms.filter(term => {
+                const hasNativeTranslation = term[gameSelectedLanguage] && term[gameSelectedLanguage].text;
+                const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
+                    lang.key !== gameSelectedLanguage && term[lang.key] && term[lang.key].text
+                );
+                return hasNativeTranslation && hasOtherLanguageTranslation;
+            });
 
-            // 1. Pick a random term for the question
-            let randomTerm = getRandomElement(availableTermsForGame);
-            // Ensure the term has at least one other language translation to display
-            const languagesToDisplay = LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && randomTerm[lang.key] && randomTerm[lang.key].text);
-
-            if (languagesToDisplay.length === 0) {
-                // If the chosen term only has the native language translation, pick another one
-                // This is a fallback to ensure we can display a term in a *different* language.
-                // In a real app, you'd pre-filter terms that have at least 2 languages.
-                const fallbackTerms = availableTermsForGame.filter(term => {
-                    const otherLangs = LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && term[lang.key] && term[lang.key].text);
-                    return otherLangs.length > 0;
-                });
-                if (fallbackTerms.length > 0) {
-                    randomTerm = getRandomElement(fallbackTerms);
-                } else {
-                    // This case means no terms have translations in other languages besides the native.
-                    // The game cannot proceed.
-                    endGame('Game ended: Not enough diverse terms to create questions.');
-                    return;
-                }
+            if (playableTerms.length < 2) {
+                endGame('Game ended: Not enough diverse terms to create questions.');
+                return;
             }
 
+            // 1. Pick a random term for the question (the one whose translation will be displayed)
+            let randomTerm = getRandomElement(playableTerms);
             gameCurrentTerm = randomTerm;
 
             // Pick a random source language for the displayed term (not the native language)
             const sourceLang = getRandomElement(LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && gameCurrentTerm[lang.key] && gameCurrentTerm[lang.key].text));
             if (!sourceLang) {
-                // Should not happen if fallback logic above is robust, but good to check
+                // This scenario should be caught by playableTerms filter, but as a safeguard
                 endGame('Game ended: Could not find a source language for the term.');
                 return;
             }
@@ -1046,13 +1051,14 @@
 
             const correctTranslation = gameCurrentTerm[gameSelectedLanguage].text;
 
-            // 2. Generate an incorrect option
+            // 2. Generate an incorrect option (a translation from a *different* term)
             let incorrectTranslation = '';
             let incorrectTerm = null;
-            // Loop until we find a term that is different and has a translation in the selected native language
+            // Loop until we find a term that is different from gameCurrentTerm
+            // and has a translation in the selected native language.
             do {
-                incorrectTerm = getRandomElement(availableTermsForGame);
-            } while (incorrectTerm.id === gameCurrentTerm.id || !incorrectTerm[gameSelectedLanguage] || !incorrectTerm[gameSelectedLanguage].text);
+                incorrectTerm = getRandomElement(playableTerms);
+            } while (incorrectTerm.id === gameCurrentTerm.id);
 
             incorrectTranslation = incorrectTerm[gameSelectedLanguage].text;
 
