@@ -165,47 +165,17 @@
         }
 
         /* Learn Hebrew Game specific styles */
-        .flashcard {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease-in-out;
+        .learn-hebrew-option-button {
+            @apply bg-emerald-500 text-white py-3 px-6 rounded-lg text-xl font-semibold w-full transition-all duration-200 ease-in-out;
         }
-        .flashcard.flipped {
-            transform: rotateY(180deg);
+        .learn-hebrew-option-button:hover {
+            @apply bg-emerald-600 transform scale-105;
         }
-        .flashcard-content {
-            backface-visibility: hidden;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        .learn-hebrew-option-button.correct {
+            @apply bg-emerald-500;
         }
-        .flashcard-front {
-            z-index: 2;
-            transform: rotateY(0deg);
-        }
-        .flashcard-back {
-            transform: rotateY(180deg);
-            z-index: 1;
-        }
-        .flashcard-container {
-            perspective: 1000px;
-            width: 100%;
-            height: 250px; /* Fixed height for flashcard */
-            position: relative;
-            margin-bottom: 1.5rem;
+        .learn-hebrew-option-button.incorrect {
+            @apply bg-red-500;
         }
     </style>
 </head>
@@ -401,7 +371,7 @@
                 <h2 class="text-3xl font-bold mb-6 text-5c4b5c">Learn Hebrew Vocabulary</h2>
                 <p class="text-lg mb-6">
                     This section helps you master essential Hebrew terms for your academic studies at Technion.
-                    Select your native language, and we'll guide you through key vocabulary with interactive flashcards.
+                    Select your native language, and we'll guide you through key vocabulary with interactive games.
                 </p>
 
                 <div id="learnHebrewStartScreen">
@@ -417,22 +387,16 @@
                         <div class="text-xl font-semibold text-5c4b5c">Words Mastered: <span id="masteredWordsCount">0</span></div>
                         <div class="text-xl font-semibold text-5c4b5c">Progress: <span id="learningProgress">0/0</span></div>
                     </div>
-                    <div class="flashcard-container">
-                        <div id="flashcard" class="flashcard">
-                            <div class="flashcard-content flashcard-front">
-                                <p class="text-4xl font-bold text-5c4b5c" id="hebrewTermDisplay"></p>
-                            </div>
-                            <div class="flashcard-content flashcard-back">
-                                <p class="text-2xl font-semibold text-emerald-700" id="translationDisplay"></p>
-                                <p class="text-sm text-gray-500 mt-2" id="definitionDisplay"></p>
-                            </div>
-                        </div>
+                    <div class="flex flex-col items-center mb-6">
+                        <p class="text-5xl font-bold text-5c4b5c mb-2" id="hebrewTermDisplay" dir="rtl"></p>
+                        <p class="text-xl text-gray-600" id="pronunciationDisplay"></p>
                     </div>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-                        <button id="showTranslationButton" class="w-full sm:w-auto">Show Translation</button>
-                        <button id="markAsMasteredButton" class="w-full sm:w-auto btn-validate hidden">Mark as Mastered</button>
-                        <button id="nextWordButton" class="w-full sm:w-auto btn-secondary">Next Word</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="learn-hebrew-option-button" id="learnHebrewOption1"></button>
+                        <button class="learn-hebrew-option-button" id="learnHebrewOption2"></button>
                     </div>
+                    <p id="learnHebrewFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                    <button id="learnHebrewNextWordButton" class="btn-secondary mt-4 hidden">Next Word</button>
                 </div>
 
                 <div id="learnHebrewEndScreen" class="hidden">
@@ -548,17 +512,16 @@
         const startLearningButton = document.getElementById('startLearningButton');
         const learnHebrewPlayScreen = document.getElementById('learnHebrewPlayScreen');
         const hebrewTermDisplay = document.getElementById('hebrewTermDisplay');
-        const translationDisplay = document.getElementById('translationDisplay');
-        const definitionDisplay = document.getElementById('definitionDisplay');
-        const showTranslationButton = document.getElementById('showTranslationButton');
-        const nextWordButton = document.getElementById('nextWordButton');
-        const markAsMasteredButton = document.getElementById('markAsMasteredButton');
+        const pronunciationDisplay = document.getElementById('pronunciationDisplay'); // New pronunciation display
+        const learnHebrewOption1Button = document.getElementById('learnHebrewOption1'); // New option buttons
+        const learnHebrewOption2Button = document.getElementById('learnHebrewOption2');
+        const learnHebrewFeedbackDisplay = document.getElementById('learnHebrewFeedback'); // New feedback display
+        const learnHebrewNextWordButton = document.getElementById('learnHebrewNextWordButton'); // New next word button
         const masteredWordsCountDisplay = document.getElementById('masteredWordsCount');
         const learningProgressDisplay = document.getElementById('learningProgress');
         const learnHebrewEndScreen = document.getElementById('learnHebrewEndScreen');
         const finalMasteredCountDisplay = document.getElementById('finalMasteredCount');
         const startNewLearningSessionButton = document.getElementById('startNewLearningSessionButton');
-        const flashcard = document.getElementById('flashcard');
 
         // Learn Hebrew Game State Variables
         let learnHebrewSelectedLanguage = null;
@@ -571,6 +534,130 @@
         const incorrectSynth = new Tone.Synth().toDestination();
         const gameOverSynth = new Tone.MembraneSynth().toDestination();
         const flipSynth = new Tone.PolySynth().toDestination();
+
+        // --- Learn Hebrew Game Vocabulary (Pre-filled, fixed database) ---
+        const learnHebrewVocabulary = [
+            {
+                hebrew: 'גם',
+                pronunciation: 'gam',
+                english: 'also',
+                russian: 'тоже',
+                arabic: 'أيضا',
+                french: 'aussi'
+            },
+            {
+                hebrew: 'אולי',
+                pronunciation: 'ulay',
+                english: 'maybe',
+                russian: 'может быть',
+                arabic: 'ربما',
+                french: 'peut-être'
+            },
+            {
+                hebrew: 'ייתכן',
+                pronunciation: 'yitachen',
+                english: 'possible',
+                russian: 'возможно',
+                arabic: 'ممكن',
+                french: 'possible'
+            },
+            {
+                hebrew: 'להוכיח',
+                pronunciation: 'lehochiach',
+                english: 'to prove',
+                russian: 'доказать',
+                arabic: 'لإثبات',
+                french: 'prouver'
+            },
+            {
+                hebrew: 'מצא',
+                pronunciation: 'matza',
+                english: 'found (he/it)',
+                russian: 'нашел',
+                arabic: 'وجد',
+                french: 'trouvé'
+            },
+            {
+                hebrew: 'כאשר',
+                pronunciation: 'kaasher',
+                english: 'when (as)',
+                russian: 'когда',
+                arabic: 'عندما',
+                french: 'lorsque'
+            },
+            {
+                hebrew: 'לכן',
+                pronunciation: 'lakhen',
+                english: 'therefore',
+                russian: 'поэтому',
+                arabic: 'لذلك',
+                french: 'donc'
+            },
+            {
+                hebrew: 'בנוסף',
+                pronunciation: 'benosaf',
+                english: 'in addition',
+                russian: 'кроме того',
+                arabic: 'بالإضافة إلى ذلك',
+                french: 'en plus'
+            },
+            {
+                hebrew: 'בדרך כלל',
+                pronunciation: 'bederech klal',
+                english: 'usually',
+                russian: 'обычно',
+                arabic: 'عادة',
+                french: 'habituellement'
+            },
+            {
+                hebrew: 'חשוב',
+                pronunciation: 'hashuv',
+                english: 'important',
+                russian: 'важный',
+                arabic: 'مهم',
+                french: 'important'
+            },
+            {
+                hebrew: 'פתרון',
+                pronunciation: 'pitaron',
+                english: 'solution',
+                russian: 'решение',
+                arabic: 'حل',
+                french: 'solution'
+            },
+            {
+                hebrew: 'קבוע',
+                pronunciation: 'kavua',
+                english: 'constant',
+                russian: 'постоянный',
+                arabic: 'ثابت',
+                french: 'constant'
+            },
+            {
+                hebrew: 'פונקציה',
+                pronunciation: 'funktsia',
+                english: 'function',
+                russian: 'функция',
+                arabic: 'دالة',
+                french: 'fonction'
+            },
+            {
+                hebrew: 'משוואה',
+                pronunciation: 'mishvaah',
+                english: 'equation',
+                russian: 'уравнение',
+                arabic: 'معادلة',
+                french: 'équation'
+            },
+            {
+                hebrew: 'מערכת',
+                pronunciation: 'maarechet',
+                english: 'system',
+                russian: 'система',
+                arabic: 'نظام',
+                french: 'système'
+            }
+        ];
 
 
         // --- Utility Functions ---
@@ -1058,7 +1145,7 @@
         // Delete a term
         function deleteTerm(termId) {
             showConfirmBox('Are you sure you want to delete this term?', () => {
-                appData.terms = appData.terms.filter(t => t.id !== termId);
+                appData.terms = appData.terms.filter(t => t.id !== term);
                 saveData(appData);
                 showMessageBox('Term deleted.', 'info', () => {
                     renderTerms(currentCourseId); // Re-render terms for current course
@@ -1338,12 +1425,13 @@
             }
 
             // Filter terms that have both a Hebrew term and a translation in the selected native language
-            learningTerms = appData.terms.filter(term =>
-                term.hebrew && term.hebrew.text && term[learnHebrewSelectedLanguage] && term[learnHebrewSelectedLanguage].text
+            // Use the dedicated `learnHebrewVocabulary` for this game
+            learningTerms = learnHebrewVocabulary.filter(term =>
+                term.hebrew && term[learnHebrewSelectedLanguage]
             );
 
-            if (learningTerms.length === 0) {
-                showMessageBox('No Hebrew terms with translations in your selected language available for learning. Please add more terms!', 'error');
+            if (learningTerms.length < 2) { // Need at least two terms to generate a question with a distractor
+                showMessageBox('Not enough Hebrew terms with translations in your selected language available for learning. Please add more terms to the vocabulary!', 'error');
                 return;
             }
 
@@ -1367,17 +1455,44 @@
             }
 
             const term = learningTerms[currentLearningIndex];
-            hebrewTermDisplay.textContent = term.hebrew.text;
-            hebrewTermDisplay.dir = 'rtl'; // Hebrew is RTL
+            hebrewTermDisplay.textContent = term.hebrew;
+            pronunciationDisplay.textContent = `(${term.pronunciation})`;
+            learnHebrewFeedbackDisplay.textContent = ''; // Clear feedback
+            learnHebrewOption1Button.disabled = false; // Enable buttons
+            learnHebrewOption2Button.disabled = false;
+            learnHebrewOption1Button.classList.remove('correct', 'incorrect'); // Reset button styles
+            learnHebrewOption2Button.classList.remove('correct', 'incorrect');
+            learnHebrewNextWordButton.classList.add('hidden'); // Hide next button
 
-            translationDisplay.textContent = term[learnHebrewSelectedLanguage].text;
-            translationDisplay.dir = LANGUAGES.find(l => l.key === learnHebrewSelectedLanguage).dir;
-            definitionDisplay.textContent = term.definition;
+            const correctTranslation = term[learnHebrewSelectedLanguage];
 
-            flashcard.classList.remove('flipped');
-            showTranslationButton.classList.remove('hidden');
-            markAsMasteredButton.classList.add('hidden'); // Hide until translation is shown
-            nextWordButton.classList.add('hidden'); // Hide until translation is shown
+            // Generate an incorrect option (a translation from a *different* term)
+            let incorrectTranslation = '';
+            let incorrectTerm = null;
+            do {
+                incorrectTerm = getRandomElement(learningTerms);
+            } while (incorrectTerm === term || !incorrectTerm[learnHebrewSelectedLanguage]); // Ensure different term and has translation
+
+            incorrectTranslation = incorrectTerm[learnHebrewSelectedLanguage];
+
+            // Prepare options and shuffle them
+            const options = [
+                { text: correctTranslation, isCorrect: true, key: 'learnHebrewOption1' },
+                { text: incorrectTranslation, isCorrect: false, key: 'learnHebrewOption2' }
+            ];
+            shuffleArray(options);
+
+            learnHebrewOption1Button.textContent = options[0].text;
+            learnHebrewOption1Button.dir = LANGUAGES.find(l => l.key === learnHebrewSelectedLanguage).dir;
+            learnHebrewOption1Button.onclick = () => checkLearnHebrewAnswer(options[0].isCorrect, 'learnHebrewOption1');
+
+            learnHebrewOption2Button.textContent = options[1].text;
+            learnHebrewOption2Button.dir = LANGUAGES.find(l => l.key === learnHebrewSelectedLanguage).dir;
+            learnHebrewOption2Button.onclick = () => checkLearnHebrewAnswer(options[1].isCorrect, 'learnHebrewOption2');
+
+            // Store which option is correct for feedback
+            learnHebrewOption1Button.dataset.isCorrect = options[0].isCorrect;
+            learnHebrewOption2Button.dataset.isCorrect = options[1].isCorrect;
 
             updateLearningProgress();
         }
@@ -1390,28 +1505,42 @@
             }
         }
 
-        // Show translation on flashcard
-        showTranslationButton.onclick = () => {
-            flashcard.classList.add('flipped');
-            showTranslationButton.classList.add('hidden');
-            markAsMasteredButton.classList.remove('hidden');
-            nextWordButton.classList.remove('hidden');
-            flipSynth.triggerAttackRelease(['C4', 'E4'], '8n'); // Play a sound effect
-        };
+        // Check the user's answer for Learn Hebrew game
+        function checkLearnHebrewAnswer(isCorrect, clickedOptionId) {
+            // Disable buttons to prevent multiple clicks
+            learnHebrewOption1Button.disabled = true;
+            learnHebrewOption2Button.disabled = true;
 
-        // Mark current word as mastered
-        markAsMasteredButton.onclick = () => {
-            masteredWordsCount++;
-            masteredWordsCountDisplay.textContent = masteredWordsCount;
-            // Optionally, visually indicate mastery or remove from current session
-            markAsMasteredButton.disabled = true; // Disable after marking
-            correctSynth.triggerAttackRelease('G5', '8n'); // Mastery sound
-        };
+            const clickedButton = document.getElementById(clickedOptionId);
 
-        // Move to the next word
-        nextWordButton.onclick = () => {
+            if (isCorrect) {
+                masteredWordsCount++;
+                masteredWordsCountDisplay.textContent = masteredWordsCount;
+                learnHebrewFeedbackDisplay.textContent = 'Correct!';
+                learnHebrewFeedbackDisplay.classList.remove('text-red-500');
+                learnHebrewFeedbackDisplay.classList.add('text-emerald-500');
+                correctSynth.triggerAttackRelease('C5', '8n');
+                clickedButton.classList.add('correct');
+            } else {
+                learnHebrewFeedbackDisplay.textContent = 'Incorrect!';
+                learnHebrewFeedbackDisplay.classList.remove('text-emerald-500');
+                learnHebrewFeedbackDisplay.classList.add('text-red-500');
+                incorrectSynth.triggerAttackRelease('C4', '8n');
+                clickedButton.classList.add('incorrect');
+
+                // Show the correct answer
+                if (learnHebrewOption1Button.dataset.isCorrect === 'true') {
+                    learnHebrewOption1Button.classList.add('correct');
+                } else {
+                    learnHebrewOption2Button.classList.add('correct');
+                }
+            }
+            learnHebrewNextWordButton.classList.remove('hidden'); // Show next button
+        }
+
+        // Move to the next word in Learn Hebrew game
+        learnHebrewNextWordButton.onclick = () => {
             currentLearningIndex++;
-            markAsMasteredButton.disabled = false; // Re-enable for next word
             displayNextLearningTerm();
         };
 
@@ -1573,7 +1702,7 @@
                         hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
                         russian: { text: 'Митохондрии', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'الميتוكونדريا', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
                     },
                     {
