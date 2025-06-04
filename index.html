@@ -150,47 +150,105 @@
             background-color: #faeddb;
         }
 
-        /* Game specific styles */
-        .game-option-button {
-            @apply bg-emerald-500 text-white py-3 px-6 rounded-lg text-xl font-semibold w-full transition-all duration-200 ease-in-out; /* New: Use emerald for game buttons */
+        /* Game specific styles (Linguini Challenge) */
+        .challenge-option-button {
+            @apply bg-emerald-500 text-white py-3 px-6 rounded-lg text-xl font-semibold w-full transition-all duration-200 ease-in-out;
         }
-        .game-option-button:hover {
-            @apply bg-emerald-600 transform scale-105; /* New: Darker emerald on hover */
+        .challenge-option-button:hover {
+            @apply bg-emerald-600 transform scale-105;
         }
-        .game-option-button.correct {
+        .challenge-option-button.correct {
             @apply bg-emerald-500;
         }
-        .game-option-button.incorrect {
+        .challenge-option-button.incorrect {
             @apply bg-red-500;
+        }
+
+        /* Learn Hebrew Game specific styles */
+        .flashcard {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease-in-out;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-content {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .flashcard-front {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 250px; /* Fixed height for flashcard */
+            position: relative;
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="bg-header-custom text-white p-4 shadow-lg">
-        <div class="container flex flex-col items-center">
-            <div class="flex justify-center mb-4 sm:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-42 w-42 md:h-28 md:w-28 rounded-full">
+        <div class="container flex flex-col md:flex-row md:justify-between md:items-center">
+            <!-- Logo on the left -->
+            <div class="flex justify-center md:justify-start mb-4 md:mb-0">
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-24 w-24 md:h-20 md:w-20 rounded-full">
             </div>
-            <nav class="flex gap-4">
-                <button id="homeButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
+            <!-- Navigation buttons below on mobile, to the right on desktop -->
+            <nav class="flex flex-wrap justify-center gap-4">
+                <button id="homeButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-100 transition flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l7 7m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
                     Home
                 </button>
-                <button id="validatorAuthButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
+                <button id="validatorAuthButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-100 transition flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                     Validator Login
                 </button>
-                <button id="letsPlayButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
+                <button id="challengeGameButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-100 transition flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
                     </svg>
-                    Let's play!
+                    Linguini Challenge
+                </button>
+                <button id="searchButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-100 transition flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+                <button id="learnHebrewButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-100 transition flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.4M3.344 11.516l-.008.008A9.752 9.752 0 0012 21.75a9.753 9.753 0 008.657-4.929l-.008-.008-1.339-2.679m0 0l-.952-1.904A2.25 2.25 0 0015.688 9.442l4.474-4.474A9.753 9.753 0 0012 2.25c-2.895 0-5.689 1.173-7.776 3.26l-.008.008z"/>
+                    </svg>
+                    Learn Hebrew
                 </button>
             </nav>
         </div>
@@ -206,24 +264,28 @@
                 <p class="text-lg text-center mb-6">Your go-to resource for Technion course terms, translated into multiple languages.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
                     <button id="showAddCourseFormBtn" class="w-full sm:w-auto">Add New Course</button>
-                    <div class="relative w-full sm:w-1/2">
-                        <input type="text" id="globalSearchInput" placeholder="Search all terms..." class="pr-10">
-                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
                 </div>
-            </div>
-
-            <div id="searchResults" class="card hidden">
-                <h3 class="text-xl font-semibold mb-4 text-5c4b5c">Search Results</h3>
-                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
-                <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
             </div>
 
             <div class="card">
                 <h2 class="text-2xl font-semibold mb-4 text-5c4b5c">Available Courses</h2>
                 <div id="courseList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     </div>
+            </div>
+        </div>
+
+        <!-- Search View -->
+        <div id="searchView" class="view hidden">
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-5c4b5c">Global Term Search</h2>
+                <div class="relative w-full mb-6">
+                    <input type="text" id="globalSearchInput" placeholder="Search all terms..." class="pr-10">
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+                <p id="noSearchResultsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found matching your search.</p>
+                <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
             </div>
         </div>
 
@@ -300,35 +362,83 @@
             </div>
         </div>
 
-        <!-- Game View -->
-        <div id="gameView" class="view hidden">
+        <!-- Linguini Challenge Game View -->
+        <div id="challengeGameView" class="view hidden">
             <div class="card text-center">
                 <h2 class="text-3xl font-bold mb-6 text-5c4b5c">Linguini Challenge!</h2>
-                <div id="gameStartScreen">
+                <div id="challengeGameStartScreen">
                     <p class="text-lg mb-4">Choose your native language to start the game:</p>
-                    <select id="gameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                    <select id="challengeGameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
                         <!-- Options populated by JS -->
                     </select>
-                    <button id="startGameButton">Start Game</button>
+                    <button id="startChallengeGameButton">Start Game</button>
                 </div>
 
-                <div id="gamePlayScreen" class="hidden">
+                <div id="challengeGamePlayScreen" class="hidden">
                     <div class="flex justify-between items-center mb-6">
-                        <div class="text-2xl font-semibold text-5c4b5c">Score: <span id="gameScore">0</span></div>
-                        <div class="text-2xl font-semibold text-red-500">Time: <span id="gameTimer">30</span>s</div>
+                        <div class="text-2xl font-semibold text-5c4b5c">Score: <span id="challengeGameScore">0</span></div>
+                        <div class="text-2xl font-semibold text-red-500">Time: <span id="challengeGameTimer">30</span>s</div>
                     </div>
-                    <p class="text-4xl font-bold mb-8 text-5c4b5c" id="gameTermDisplay"></p>
+                    <p class="text-4xl font-bold mb-8 text-5c4b5c" id="challengeGameTermDisplay"></p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="game-option-button" id="option1"></button>
-                        <button class="game-option-button" id="option2"></button>
+                        <button class="challenge-option-button" id="challengeOption1"></button>
+                        <button class="challenge-option-button" id="challengeOption2"></button>
                     </div>
-                    <p id="gameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                    <p id="challengeGameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
                 </div>
 
-                <div id="gameOverScreen" class="hidden">
+                <div id="challengeGameOverScreen" class="hidden">
                     <h3 class="text-3xl font-bold text-5c4b5c mb-4">Game Over!</h3>
-                    <p class="text-xl mb-6">Your final score: <span id="finalScore" class="font-bold text-emerald-600"></span></p>
-                    <button id="playAgainButton">Play Again</button>
+                    <p class="text-xl mb-6">Your final score: <span id="challengeFinalScore" class="font-bold text-emerald-600"></span></p>
+                    <button id="playAgainChallengeButton">Play Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learn Hebrew View -->
+        <div id="learnHebrewView" class="view hidden">
+            <div class="card text-center">
+                <h2 class="text-3xl font-bold mb-6 text-5c4b5c">Learn Hebrew Vocabulary</h2>
+                <p class="text-lg mb-6">
+                    This section helps you master essential Hebrew terms for your academic studies at Technion.
+                    Select your native language, and we'll guide you through key vocabulary with interactive flashcards.
+                </p>
+
+                <div id="learnHebrewStartScreen">
+                    <p class="text-lg mb-4">Choose your native language for learning:</p>
+                    <select id="learnHebrewLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                        <!-- Options populated by JS -->
+                    </select>
+                    <button id="startLearningButton">Start Learning</button>
+                </div>
+
+                <div id="learnHebrewPlayScreen" class="hidden">
+                    <div class="flex justify-between items-center w-full mb-4">
+                        <div class="text-xl font-semibold text-5c4b5c">Words Mastered: <span id="masteredWordsCount">0</span></div>
+                        <div class="text-xl font-semibold text-5c4b5c">Progress: <span id="learningProgress">0/0</span></div>
+                    </div>
+                    <div class="flashcard-container">
+                        <div id="flashcard" class="flashcard">
+                            <div class="flashcard-content flashcard-front">
+                                <p class="text-4xl font-bold text-5c4b5c" id="hebrewTermDisplay"></p>
+                            </div>
+                            <div class="flashcard-content flashcard-back">
+                                <p class="text-2xl font-semibold text-emerald-700" id="translationDisplay"></p>
+                                <p class="text-sm text-gray-500 mt-2" id="definitionDisplay"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+                        <button id="showTranslationButton" class="w-full sm:w-auto">Show Translation</button>
+                        <button id="markAsMasteredButton" class="w-full sm:w-auto btn-validate hidden">Mark as Mastered</button>
+                        <button id="nextWordButton" class="w-full sm:w-auto btn-secondary">Next Word</button>
+                    </div>
+                </div>
+
+                <div id="learnHebrewEndScreen" class="hidden">
+                    <h3 class="text-3xl font-bold text-5c4b5c mb-4">Learning Session Complete!</h3>
+                    <p class="text-xl mb-6">You mastered <span id="finalMasteredCount" class="font-bold text-emerald-600"></span> words.</p>
+                    <button id="startNewLearningSessionButton">Start New Session</button>
                 </div>
             </div>
         </div>
@@ -378,15 +488,19 @@
 
         // --- UI Elements ---
         const homeView = document.getElementById('homeView');
+        const searchView = document.getElementById('searchView'); // New search view
         const addCourseView = document.getElementById('addCourseView');
         const courseDetailsView = document.getElementById('courseDetailsView');
         const addTermView = document.getElementById('addTermView');
-        const gameView = document.getElementById('gameView'); // New game view
+        const challengeGameView = document.getElementById('challengeGameView'); // Renamed game view
+        const learnHebrewView = document.getElementById('learnHebrewView'); // New learn Hebrew view
         const messageBoxContainer = document.getElementById('messageBoxContainer');
 
         const homeButton = document.getElementById('homeButton');
         const validatorAuthButton = document.getElementById('validatorAuthButton');
-        const letsPlayButton = document.getElementById('letsPlayButton'); // New "Let's play!" button
+        const challengeGameButton = document.getElementById('challengeGameButton'); // Renamed button
+        const searchButton = document.getElementById('searchButton'); // New search button
+        const learnHebrewButton = document.getElementById('learnHebrewButton'); // New learn Hebrew button
         const showAddCourseFormBtn = document.getElementById('showAddCourseFormBtn');
         const addCourseForm = document.getElementById('addCourseForm');
         const cancelAddCourseBtn = document.getElementById('cancelAddCourseBtn');
@@ -400,38 +514,63 @@
         const termList = document.getElementById('termList');
         const noTermsMessage = document.getElementById('noTermsMessage');
         const globalSearchInput = document.getElementById('globalSearchInput');
-        const searchResults = document.getElementById('searchResults');
         const searchResultsList = document.getElementById('searchResultsList');
+        const noSearchResultsMessage = document.getElementById('noSearchResultsMessage'); // New message for search
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         const courseSearchInput = document.getElementById('courseSearchInput');
 
-        // Game UI Elements
-        const gameStartScreen = document.getElementById('gameStartScreen');
-        const gameLanguageSelect = document.getElementById('gameLanguageSelect');
-        const startGameButton = document.getElementById('startGameButton');
-        const gamePlayScreen = document.getElementById('gamePlayScreen');
-        const gameScoreDisplay = document.getElementById('gameScore');
-        const gameTimerDisplay = document.getElementById('gameTimer');
-        const gameTermDisplay = document.getElementById('gameTermDisplay');
-        const option1Button = document.getElementById('option1');
-        const option2Button = document.getElementById('option2');
-        const gameFeedbackDisplay = document.getElementById('gameFeedback');
-        const gameOverScreen = document.getElementById('gameOverScreen');
-        const finalScoreDisplay = document.getElementById('finalScore');
-        const playAgainButton = document.getElementById('playAgainButton');
+        // Linguini Challenge Game UI Elements
+        const challengeGameStartScreen = document.getElementById('challengeGameStartScreen');
+        const challengeGameLanguageSelect = document.getElementById('challengeGameLanguageSelect');
+        const startChallengeGameButton = document.getElementById('startChallengeGameButton');
+        const challengeGamePlayScreen = document.getElementById('challengeGamePlayScreen');
+        const challengeGameScoreDisplay = document.getElementById('challengeGameScore');
+        const challengeGameTimerDisplay = document.getElementById('challengeGameTimer');
+        const challengeGameTermDisplay = document.getElementById('challengeGameTermDisplay');
+        const challengeOption1Button = document.getElementById('challengeOption1');
+        const challengeOption2Button = document.getElementById('challengeOption2');
+        const challengeGameFeedbackDisplay = document.getElementById('challengeGameFeedback');
+        const challengeGameOverScreen = document.getElementById('challengeGameOverScreen');
+        const challengeFinalScoreDisplay = document.getElementById('challengeFinalScore');
+        const playAgainChallengeButton = document.getElementById('playAgainChallengeButton');
 
-        // Game State Variables
-        let gameScore = 0;
-        let gameTimeLeft = 30;
-        let gameTimerInterval;
-        let gameCurrentTerm = null;
-        let gameCorrectOptionKey = null;
-        let gameSelectedLanguage = null;
+        // Linguini Challenge Game State Variables
+        let challengeGameScore = 0;
+        let challengeGameTimeLeft = 30;
+        let challengeGameTimerInterval;
+        let challengeGameCurrentTerm = null;
+        let challengeGameCorrectOptionKey = null;
+        let challengeGameSelectedLanguage = null;
+
+        // Learn Hebrew Game UI Elements
+        const learnHebrewStartScreen = document.getElementById('learnHebrewStartScreen');
+        const learnHebrewLanguageSelect = document.getElementById('learnHebrewLanguageSelect');
+        const startLearningButton = document.getElementById('startLearningButton');
+        const learnHebrewPlayScreen = document.getElementById('learnHebrewPlayScreen');
+        const hebrewTermDisplay = document.getElementById('hebrewTermDisplay');
+        const translationDisplay = document.getElementById('translationDisplay');
+        const definitionDisplay = document.getElementById('definitionDisplay');
+        const showTranslationButton = document.getElementById('showTranslationButton');
+        const nextWordButton = document.getElementById('nextWordButton');
+        const markAsMasteredButton = document.getElementById('markAsMasteredButton');
+        const masteredWordsCountDisplay = document.getElementById('masteredWordsCount');
+        const learningProgressDisplay = document.getElementById('learningProgress');
+        const learnHebrewEndScreen = document.getElementById('learnHebrewEndScreen');
+        const finalMasteredCountDisplay = document.getElementById('finalMasteredCount');
+        const startNewLearningSessionButton = document.getElementById('startNewLearningSessionButton');
+        const flashcard = document.getElementById('flashcard');
+
+        // Learn Hebrew Game State Variables
+        let learnHebrewSelectedLanguage = null;
+        let learningTerms = []; // Terms for the current learning session
+        let currentLearningIndex = 0;
+        let masteredWordsCount = 0;
 
         // Tone.js Synths for sound effects
         const correctSynth = new Tone.Synth().toDestination();
         const incorrectSynth = new Tone.Synth().toDestination();
         const gameOverSynth = new Tone.MembraneSynth().toDestination();
+        const flipSynth = new Tone.PolySynth().toDestination();
 
 
         // --- Utility Functions ---
@@ -665,7 +804,7 @@
                                         <td ${dirAttribute}>${translationText}</td>
                                         <td class="${statusClass}">${status}</td>
                                         <td>
-                                            ${hasText && status === 'Pending' ?
+                                            ${isValidatorMode && hasText && status === 'Pending' ?
                                                 `<button class="btn-validate px-3 py-1 text-xs" data-term-id="${term.id}" data-lang-key="${lang.key}">Validate</button>` : ''}
                                         </td>
                                     </tr>
@@ -707,8 +846,10 @@
         function renderSearchResults(results) {
             searchResultsList.innerHTML = '';
             if (results.length === 0) {
-                searchResultsList.innerHTML = '<p class="text-gray-500 col-span-full">No terms found matching your search.</p>';
+                noSearchResultsMessage.classList.remove('hidden');
                 return;
+            } else {
+                noSearchResultsMessage.classList.add('hidden');
             }
             results.forEach(term => {
                 const termOverallStatus = getOverallTermStatus(term);
@@ -935,17 +1076,18 @@
                         term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(query)
                     ) || term.definition.toLowerCase().includes(query)
                 );
-                searchResults.classList.remove('hidden');
                 renderSearchResults(results);
             } else {
-                searchResults.classList.add('hidden');
+                searchResultsList.innerHTML = '';
+                noSearchResultsMessage.classList.remove('hidden');
             }
         };
 
         // Clear global search results
         clearSearchBtn.onclick = () => {
             globalSearchInput.value = '';
-            searchResults.classList.add('hidden');
+            searchResultsList.innerHTML = '';
+            noSearchResultsMessage.classList.remove('hidden');
         };
 
         // Course-specific search functionality
@@ -954,36 +1096,36 @@
         };
 
 
-        // --- Game Logic ---
+        // --- Linguini Challenge Game Logic ---
 
-        // Populate language selection dropdown for the game
-        function populateGameLanguageSelect() {
-            gameLanguageSelect.innerHTML = '';
+        // Populate language selection dropdown for the challenge game
+        function populateChallengeGameLanguageSelect() {
+            challengeGameLanguageSelect.innerHTML = '';
             // Add a default "select" option
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Select your native language';
             defaultOption.disabled = true;
             defaultOption.selected = true;
-            gameLanguageSelect.appendChild(defaultOption);
+            challengeGameLanguageSelect.appendChild(defaultOption);
 
             LANGUAGES.forEach(lang => {
                 const option = document.createElement('option');
                 option.value = lang.key;
                 option.textContent = lang.name;
-                gameLanguageSelect.appendChild(option);
+                challengeGameLanguageSelect.appendChild(option);
             });
         }
 
-        // Start the game
-        startGameButton.onclick = async () => {
+        // Start the challenge game
+        startChallengeGameButton.onclick = async () => {
             // Initialize Tone.js context if not already running (required for sounds)
             if (Tone.context.state !== 'running') {
                 await Tone.start();
             }
 
-            gameSelectedLanguage = gameLanguageSelect.value;
-            if (!gameSelectedLanguage) {
+            challengeGameSelectedLanguage = challengeGameLanguageSelect.value;
+            if (!challengeGameSelectedLanguage) {
                 showMessageBox('Please select your native language to start the game.', 'error');
                 return;
             }
@@ -991,9 +1133,9 @@
             // Filter terms to only include those that have a translation in the selected native language
             // and have at least one other language translation to be the source term.
             const playableTerms = appData.terms.filter(term => {
-                const hasNativeTranslation = term[gameSelectedLanguage] && term[gameSelectedLanguage].text;
+                const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
-                    lang.key !== gameSelectedLanguage && term[lang.key] && term[lang.key].text
+                    lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
                 );
                 return hasNativeTranslation && hasOtherLanguageTranslation;
             });
@@ -1003,121 +1145,121 @@
                 return;
             }
 
-            gameScore = 0;
-            gameTimeLeft = 30;
-            gameScoreDisplay.textContent = gameScore;
-            gameTimerDisplay.textContent = gameTimeLeft;
-            gameFeedbackDisplay.textContent = '';
+            challengeGameScore = 0;
+            challengeGameTimeLeft = 30;
+            challengeGameScoreDisplay.textContent = challengeGameScore;
+            challengeGameTimerDisplay.textContent = challengeGameTimeLeft;
+            challengeGameFeedbackDisplay.textContent = '';
 
-            gameStartScreen.classList.add('hidden');
-            gamePlayScreen.classList.remove('hidden');
-            gameOverScreen.classList.add('hidden');
+            challengeGameStartScreen.classList.add('hidden');
+            challengeGamePlayScreen.classList.remove('hidden');
+            challengeGameOverScreen.classList.add('hidden');
 
-            startTimer();
-            generateQuestion();
+            startChallengeTimer();
+            generateChallengeQuestion();
         };
 
-        // Timer functionality
-        function startTimer() {
-            clearInterval(gameTimerInterval); // Clear any existing timer
-            gameTimerInterval = setInterval(() => {
-                gameTimeLeft--;
-                gameTimerDisplay.textContent = gameTimeLeft;
-                if (gameTimeLeft <= 0) {
-                    endGame();
+        // Challenge Game Timer functionality
+        function startChallengeTimer() {
+            clearInterval(challengeGameTimerInterval); // Clear any existing timer
+            challengeGameTimerInterval = setInterval(() => {
+                challengeGameTimeLeft--;
+                challengeGameTimerDisplay.textContent = challengeGameTimeLeft;
+                if (challengeGameTimeLeft <= 0) {
+                    endChallengeGame();
                 }
             }, 1000);
         }
 
-        // Generate a new question
-        function generateQuestion() {
+        // Generate a new challenge question
+        function generateChallengeQuestion() {
             // Reset button styles
-            option1Button.classList.remove('correct', 'incorrect');
-            option2Button.classList.remove('correct', 'incorrect');
-            gameFeedbackDisplay.textContent = '';
-            option1Button.disabled = false;
-            option2Button.disabled = false;
+            challengeOption1Button.classList.remove('correct', 'incorrect');
+            challengeOption2Button.classList.remove('correct', 'incorrect');
+            challengeGameFeedbackDisplay.textContent = '';
+            challengeOption1Button.disabled = false;
+            challengeOption2Button.disabled = false;
 
             const playableTerms = appData.terms.filter(term => {
-                const hasNativeTranslation = term[gameSelectedLanguage] && term[gameSelectedLanguage].text;
+                const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
-                    lang.key !== gameSelectedLanguage && term[lang.key] && term[lang.key].text
+                    lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
                 );
                 return hasNativeTranslation && hasOtherLanguageTranslation;
             });
 
             if (playableTerms.length < 2) {
-                endGame('Game ended: Not enough diverse terms to create questions.');
+                endChallengeGame('Game ended: Not enough diverse terms to create questions.');
                 return;
             }
 
             // 1. Pick a random term for the question (the one whose translation will be displayed)
             let randomTerm = getRandomElement(playableTerms);
-            gameCurrentTerm = randomTerm;
+            challengeGameCurrentTerm = randomTerm;
 
             // Pick a random source language for the displayed term (not the native language)
-            const sourceLang = getRandomElement(LANGUAGES.filter(lang => lang.key !== gameSelectedLanguage && gameCurrentTerm[lang.key] && gameCurrentTerm[lang.key].text));
+            const sourceLang = getRandomElement(LANGUAGES.filter(lang => lang.key !== challengeGameSelectedLanguage && challengeGameCurrentTerm[lang.key] && challengeGameCurrentTerm[lang.key].text));
             if (!sourceLang) {
                 // This scenario should be caught by playableTerms filter, but as a safeguard
-                endGame('Game ended: Could not find a source language for the term.');
+                endChallengeGame('Game ended: Could not find a source language for the term.');
                 return;
             }
 
-            gameTermDisplay.textContent = gameCurrentTerm[sourceLang.key].text;
-            gameTermDisplay.dir = sourceLang.dir; // Set text direction
+            challengeGameTermDisplay.textContent = challengeGameCurrentTerm[sourceLang.key].text;
+            challengeGameTermDisplay.dir = sourceLang.dir; // Set text direction
 
-            const correctTranslation = gameCurrentTerm[gameSelectedLanguage].text;
+            const correctTranslation = challengeGameCurrentTerm[challengeGameSelectedLanguage].text;
 
             // 2. Generate an incorrect option (a translation from a *different* term)
             let incorrectTranslation = '';
             let incorrectTerm = null;
-            // Loop until we find a term that is different from gameCurrentTerm
+            // Loop until we find a term that is different from challengeGameCurrentTerm
             // and has a translation in the selected native language.
             do {
                 incorrectTerm = getRandomElement(playableTerms);
-            } while (incorrectTerm.id === gameCurrentTerm.id);
+            } while (incorrectTerm.id === challengeGameCurrentTerm.id);
 
-            incorrectTranslation = incorrectTerm[gameSelectedLanguage].text;
+            incorrectTranslation = incorrectTerm[challengeGameSelectedLanguage].text;
 
             // 3. Prepare options and shuffle them
             const options = [
-                { text: correctTranslation, isCorrect: true, key: 'option1' },
-                { text: incorrectTranslation, isCorrect: false, key: 'option2' }
+                { text: correctTranslation, isCorrect: true, key: 'challengeOption1' },
+                { text: incorrectTranslation, isCorrect: false, key: 'challengeOption2' }
             ];
             shuffleArray(options);
 
-            option1Button.textContent = options[0].text;
-            option1Button.dir = LANGUAGES.find(l => l.key === gameSelectedLanguage).dir; // Set option text direction
-            option1Button.onclick = () => checkAnswer(options[0].isCorrect, 'option1');
+            challengeOption1Button.textContent = options[0].text;
+            challengeOption1Button.dir = LANGUAGES.find(l => l.key === challengeGameSelectedLanguage).dir; // Set option text direction
+            challengeOption1Button.onclick = () => checkChallengeAnswer(options[0].isCorrect, 'challengeOption1');
 
-            option2Button.textContent = options[1].text;
-            option2Button.dir = LANGUAGES.find(l => l.key === gameSelectedLanguage).dir; // Set option text direction
-            option2Button.onclick = () => checkAnswer(options[1].isCorrect, 'option2');
+            challengeOption2Button.textContent = options[1].text;
+            challengeOption2Button.dir = LANGUAGES.find(l => l.key === challengeGameSelectedLanguage).dir; // Set option text direction
+            challengeOption2Button.onclick = () => checkChallengeAnswer(options[1].isCorrect, 'challengeOption2');
 
-            gameCorrectOptionKey = options.find(opt => opt.isCorrect).key; // Store which option is correct
+            challengeGameCorrectOptionKey = options.find(opt => opt.isCorrect).key; // Store which option is correct
         }
 
-        // Check the user's answer
-        function checkAnswer(isCorrect, clickedOptionKey) {
+        // Check the user's answer for challenge game
+        function checkChallengeAnswer(isCorrect, clickedOptionKey) {
             // Disable buttons to prevent multiple clicks
-            option1Button.disabled = true;
-            option2Button.disabled = true;
+            challengeOption1Button.disabled = true;
+            challengeOption2Button.disabled = true;
 
             const clickedButton = document.getElementById(clickedOptionKey);
-            const correctButton = document.getElementById(gameCorrectOptionKey === 'option1' ? 'option1' : 'option2');
+            const correctButton = document.getElementById(challengeGameCorrectOptionKey === 'challengeOption1' ? 'challengeOption1' : 'challengeOption2');
 
             if (isCorrect) {
-                gameScore++;
-                gameScoreDisplay.textContent = gameScore;
-                gameFeedbackDisplay.textContent = 'Correct!';
-                gameFeedbackDisplay.classList.remove('text-red-500');
-                gameFeedbackDisplay.classList.add('text-emerald-500');
+                challengeGameScore++;
+                challengeGameScoreDisplay.textContent = challengeGameScore;
+                challengeGameFeedbackDisplay.textContent = 'Correct!';
+                challengeGameFeedbackDisplay.classList.remove('text-red-500');
+                challengeGameFeedbackDisplay.classList.add('text-emerald-500');
                 correctSynth.triggerAttackRelease('C5', '8n'); // Play a note for correct answer
                 clickedButton.classList.add('correct');
             } else {
-                gameFeedbackDisplay.textContent = 'Incorrect!';
-                gameFeedbackDisplay.classList.remove('text-emerald-500');
-                gameFeedbackDisplay.classList.add('text-red-500');
+                challengeGameFeedbackDisplay.textContent = 'Incorrect!';
+                challengeGameFeedbackDisplay.classList.remove('text-emerald-500');
+                challengeGameFeedbackDisplay.classList.add('text-red-500');
                 incorrectSynth.triggerAttackRelease('C4', '8n'); // Play a different note for incorrect
                 clickedButton.classList.add('incorrect');
                 correctButton.classList.add('correct'); // Show the correct answer
@@ -1125,42 +1267,172 @@
 
             // Wait a moment before generating the next question
             setTimeout(() => {
-                if (gameTimeLeft > 0) { // Only generate next if time hasn't run out
-                    generateQuestion();
+                if (challengeGameTimeLeft > 0) { // Only generate next if time hasn't run out
+                    generateChallengeQuestion();
                 }
             }, 1000); // 1 second delay
         }
 
-        // End the game
-        function endGame(message = '') {
-            clearInterval(gameTimerInterval);
+        // End the challenge game
+        function endChallengeGame(message = '') {
+            clearInterval(challengeGameTimerInterval);
             gameOverSynth.triggerAttackRelease('C2', '2n'); // Game over sound
 
-            gamePlayScreen.classList.add('hidden');
-            gameOverScreen.classList.remove('hidden');
-            finalScoreDisplay.textContent = gameScore;
+            challengeGamePlayScreen.classList.add('hidden');
+            challengeGameOverScreen.classList.remove('hidden');
+            challengeFinalScoreDisplay.textContent = challengeGameScore;
 
             if (message) {
                 showMessageBox(message, 'info', () => {
-                    showView(gameView); // Go back to game start screen
-                    gameStartScreen.classList.remove('hidden');
-                    gamePlayScreen.classList.add('hidden');
-                    gameOverScreen.classList.add('hidden');
+                    showView(challengeGameView); // Go back to game start screen
+                    challengeGameStartScreen.classList.remove('hidden');
+                    challengeGamePlayScreen.classList.add('hidden');
+                    challengeGameOverScreen.classList.add('hidden');
                 });
             }
         }
 
-        // Play again button
-        playAgainButton.onclick = () => {
-            gameStartScreen.classList.remove('hidden');
-            gamePlayScreen.classList.add('hidden');
-            gameOverScreen.classList.add('hidden');
-            gameScore = 0;
-            gameTimeLeft = 30;
-            gameScoreDisplay.textContent = gameScore;
-            gameTimerDisplay.textContent = gameTimeLeft;
-            gameFeedbackDisplay.textContent = '';
+        // Play again button for challenge game
+        playAgainChallengeButton.onclick = () => {
+            challengeGameStartScreen.classList.remove('hidden');
+            challengeGamePlayScreen.classList.add('hidden');
+            challengeGameOverScreen.classList.add('hidden');
+            challengeGameScore = 0;
+            challengeGameTimeLeft = 30;
+            challengeGameScoreDisplay.textContent = challengeGameScore;
+            challengeGameTimerDisplay.textContent = challengeGameTimeLeft;
+            challengeGameFeedbackDisplay.textContent = '';
         };
+
+
+        // --- Learn Hebrew Game Logic ---
+
+        // Populate language selection dropdown for learn Hebrew game
+        function populateLearnHebrewLanguageSelect() {
+            learnHebrewLanguageSelect.innerHTML = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select your native language';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            learnHebrewLanguageSelect.appendChild(defaultOption);
+
+            LANGUAGES.filter(lang => lang.key !== 'hebrew').forEach(lang => { // Exclude Hebrew as native language for learning Hebrew
+                const option = document.createElement('option');
+                option.value = lang.key;
+                option.textContent = lang.name;
+                learnHebrewLanguageSelect.appendChild(option);
+            });
+        }
+
+        // Start learning session
+        startLearningButton.onclick = async () => {
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+            }
+
+            learnHebrewSelectedLanguage = learnHebrewLanguageSelect.value;
+            if (!learnHebrewSelectedLanguage) {
+                showMessageBox('Please select your native language to start learning.', 'error');
+                return;
+            }
+
+            // Filter terms that have both a Hebrew term and a translation in the selected native language
+            learningTerms = appData.terms.filter(term =>
+                term.hebrew && term.hebrew.text && term[learnHebrewSelectedLanguage] && term[learnHebrewSelectedLanguage].text
+            );
+
+            if (learningTerms.length === 0) {
+                showMessageBox('No Hebrew terms with translations in your selected language available for learning. Please add more terms!', 'error');
+                return;
+            }
+
+            shuffleArray(learningTerms); // Randomize the order of terms
+            currentLearningIndex = 0;
+            masteredWordsCount = 0;
+            masteredWordsCountDisplay.textContent = masteredWordsCount;
+
+            learnHebrewStartScreen.classList.add('hidden');
+            learnHebrewPlayScreen.classList.remove('hidden');
+            learnHebrewEndScreen.classList.add('hidden');
+
+            displayNextLearningTerm();
+        };
+
+        // Display the next Hebrew term flashcard
+        function displayNextLearningTerm() {
+            if (currentLearningIndex >= learningTerms.length) {
+                endLearningSession();
+                return;
+            }
+
+            const term = learningTerms[currentLearningIndex];
+            hebrewTermDisplay.textContent = term.hebrew.text;
+            hebrewTermDisplay.dir = 'rtl'; // Hebrew is RTL
+
+            translationDisplay.textContent = term[learnHebrewSelectedLanguage].text;
+            translationDisplay.dir = LANGUAGES.find(l => l.key === learnHebrewSelectedLanguage).dir;
+            definitionDisplay.textContent = term.definition;
+
+            flashcard.classList.remove('flipped');
+            showTranslationButton.classList.remove('hidden');
+            markAsMasteredButton.classList.add('hidden'); // Hide until translation is shown
+            nextWordButton.classList.add('hidden'); // Hide until translation is shown
+
+            updateLearningProgress();
+        }
+
+        // Update learning progress display
+        function updateLearningProgress() {
+            learningProgressDisplay.textContent = `${currentLearningIndex + 1}/${learningTerms.length}`;
+            if (currentLearningIndex >= learningTerms.length) {
+                 learningProgressDisplay.textContent = `${learningTerms.length}/${learningTerms.length}`;
+            }
+        }
+
+        // Show translation on flashcard
+        showTranslationButton.onclick = () => {
+            flashcard.classList.add('flipped');
+            showTranslationButton.classList.add('hidden');
+            markAsMasteredButton.classList.remove('hidden');
+            nextWordButton.classList.remove('hidden');
+            flipSynth.triggerAttackRelease(['C4', 'E4'], '8n'); // Play a sound effect
+        };
+
+        // Mark current word as mastered
+        markAsMasteredButton.onclick = () => {
+            masteredWordsCount++;
+            masteredWordsCountDisplay.textContent = masteredWordsCount;
+            // Optionally, visually indicate mastery or remove from current session
+            markAsMasteredButton.disabled = true; // Disable after marking
+            correctSynth.triggerAttackRelease('G5', '8n'); // Mastery sound
+        };
+
+        // Move to the next word
+        nextWordButton.onclick = () => {
+            currentLearningIndex++;
+            markAsMasteredButton.disabled = false; // Re-enable for next word
+            displayNextLearningTerm();
+        };
+
+        // End learning session
+        function endLearningSession() {
+            learnHebrewPlayScreen.classList.add('hidden');
+            learnHebrewEndScreen.classList.remove('hidden');
+            finalMasteredCountDisplay.textContent = masteredWordsCount;
+        }
+
+        // Start new learning session
+        startNewLearningSessionButton.onclick = () => {
+            learnHebrewStartScreen.classList.remove('hidden');
+            learnHebrewPlayScreen.classList.add('hidden');
+            learnHebrewEndScreen.classList.add('hidden');
+            masteredWordsCount = 0;
+            currentLearningIndex = 0;
+            masteredWordsCountDisplay.textContent = masteredWordsCount;
+            learnHebrewLanguageSelect.value = ''; // Reset language selection
+        };
+
 
         // --- Navigation Logic ---
 
@@ -1185,7 +1457,8 @@
         // Initial render on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderCourses(); // Initial render to show courses (with or without delete buttons)
-            populateGameLanguageSelect(); // Populate language options for the game
+            populateChallengeGameLanguageSelect(); // Populate language options for the challenge game
+            populateLearnHebrewLanguageSelect(); // Populate language options for the learn Hebrew game
             showView(homeView);
         });
 
@@ -1193,10 +1466,13 @@
         homeButton.onclick = () => {
             showView(homeView);
             renderCourses();
-            globalSearchInput.value = ''; // Clear global search
-            searchResults.classList.add('hidden'); // Hide search results
-            currentCourseId = null; // Reset current course ID
-            currentTermId = null; // Reset editing state
+            // Reset search and game states when returning home
+            globalSearchInput.value = '';
+            searchResultsList.innerHTML = '';
+            noSearchResultsMessage.classList.remove('hidden');
+            currentCourseId = null;
+            currentTermId = null;
+            clearInterval(challengeGameTimerInterval); // Stop challenge game timer
         };
         showAddCourseFormBtn.onclick = () => showView(addCourseView);
         cancelAddCourseBtn.onclick = () => {
@@ -1221,13 +1497,30 @@
             }
         };
 
-        // "Let's play!" button click handler
-        letsPlayButton.onclick = () => {
-            showView(gameView);
-            gameStartScreen.classList.remove('hidden');
-            gamePlayScreen.classList.add('hidden');
-            gameOverScreen.classList.add('hidden');
-            populateGameLanguageSelect(); // Ensure dropdown is fresh
+        // "Linguini Challenge" button click handler
+        challengeGameButton.onclick = () => {
+            showView(challengeGameView);
+            challengeGameStartScreen.classList.remove('hidden');
+            challengeGamePlayScreen.classList.add('hidden');
+            challengeGameOverScreen.classList.add('hidden');
+            populateChallengeGameLanguageSelect(); // Ensure dropdown is fresh
+        };
+
+        // "Search" button click handler
+        searchButton.onclick = () => {
+            showView(searchView);
+            globalSearchInput.value = ''; // Clear search input when entering search view
+            searchResultsList.innerHTML = '';
+            noSearchResultsMessage.classList.remove('hidden');
+        };
+
+        // "Learn Hebrew" button click handler
+        learnHebrewButton.onclick = () => {
+            showView(learnHebrewView);
+            learnHebrewStartScreen.classList.remove('hidden');
+            learnHebrewPlayScreen.classList.add('hidden');
+            learnHebrewEndScreen.classList.add('hidden');
+            populateLearnHebrewLanguageSelect(); // Ensure dropdown is fresh
         };
 
         // --- Initial Data (for demonstration) ---
@@ -1280,7 +1573,7 @@
                         hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
                         english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
                         russian: { text: 'Митохондрии', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
+                        arabic: { text: 'الميتוكونדريا', status: 'Validated', validatedBy: 'Admin' },
                         french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
                     },
                     {
