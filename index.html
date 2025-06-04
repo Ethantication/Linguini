@@ -11,8 +11,8 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light blue-gray background */
-            color: #334155; /* Darker text */
+            background-color: #fdfbf7; /* New: Very light, warm off-white */
+            color: #5c4b5c; /* New: Deep, slightly purplish-gray for main text */
         }
         .container {
             max-width: 1200px;
@@ -20,14 +20,14 @@
             padding: 1.5rem;
         }
         .card {
-            background-color: #ffffff;
+            background-color: #ffffff; /* Keep white for content contrast */
             border-radius: 0.75rem; /* rounded-xl */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
         input[type="text"], textarea, select {
-            border: 1px solid #cbd5e1; /* border-gray-300 */
+            border: 1px solid #d1d5db; /* New: Light gray border */
             border-radius: 0.375rem; /* rounded-md */
             padding: 0.75rem 1rem;
             width: 100%;
@@ -36,11 +36,11 @@
         }
         input[type="text"]:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #3b82f6; /* blue-500 */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            border-color: #34d399; /* New: emerald-400 for focus */
+            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2); /* New: emerald-400 shadow */
         }
         button {
-            background-color: #3b82f6; /* blue-500 */
+            background-color: #88b04b; /* New: Accent green */
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem; /* rounded-lg */
@@ -50,35 +50,35 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         button:hover {
-            background-color: #2563eb; /* blue-600 */
+            background-color: #6b8e23; /* New: Darker green on hover */
             transform: translateY(-1px);
         }
         button:active {
             transform: translateY(0);
         }
         .btn-secondary {
-            background-color: #64748b; /* slate-500 */
+            background-color: #a2b9bc; /* New: Muted blue-gray */
         }
         .btn-secondary:hover {
-            background-color: #475569; /* slate-600 */
+            background-color: #8b9b9e; /* New: Darker muted blue-gray on hover */
         }
         .btn-validate {
-            background-color: #10b981; /* emerald-500 */
+            background-color: #10b981; /* emerald-500 - keep green */
         }
         .btn-validate:hover {
-            background-color: #059669; /* emerald-600 */
+            background-color: #059669; /* emerald-600 - keep green */
         }
         .btn-edit {
-            background-color: #f97316; /* orange-500 */
+            background-color: #f97316; /* orange-500 - keep */
         }
         .btn-edit:hover {
-            background-color: #ea580c; /* orange-600 */
+            background-color: #ea580c; /* orange-600 - keep */
         }
         .btn-delete {
-            background-color: #ef4444; /* red-500 */
+            background-color: #ef4444; /* red-500 - keep */
         }
         .btn-delete:hover {
-            background-color: #dc2626; /* red-600 */
+            background-color: #dc2626; /* red-600 - keep */
         }
         .status-pending {
             color: #f59e0b; /* amber-500 */
@@ -140,9 +140,9 @@
             text-align: left;
         }
         .term-table th {
-            background-color: #f8fafc; /* gray-50 */
+            background-color: #f8fafc; /* very light off-white */
             font-weight: 600;
-            color: #475569; /* slate-700 */
+            color: #5c4b5c; /* New: primary text color */
         }
 
         /* Custom header background color */
@@ -152,10 +152,10 @@
 
         /* Game specific styles */
         .game-option-button {
-            @apply bg-blue-500 text-white py-3 px-6 rounded-lg text-xl font-semibold w-full transition-all duration-200 ease-in-out;
+            @apply bg-emerald-500 text-white py-3 px-6 rounded-lg text-xl font-semibold w-full transition-all duration-200 ease-in-out; /* New: Use emerald for game buttons */
         }
         .game-option-button:hover {
-            @apply bg-blue-600 transform scale-105;
+            @apply bg-emerald-600 transform scale-105; /* New: Darker emerald on hover */
         }
         .game-option-button.correct {
             @apply bg-emerald-500;
@@ -172,20 +172,20 @@
                 <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-42 w-42 md:h-28 md:w-28 rounded-full">
             </div>
             <nav class="flex gap-4">
-                <button id="homeButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
+                <button id="homeButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l7 7m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
                     Home
                 </button>
-                <button id="validatorAuthButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
+                <button id="validatorAuthButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                     Validator Login
                 </button>
-                <button id="letsPlayButton" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
+                <button id="letsPlayButton" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
@@ -202,7 +202,7 @@
         <!-- Home View -->
         <div id="homeView" class="view">
             <div class="card">
-                <h2 class="text-2xl font-semibold mb-4 text-center">Welcome to Linguini!</h2>
+                <h2 class="text-2xl font-semibold mb-4 text-center text-5c4b5c">Welcome to Linguini!</h2>
                 <p class="text-lg text-center mb-6">Your go-to resource for Technion course terms, translated into multiple languages.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
                     <button id="showAddCourseFormBtn" class="w-full sm:w-auto">Add New Course</button>
@@ -214,14 +214,14 @@
             </div>
 
             <div id="searchResults" class="card hidden">
-                <h3 class="text-xl font-semibold mb-4">Search Results</h3>
+                <h3 class="text-xl font-semibold mb-4 text-5c4b5c">Search Results</h3>
                 <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     </div>
                 <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
             </div>
 
             <div class="card">
-                <h2 class="text-2xl font-semibold mb-4">Available Courses</h2>
+                <h2 class="text-2xl font-semibold mb-4 text-5c4b5c">Available Courses</h2>
                 <div id="courseList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     </div>
             </div>
@@ -230,7 +230,7 @@
         <!-- Add Course View -->
         <div id="addCourseView" class="view hidden">
             <div class="card">
-                <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
+                <h2 class="text-2xl font-semibold mb-6 text-5c4b5c">Add New Course</h2>
                 <form id="addCourseForm" class="space-y-4">
                     <div>
                         <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
@@ -247,7 +247,7 @@
         <!-- Course Details View -->
         <div id="courseDetailsView" class="view hidden">
             <div class="card">
-                <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
+                <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4 text-5c4b5c"></h2>
                 <p class="text-gray-600 mb-6">Terms for this course:</p>
                 <div class="flex flex-col sm:flex-row gap-4 mb-6">
                     <button id="showAddTermFormBtn" class="w-full sm:w-auto">Add New Term to Course</button>
@@ -265,7 +265,7 @@
         <!-- Add Term View -->
         <div id="addTermView" class="view hidden">
             <div class="card">
-                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
+                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6 text-5c4b5c">Add New Term</h2>
                 <form id="addTermForm" class="space-y-4">
                     <div>
                         <label for="termHebrew" class="block text-sm font-medium text-gray-700 mb-1">Term (Hebrew) <span class="text-red-500">*</span></label>
@@ -303,7 +303,7 @@
         <!-- Game View -->
         <div id="gameView" class="view hidden">
             <div class="card text-center">
-                <h2 class="text-3xl font-bold mb-6 text-blue-700">Linguini Challenge!</h2>
+                <h2 class="text-3xl font-bold mb-6 text-5c4b5c">Linguini Challenge!</h2>
                 <div id="gameStartScreen">
                     <p class="text-lg mb-4">Choose your native language to start the game:</p>
                     <select id="gameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
@@ -314,10 +314,10 @@
 
                 <div id="gamePlayScreen" class="hidden">
                     <div class="flex justify-between items-center mb-6">
-                        <div class="text-2xl font-semibold text-gray-700">Score: <span id="gameScore">0</span></div>
+                        <div class="text-2xl font-semibold text-5c4b5c">Score: <span id="gameScore">0</span></div>
                         <div class="text-2xl font-semibold text-red-500">Time: <span id="gameTimer">30</span>s</div>
                     </div>
-                    <p class="text-4xl font-bold mb-8 text-gray-800" id="gameTermDisplay"></p>
+                    <p class="text-4xl font-bold mb-8 text-5c4b5c" id="gameTermDisplay"></p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button class="game-option-button" id="option1"></button>
                         <button class="game-option-button" id="option2"></button>
@@ -326,7 +326,7 @@
                 </div>
 
                 <div id="gameOverScreen" class="hidden">
-                    <h3 class="text-3xl font-bold text-blue-700 mb-4">Game Over!</h3>
+                    <h3 class="text-3xl font-bold text-5c4b5c mb-4">Game Over!</h3>
                     <p class="text-xl mb-6">Your final score: <span id="finalScore" class="font-bold text-emerald-600"></span></p>
                     <button id="playAgainButton">Play Again</button>
                 </div>
@@ -446,7 +446,7 @@
             box.className = 'message-box';
             box.innerHTML = `
                 <p class="text-lg font-medium mb-4">${message}</p>
-                <button id="messageBoxOkBtn" class="px-6 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition">OK</button>
+                <button id="messageBoxOkBtn" class="px-6 py-2 rounded-md bg-emerald-500 text-white hover:bg-emerald-600 transition">OK</button>
             `;
 
             messageBoxContainer.appendChild(backdrop);
@@ -499,7 +499,7 @@
                 <p class="text-lg font-medium mb-4">${message}</p>
                 <input type="password" id="promptInput" class="mb-4" placeholder="Enter secret key">
                 <div class="flex justify-center gap-4">
-                    <button id="promptBoxOkBtn" class="px-6 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition">OK</button>
+                    <button id="promptBoxOkBtn" class="px-6 py-2 rounded-md bg-emerald-500 text-white hover:bg-emerald-600 transition">OK</button>
                     <button id="promptBoxCancelBtn" class="px-6 py-2 rounded-md bg-gray-500 text-white hover:bg-gray-600 transition">Cancel</button>
                 </div>
             `;
@@ -581,7 +581,7 @@
                 const courseCard = document.createElement('div');
                 courseCard.className = 'card cursor-pointer hover:bg-blue-50 transition flex justify-between items-center';
                 courseCard.innerHTML = `
-                    <h3 class="text-xl font-semibold text-blue-700">${course.name}</h3>
+                    <h3 class="text-xl font-semibold text-5c4b5c">${course.name}</h3>
                     <div class="flex gap-2">
                         ${isValidatorMode ? `<button class="btn-delete px-3 py-1 text-sm" data-course-id="${course.id}">Delete</button>` : ''}
                     </div>
