@@ -705,7 +705,7 @@
                     pronunciation: 'protokol',
                     english: { text: 'Protocol', status: 'Pending', validatedBy: null },
                     russian: { text: 'Протокол', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'بروتוקول', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'بروتوكول', status: 'Pending', validatedBy: null },
                     french: { text: 'Protocole', status: 'Pending', validatedBy: null },
                     mandarin: { text: '协议', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Protocolo', status: 'Pending', validatedBy: null },
@@ -2150,6 +2150,7 @@
 
                 const termCard = document.createElement('div');
                 termCard.className = 'card';
+                // IMPORTANT: All buttons now include data-term-id for event delegation.
                 termCard.innerHTML = `
                     <h3 class="text-xl font-semibold mb-2" dir="rtl">${mainHebrewTerm}</h3>
                     <p class="text-gray-600 mb-2">${mainEnglishPronunciation ? `(${mainEnglishPronunciation})` : ''}</p>
@@ -2206,22 +2207,7 @@
                 `;
                 termList.appendChild(termCard);
 
-                // Add event listeners for validate buttons
-                termCard.querySelectorAll('.btn-validate').forEach(button => {
-                    button.onclick = () => {
-                        const termId = button.dataset.termId;
-                        const langKey = button.dataset.langKey;
-                        validateTerm(termId, langKey);
-                    };
-                });
-
-                // Add event listener for edit button
-                termCard.querySelector('.btn-edit').onclick = () => editTerm(term.id);
-
-                // Add event listener for delete button
-                termCard.querySelector('.btn-delete').onclick = () => deleteTerm(term.id);
-
-                // Add event listener for the new "View Translations" button
+                // Add event listener for the "View Translations" button (this one is fine to keep here)
                 const toggleBtn = termCard.querySelector(`.toggle-translations-btn`);
                 toggleBtn.onclick = () => {
                     const translationsDiv = document.getElementById(`termTranslations_${term.id}`);
@@ -2551,6 +2537,25 @@
                 }
             });
         }
+
+        // --- NEW: Event Delegation for Term List Actions ---
+        termList.addEventListener('click', function(event) {
+            // Find the closest button with a data-term-id attribute
+            const target = event.target.closest('button[data-term-id]');
+            
+            if (!target) return; // Exit if a relevant button wasn't clicked
+
+            const termId = target.dataset.termId;
+
+            if (target.classList.contains('btn-delete')) {
+                deleteTerm(termId);
+            } else if (target.classList.contains('btn-edit')) {
+                editTerm(termId);
+            } else if (target.classList.contains('btn-validate')) {
+                const langKey = target.dataset.langKey;
+                validateTerm(termId, langKey);
+            }
+        });
 
         // Global search functionality
         globalSearchInput.onkeyup = () => {
