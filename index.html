@@ -245,7 +245,7 @@
                     pronunciation: 'hofchi',
                     english: { text: 'Reciprocal', status: 'Pending', validatedBy: null },
                     russian: { text: 'Взаимный', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'מقلوب', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'مقلوب', status: 'Pending', validatedBy: null },
                     french: { text: 'Inverse', status: 'Pending', validatedBy: null },
                     mandarin: { text: '倒数', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Recíproco', status: 'Pending', validatedBy: null },
@@ -982,6 +982,8 @@
             ]
         };
 
+        window.appData = { courses: [], terms: [] }; // Global appData, initialized empty
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Initialize Firebase only once
@@ -992,62 +994,87 @@
                         window.db = getFirestore(window.firebaseApp);
                         window.auth = getAuth(window.firebaseApp);
 
-                        // Sign in with custom token or anonymously
-                        if (typeof __initial_auth_token !== 'undefined') {
-                            await signInWithCustomToken(window.auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(window.auth);
-                        }
-
-                        // Set up auth state change listener to get user ID and initialize data
+                        // Set up auth state change listener FIRST. This listener will handle
+                        // all subsequent user state changes, including the initial sign-in.
                         onAuthStateChanged(window.auth, async (user) => {
                             if (user) {
                                 window.userId = user.uid;
                                 console.log('Firebase initialized. User ID:', window.userId);
                                 window.isFirebaseReady = true; // Set flag to true
-                                // After Firebase is ready, proceed with app initialization
+
+                                // After Firebase is ready and user is authenticated, proceed with app initialization
                                 await initializeAppData();
-                                renderCourses();
+                                renderCourses(); // Explicitly render courses after data is fetched/seeded
                                 populateChallengeGameLanguageSelect();
                                 populateLearnHebrewLanguageSelect();
                                 showView(homeView);
                             } else {
-                                console.log('No user signed in.');
-                                window.userId = null;
-                                window.isFirebaseReady = true; // Still ready for anonymous access
-                                // If not signed in, app might still function but without user-specific data
-                                await initializeAppData();
-                                renderCourses();
-                                populateChallengeGameLanguageSelect();
-                                populateLearnHebrewLanguageSelect();
-                                showView(homeView);
+                                // If onAuthStateChanged is called with no user, and no custom token was provided,
+                                // attempt anonymous sign-in. This will trigger onAuthStateChanged again with the anonymous user.
+                                console.log('No user signed in. Attempting anonymous sign-in if not already tried.');
+                                // Only try to sign in anonymously if there's no current user (prevents redundant calls)
+                                if (!window.auth.currentUser) {
+                                    await signInAnonymously(window.auth);
+                                }
+                                // No need to call initializeAppData or renderCourses here,
+                                // the next onAuthStateChanged event (after anonymous sign-in) will handle it.
                             }
                         });
+
+                        // Attempt to sign in with custom token immediately if available.
+                        // The onAuthStateChanged listener above will then pick up the signed-in user.
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
+                            console.log('Attempting custom token sign-in...');
+                            await signInWithCustomToken(window.auth, __initial_auth_token);
+                        } else {
+                            console.log('No custom token found or empty. Relying on onAuthStateChanged to handle initial anonymous sign-in.');
+                            // If no custom token, onAuthStateChanged will eventually call signInAnonymously if needed.
+                        }
+
                     } else {
-                        console.error("Firebase config is missing. Cannot initialize Firebase.");
-                        // Proceed without Firebase features if config is missing
-                        renderCourses();
+                        console.error("Firebase config is missing. Cannot initialize Firebase. Displaying local data if any.");
+                        // If Firebase config is missing, the app will run without Firestore.
+                        // In this scenario, window.appData will remain empty, so courses will not be displayed
+                        // unless you had a hardcoded fallback for a non-Firebase scenario.
+                        renderCourses(); // Still call renderCourses to show "No courses added" message
                         populateChallengeGameLanguageSelect();
                         populateLearnHebrewLanguageSelect();
                         showView(homeView);
                     }
                 } else {
                     // If Firebase is already initialized (e.g., due to hot reload in dev env)
-                    await initializeAppData();
-                    renderCourses();
-                    populateChallengeGameLanguageSelect();
-                    populateLearnHebrewLanguageSelect();
-                    showView(homeView);
+                    console.log("Firebase already initialized. Re-initializing app data and rendering.");
+                    // Ensure user is set if app is re-initialized and user is already authenticated
+                    if (window.auth && window.auth.currentUser) {
+                        window.userId = window.auth.currentUser.uid;
+                        window.isFirebaseReady = true;
+                        await initializeAppData();
+                        renderCourses();
+                        populateChallengeGameLanguageSelect();
+                        populateLearnHebrewLanguageSelect();
+                        showView(homeView);
+                    } else {
+                        console.log("Firebase initialized but user not yet available. Waiting for auth state change.");
+                        // Provide a default render while waiting for auth state to resolve
+                        renderCourses();
+                        populateChallengeGameLanguageSelect();
+                        populateLearnHebrewLanguageSelect();
+                        showView(homeView);
+                    }
                 }
             } catch (error) {
                 console.error("Error during Firebase initialization or auth:", error);
                 showMessageBox("Error loading application. Please try again.", "error");
+                // Fallback to rendering courses even if Firebase setup failed, to show the empty state.
+                renderCourses();
+                populateChallengeGameLanguageSelect();
+                populateLearnHebrewLanguageSelect();
+                showView(homeView);
             }
         });
 
         // Function to ensure appData is loaded from Firestore or seeded
-        window.appData = { courses: [], terms: [] }; // Global appData
-
+        // window.appData is already global at this point
         async function initializeAppData() {
             const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -1070,6 +1097,7 @@
             // Set up real-time listeners for courses and terms
             onSnapshot(coursesRef, (snapshot) => {
                 window.appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Courses data received from Firestore:", window.appData.courses); // Debug log
                 renderCourses(); // Re-render courses whenever data changes
                 // If a course was being viewed, re-render its terms as well
                 if (window.currentCourseId) {
@@ -1082,6 +1110,7 @@
 
             onSnapshot(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), (snapshot) => {
                 window.appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Terms data received from Firestore:", window.appData.terms); // Debug log
                 // Re-render terms for current course if active
                 if (window.currentCourseId) {
                     renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
@@ -2873,14 +2902,6 @@
                 currentCourseId = null; // Reset current course ID if not found
             }
         }
-
-        // Initial render on page load - Now handled by Firebase auth state change listener
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     renderCourses(); // Initial render to show courses (with or without delete buttons)
-        //     populateChallengeGameLanguageSelect(); // Populate language options for the challenge game
-        //     populateLearnHebrewLanguageSelect(); // Populate language options for the learn Hebrew game
-        //     showView(homeView);
-        // });
 
         // Event listeners for navigation buttons
         homeButton.onclick = () => {
