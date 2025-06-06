@@ -1589,6 +1589,8 @@
             </div>
         </div>
 
+
+
         <!-- Linguini Challenge Game View -->
         <div id="challengeGameView" class="view hidden">
             <div class="card text-center">
@@ -1621,6 +1623,39 @@
                 </div>
             </div>
         </div>
+
+        <button id="becomeValidatorBtn" class="bg-header-custom button-styling-here">Become a Validator</button>
+
+<div id="validatorFormContainer" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+    <form id="validatorForm" class="bg-white p-8 rounded-lg shadow-xl relative w-full max-w-lg mx-auto">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Become a Validator</h2>
+        
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
+                Q1: Please enter your Technion Mail:
+            </label>
+            <input type="email" id="validatorEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+
+        <div class="mb-6">
+            <label for="trustAgreement" class="block text-gray-700 text-sm font-bold mb-2">
+                Q2: To ensure the integrity of our platform, please type the following phrase exactly: "I trust Linguini to advance my academic learning."
+            </label>
+            <textarea id="trustAgreement" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24" required></textarea>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <button type="button" id="cancelValidatorFormBtn" class="btn-secondary">Cancel</button>
+            <button type="submit">Submit Application</button>
+        </div>
+
+        <div id="secretKeyDisplay" class="hidden text-center mt-6">
+            <p class="text-lg font-semibold text-gray-700 mb-4">Your Secret Key: V2025</p>
+            <p id="secretKeyValue" class="text-xl font-mono bg-gray-100 p-3 rounded-md break-all mb-4"></p>
+            <button onclick="copySecretKey()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Copy Key</button>
+        </div>
+    </form>
+</div>
 
         <!-- Learn Hebrew View -->
         <div id="learnHebrewView" class="view hidden">
@@ -2968,6 +3003,160 @@
             masteredWordsCountDisplay.textContent = masteredWordsCount;
             learnHebrewLanguageSelect.value = ''; // Reset language selection
         };
+        document.addEventListener('DOMContentLoaded', () => {
+    // ... (existing element declarations)
+
+    // New element declarations for the validator feature
+    const becomeValidatorBtn = document.getElementById('becomeValidatorBtn');
+    const validatorFormContainer = document.getElementById('validatorFormContainer');
+    const validatorForm = document.getElementById('validatorForm');
+    const cancelValidatorFormBtn = document.getElementById('cancelValidatorFormBtn');
+    const secretKeyDisplay = document.getElementById('secretKeyDisplay');
+    const secretKeyValue = document.getElementById('secretKeyValue'); // Needed for displaying the key
+    const validatorEmailInput = document.getElementById('validatorEmail'); // Input for email
+    const trustAgreementInput = document.getElementById('trustAgreement'); // Input for trust agreement
+
+
+    // Error checking (recommended for debugging)
+    if (!becomeValidatorBtn) console.error("Error: 'becomeValidatorBtn' not found!");
+    if (!validatorFormContainer) console.error("Error: 'validatorFormContainer' not found!");
+    if (!validatorForm) console.error("Error: 'validatorForm' not found!");
+    if (!cancelValidatorFormBtn) console.error("Error: 'cancelValidatorFormBtn' not found!");
+    if (!secretKeyDisplay) console.error("Error: 'secretKeyDisplay' not found!");
+    if (!secretKeyValue) console.error("Error: 'secretKeyValue' not found!");
+    if (!validatorEmailInput) console.error("Error: 'validatorEmailInput' not found!");
+    if (!trustAgreementInput) console.error("Error: 'trustAgreementInput' not found!");
+
+    // Your new 'becomeValidatorBtn' click handler
+    if (becomeValidatorBtn) {
+        becomeValidatorBtn.onclick = () => {
+            // Assuming 'showView' exists and handles hiding other views
+            // If validatorFormContainer is not a main 'view' in the same way as your other sections,
+            // you might only need to handle its visibility.
+            // For now, let's assume it fits the 'showView' paradigm.
+            showView(validatorFormContainer); // Pass the container as the "view" to show
+
+            // Specific actions for the validator form modal
+            validatorFormContainer.classList.remove('hidden'); // Make sure the modal is visible
+            secretKeyDisplay.classList.add('hidden'); // Hide the secret key display initially
+            validatorForm.classList.remove('hidden'); // Ensure the form itself is visible (if it was hidden after submission)
+            validatorForm.reset(); // Clear any previous form data
+        };
+    }
+
+    // Event listener for the cancel button inside the form
+    if (cancelValidatorFormBtn) {
+        cancelValidatorFormBtn.onclick = () => {
+            validatorFormContainer.classList.add('hidden'); // Hide the entire modal
+        };
+    }
+
+    // Event listener for clicking outside the form (on the backdrop)
+    if (validatorFormContainer) {
+        validatorFormContainer.addEventListener('click', (event) => {
+            if (event.target === validatorFormContainer) {
+                validatorFormContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // Form submission handler
+    if (validatorForm) {
+        validatorForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const email = validatorEmailInput.value;
+            const trustAgreement = trustAgreementInput.value;
+
+            // Validation logic
+            const isEmailValid = email.endsWith('@campus.technion.ac.il');
+            const requiredTrustPhrase = "I trust Linguini to advance my academic learning.";
+            const isTrustAgreementProvided = trustAgreement.trim() === requiredTrustPhrase;
+
+            if (isEmailValid && isTrustAgreementProvided) {
+                // Generate a simple secret key
+                const secretKey = `VALIDATOR-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+                secretKeyValue.textContent = secretKey;
+                secretKeyDisplay.classList.remove('hidden'); // Show the secret key
+                validatorForm.classList.add('hidden'); // Hide the form itself
+
+                // Store validation status and secret key in Firestore (assuming Firebase is initialized)
+                if (window.isFirebaseReady && window.userId) {
+                    try {
+                        const userDocRef = doc(window.db, 'users', window.userId);
+                        await updateDoc(userDocRef, {
+                            isValidator: true,
+                            validatorSecretKey: secretKey,
+                            validatorEmail: email,
+                            validatorApplicationDate: new Date()
+                        });
+                        console.log("Validator status updated in Firestore.");
+                    } catch (error) {
+                        console.error("Error updating validator status:", error);
+                        alert("Failed to update validator status in database. Please try again.");
+                        // Keep form visible if database update fails
+                        secretKeyDisplay.classList.add('hidden');
+                        validatorForm.classList.remove('hidden');
+                    }
+                } else {
+                    console.warn("Firebase not ready or user not authenticated. Validator status not saved.");
+                    alert("Application successful, but couldn't save to database (Firebase not ready). Your key is: " + secretKey);
+                }
+
+            } else {
+                let errorMessage = "Your application could not be processed due to incorrect answers.\n";
+                if (!isEmailValid) {
+                    errorMessage += "- Technion Mail must end with '@campus.technion.ac.il'.\n";
+                }
+                if (!isTrustAgreementProvided) {
+                    errorMessage += "- The Trust Agreement must be typed exactly as instructed.\n";
+                }
+                alert(errorMessage);
+                secretKeyDisplay.classList.add('hidden'); // Keep secret key hidden
+                validatorFormContainer.classList.add('hidden'); // Close the form modal on incorrect answers
+            }
+        });
+    }
+
+    // Function to copy the secret key
+    window.copySecretKey = () => {
+        const key = secretKeyValue.textContent;
+        navigator.clipboard.writeText(key).then(() => {
+            alert('Secret key copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy key:', err);
+            alert('Failed to copy the secret key. Please copy it manually: ' + key);
+        });
+    };
+
+    // Placeholder for your 'showView' function if not already defined:
+    function showView(viewToShow) {
+        // Hide all main content views first
+        const allViews = [
+            document.getElementById('welcomeView'),
+            document.getElementById('linguiniChallengeView'),
+            document.getElementById('learnHebrewView'),
+            // Add any other main view containers here
+            validatorFormContainer // Include the validator form container as a "view"
+        ];
+
+        allViews.forEach(view => {
+            if (view) { // Check if the view element actually exists
+                view.classList.add('hidden');
+            }
+        });
+
+        // Show the requested view
+        if (viewToShow) {
+            viewToShow.classList.remove('hidden');
+        }
+    }
+
+    // Example of how you might integrate it with initial view setup
+    // Initial view setup might be handled here or elsewhere
+    // showView(document.getElementById('welcomeView')); // Or whatever your default starting view is
+
+});
 
 
         // --- Navigation Logic ---
@@ -3049,6 +3238,12 @@
             learnHebrewPlayScreen.classList.add('hidden');
             learnHebrewEndScreen.classList.add('hidden');
             populateLearnHebrewLanguageSelect(); // Ensure dropdown is fresh
+        };
+        becomeValidator.onclick = () +> {
+            showView(validatorFormContainer);
+            validatorFormContainer.classList.remove('hidden');
+            secretKeyDisplay.classList.add('hidden');
+            validatorForm.classList.remove('hidden');
         };
     </script>
 </body>
