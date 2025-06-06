@@ -236,6 +236,18 @@
             border-radius: 9999px; /* Fully rounded */
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
+        /* Debug Info Styling */
+        #debugInfo {
+            font-size: 0.75rem;
+            color: #A0A0A0;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        #debugInfo span {
+            font-weight: bold;
+            color: #E0E0E0;
+        }
     </style>
 
     <!-- Firebase SDKs - loaded after all styling to ensure UI is ready -->
@@ -1215,22 +1227,32 @@
         window.appData = { courses: [], terms: [] }; // Global appData, initialized empty
 
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM Content Loaded. Starting Firebase initialization...');
             try {
                 // Initialize Firebase only once
                 if (!window.firebaseApp) {
-                    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                    const rawFirebaseConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+                    console.log('Raw Firebase Config:', rawFirebaseConfig);
+                    const firebaseConfig = JSON.parse(rawFirebaseConfig);
+                    console.log('Parsed Firebase Config:', firebaseConfig);
+
                     if (Object.keys(firebaseConfig).length > 0) {
                         window.firebaseApp = initializeApp(firebaseConfig);
                         window.db = getFirestore(window.firebaseApp);
                         window.auth = getAuth(window.firebaseApp);
+                        console.log('Firebase services (app, db, auth) initialized.');
+
+                        // Update debug info in footer
+                        updateDebugInfo();
 
                         // Set up auth state change listener FIRST. This listener will handle
                         // all subsequent user state changes, including the initial sign-in.
                         onAuthStateChanged(window.auth, async (user) => {
                             if (user) {
                                 window.userId = user.uid;
-                                console.log('Firebase initialized. User ID:', window.userId);
+                                console.log('Firebase Auth State Changed: User signed in. User ID:', window.userId);
                                 window.isFirebaseReady = true; // Set flag to true
+                                updateDebugInfo(); // Update debug info with user ID and ready status
 
                                 // After Firebase is ready and user is authenticated, proceed with app initialization
                                 await initializeAppData();
@@ -1239,12 +1261,18 @@
                                 populateLearnHebrewLanguageSelect();
                                 showView(homeView);
                             } else {
-                                // If onAuthStateChanged is called with no user, and no custom token was provided,
-                                // attempt anonymous sign-in. This will trigger onAuthStateChanged again with the anonymous user.
-                                console.log('No user signed in. Attempting anonymous sign-in if not already tried.');
+                                console.log('Firebase Auth State Changed: No user. Attempting anonymous sign-in if not already tried.');
                                 // Only try to sign in anonymously if there's no current user (prevents redundant calls)
                                 if (!window.auth.currentUser) {
-                                    await signInAnonymously(window.auth);
+                                    try {
+                                        await signInAnonymously(window.auth);
+                                        console.log('Anonymous sign-in attempted.');
+                                    } catch (anonError) {
+                                        console.error('Error during anonymous sign-in:', anonError);
+                                        showMessageBox("Error signing in anonymously. Functionality may be limited.", "error");
+                                        window.isFirebaseReady = false; // Mark as not ready if auth failed
+                                        updateDebugInfo();
+                                    }
                                 }
                                 // No need to call initializeAppData or renderCourses here,
                                 // the next onAuthStateChanged event (after anonymous sign-in) will handle it.
@@ -1253,23 +1281,32 @@
 
                         // Attempt to sign in with custom token immediately if available.
                         // The onAuthStateChanged listener above will then pick up the signed-in user.
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
-                            console.log('Attempting custom token sign-in...');
-                            await signInWithCustomToken(window.auth, __initial_auth_token);
+                        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+                        console.log('Initial Auth Token (present if not empty):', initialAuthToken ? 'YES' : 'NO');
+                        if (initialAuthToken) {
+                            try {
+                                console.log('Attempting custom token sign-in...');
+                                await signInWithCustomToken(window.auth, initialAuthToken);
+                                console.log('Custom token sign-in initiated. Waiting for onAuthStateChanged...');
+                            } catch (tokenError) {
+                                console.error('Error during custom token sign-in:', tokenError);
+                                showMessageBox("Error with custom token. Attempting anonymous sign-in.", "error");
+                                // Fallback to anonymous sign-in, which onAuthStateChanged should handle
+                            }
                         } else {
                             console.log('No custom token found or empty. Relying on onAuthStateChanged to handle initial anonymous sign-in.');
-                            // If no custom token, onAuthStateChanged will eventually call signInAnonymously if needed.
                         }
 
                     } else {
-                        console.error("Firebase config is missing. Cannot initialize Firebase. Displaying local data if any.");
+                        console.error("Firebase config is missing or empty. Cannot initialize Firebase.");
+                        showMessageBox("Application cannot load data. Firebase config is missing. Please ensure the environment variables are set up correctly.", "error");
                         // If Firebase config is missing, the app will run without Firestore.
-                        // In this scenario, window.appData will remain empty, so courses will not be displayed
-                        // unless you had a hardcoded fallback for a non-Firebase scenario.
+                        // window.appData will remain empty.
                         renderCourses(); // Still call renderCourses to show "No courses added" message
                         populateChallengeGameLanguageSelect();
                         populateLearnHebrewLanguageSelect();
                         showView(homeView);
+                        updateDebugInfo();
                     }
                 } else {
                     // If Firebase is already initialized (e.g., due to hot reload in dev env)
@@ -1278,6 +1315,8 @@
                     if (window.auth && window.auth.currentUser) {
                         window.userId = window.auth.currentUser.uid;
                         window.isFirebaseReady = true;
+                        console.log('Firebase already initialized and user found. User ID:', window.userId);
+                        updateDebugInfo();
                         await initializeAppData();
                         renderCourses();
                         populateChallengeGameLanguageSelect();
@@ -1285,6 +1324,7 @@
                         showView(homeView);
                     } else {
                         console.log("Firebase initialized but user not yet available. Waiting for auth state change.");
+                        updateDebugInfo(); // Update current debug info
                         // Provide a default render while waiting for auth state to resolve
                         renderCourses();
                         populateChallengeGameLanguageSelect();
@@ -1293,66 +1333,96 @@
                     }
                 }
             } catch (error) {
-                console.error("Error during Firebase initialization or auth:", error);
-                showMessageBox("Error loading application. Please try again.", "error");
+                console.error("Critical error during Firebase initialization or auth setup:", error);
+                showMessageBox("Critical error loading application. Please check console for details and try again.", "error");
                 // Fallback to rendering courses even if Firebase setup failed, to show the empty state.
                 renderCourses();
                 populateChallengeGameLanguageSelect();
                 populateLearnHebrewLanguageSelect();
                 showView(homeView);
+                updateDebugInfo();
             }
         });
 
-        // Function to ensure appData is loaded from Firestore or seeded
-        // window.appData is already global at this point
-        async function initializeAppData() {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-            // Check if courses collection is empty and seed if necessary
-            const coursesRef = collection(window.db, 'artifacts', appId, 'public', 'data', 'courses');
-            const coursesSnapshot = await getDocs(coursesRef);
-
-            if (coursesSnapshot.empty) {
-                console.log("Seeding initial data to Firestore...");
-                for (const course of window.initialAppData.courses) {
-                    await setDoc(doc(coursesRef, course.id), course);
-                }
-                for (const term of window.initialAppData.terms) {
-                    const termRef = doc(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), term.id);
-                    await setDoc(termRef, term);
-                }
-                console.log("Initial data seeded.");
+        // Function to update the debug info in the footer
+        function updateDebugInfo() {
+            const debugInfoElement = document.getElementById('debugInfo');
+            if (debugInfoElement) {
+                debugInfoElement.innerHTML = `
+                    <p>User ID: <span id="displayUserId">${window.userId || 'N/A (Not authenticated)'}</span></p>
+                    <p>Firebase Ready: <span id="displayFirebaseReady">${window.isFirebaseReady ? 'YES' : 'NO'}</span></p>
+                `;
             }
+        }
 
-            // Set up real-time listeners for courses and terms
-            onSnapshot(coursesRef, (snapshot) => {
-                window.appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Courses data received from Firestore:", window.appData.courses); // Debug log
-                renderCourses(); // Re-render courses whenever data changes
-                // If a course was being viewed, re-render its terms as well
-                if (window.currentCourseId) {
-                    renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
-                }
-            }, (error) => {
-                console.error("Error fetching courses:", error);
-                showMessageBox("Error loading courses. Please refresh.", "error");
-            });
+        // Function to ensure appData is loaded from Firestore or seeded
+        async function initializeAppData() {
+            if (!window.isFirebaseReady || !window.db) {
+                console.warn("initializeAppData called before Firebase is ready or db is null.");
+                return;
+            }
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            console.log(`Attempting to initialize app data for appId: ${appId}`);
 
-            onSnapshot(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), (snapshot) => {
-                window.appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Terms data received from Firestore:", window.appData.terms); // Debug log
-                // Re-render terms for current course if active
-                if (window.currentCourseId) {
-                    renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+            try {
+                // Check if courses collection is empty and seed if necessary
+                const coursesRef = collection(window.db, 'artifacts', appId, 'public', 'data', 'courses');
+                console.log('Attempting to get courses snapshot to check for emptiness...');
+                const coursesSnapshot = await getDocs(coursesRef);
+                console.log('Courses snapshot received. Is empty:', coursesSnapshot.empty);
+
+                if (coursesSnapshot.empty) {
+                    console.log("Seeding initial data to Firestore...");
+                    for (const course of window.initialAppData.courses) {
+                        await setDoc(doc(coursesRef, course.id), course);
+                        console.log(`Seeded course: ${course.name}`);
+                    }
+                    const termsCollectionRef = collection(window.db, 'artifacts', appId, 'public', 'data', 'terms');
+                    for (const term of window.initialAppData.terms) {
+                        await setDoc(doc(termsCollectionRef, term.id), term);
+                        console.log(`Seeded term: ${term.hebrew ? term.hebrew.text : term.english.text}`);
+                    }
+                    console.log("Initial data seeding complete.");
+                } else {
+                    console.log("Courses collection is not empty. Skipping seeding.");
                 }
-                // Also update global search results if search view is active
-                if (!searchView.classList.contains('hidden') && globalSearchInput.value.trim().length > 0) {
-                    globalSearchInput.onkeyup(); // Trigger search re-render
-                }
-            }, (error) => {
-                console.error("Error fetching terms:", error);
-                showMessageBox("Error loading terms. Please refresh.", "error");
-            });
+
+                // Set up real-time listeners for courses and terms
+                console.log('Setting up real-time listeners for courses and terms...');
+                onSnapshot(coursesRef, (snapshot) => {
+                    window.appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log("Courses data received from Firestore (onSnapshot):", window.appData.courses);
+                    renderCourses(); // Re-render courses whenever data changes
+                    // If a course was being viewed, re-render its terms as well
+                    if (window.currentCourseId) {
+                        renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+                    }
+                }, (error) => {
+                    console.error("Error fetching courses via onSnapshot:", error);
+                    showMessageBox("Error loading courses. Please refresh.", "error");
+                });
+
+                onSnapshot(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), (snapshot) => {
+                    window.appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log("Terms data received from Firestore (onSnapshot):", window.appData.terms);
+                    // Re-render terms for current course if active
+                    if (window.currentCourseId) {
+                        renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+                    }
+                    // Also update global search results if search view is active
+                    if (!searchView.classList.contains('hidden') && globalSearchInput.value.trim().length > 0) {
+                        globalSearchInput.onkeyup(); // Trigger search re-render
+                    }
+                }, (error) => {
+                    console.error("Error fetching terms via onSnapshot:", error);
+                    showMessageBox("Error loading terms. Please refresh.", "error");
+                });
+                console.log('Real-time listeners for courses and terms setup complete.');
+
+            } catch (error) {
+                console.error("Error during initializeAppData (seeding or initial fetch):", error);
+                showMessageBox("Error initializing application data. Please check your network connection and Firebase security rules.", "error");
+            }
         }
     </script>
 </head>
@@ -1606,6 +1676,9 @@
         <div class="container footer-content">
             &copy; 2025 Linguini. All rights reserved.
             <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse Footer" class="remi-mascot ml-2">
+        </div>
+        <div id="debugInfo" class="mt-2">
+            <!-- Debug information will be displayed here -->
         </div>
     </footer>
 
@@ -2028,6 +2101,7 @@
 
         // Renders the list of courses
         function renderCourses() {
+            console.log('Rendering courses. Current appData.courses:', window.appData.courses);
             courseList.innerHTML = '';
             if (window.appData.courses.length === 0) {
                 courseList.innerHTML = '<p class="text-gray-500 text-center col-span-full">No courses added yet. Be the first!</p>';
@@ -2057,6 +2131,7 @@
 
         // Renders the list of terms for a specific course
         function renderTerms(courseId, searchTerm = '') {
+            console.log('Rendering terms for course:', courseId, 'Search term:', searchTerm);
             termList.innerHTML = '';
             const termsForCourse = window.appData.terms.filter(term => term.courseId === courseId);
             const filteredTerms = searchTerm
