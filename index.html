@@ -250,28 +250,11 @@
         }
     </style>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs - loaded after all styling to ensure UI is ready -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
-        // Also import Auth and Firestore for your app's functionality
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
-        import { getFirestore, collection, query, getDocs, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, where } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
-
-        // Your web app's Firebase configuration (hardcoded directly)
-        const firebaseConfig = {
-            apiKey: "AIzaSyD9ijB7vwoQbog5JUCO76F5vMlvsvusodk",
-            authDomain: "linguini-database.firebaseapp.com",
-            projectId: "linguini-database",
-            storageBucket: "linguini-database.firebasestorage.app",
-            messagingSenderId: "363537478736",
-            appId: "1:363537478736:web:a62c9290a9574f969d8d55",
-            measurementId: "G-0D0KLF5W1V"
-        };
-
-        // Define a constant for the app ID directly from firebaseConfig
-        const APP_ID = firebaseConfig.appId;
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, getDocs, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables for Firebase instances and user ID
         window.firebaseApp = null;
@@ -797,9 +780,9 @@
                     english: { text: 'Displacement', status: 'Pending', validatedBy: null },
                     russian: { text: 'Смещение', status: 'Pending', validatedBy: null },
                     arabic: { text: 'إزاحة', status: 'Pending', validatedBy: null },
-                    french: { text: 'Déplacement', status: 'Pending', validatedTo: null },
+                    french: { text: 'Déplacement', status: 'Pending', validatedBy: null },
                     mandarin: { text: '位移', status: 'Pending', validatedBy: null },
-                    spanish: { text: 'Desplazamiento', status: 'Pending', validatedBy: null },
+                    spanish: { text: 'Desplazamiento', status: 'Pending', validatedTo: null },
                     hindi: { text: 'विस्थापन', status: 'Pending', validatedBy: null }
                 },
                 {
@@ -974,7 +957,7 @@
                 },
                 {
                     id: 't_c5_9', courseId: 'c5', definition: 'A type of chemical bond that involves the sharing of electron pairs between atoms.',
-                    hebrew: { text: 'קשר קوולנטי', status: 'Pending', validatedBy: null },
+                    hebrew: { text: 'קשר קוולנטי', status: 'Pending', validatedBy: null },
                     pronunciation: 'kesher kovalenti',
                     english: { text: 'Covalent Bond', status: 'Pending', validatedBy: null },
                     russian: { text: 'Ковалентная связь', status: 'Pending', validatedBy: null },
@@ -1248,61 +1231,87 @@
             try {
                 // Initialize Firebase only once
                 if (!window.firebaseApp) {
-                    window.firebaseApp = initializeApp(firebaseConfig);
-                    window.db = getFirestore(window.firebaseApp);
-                    window.auth = getAuth(window.firebaseApp);
-                    getAnalytics(window.firebaseApp); // Initialize Analytics
-                    console.log('Firebase services (app, db, auth, analytics) initialized with hardcoded config.');
+                    const rawFirebaseConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+                    console.log('Raw Firebase Config:', rawFirebaseConfig);
+                    const firebaseConfig = JSON.parse(rawFirebaseConfig);
+                    console.log('Parsed Firebase Config:', firebaseConfig);
 
-                    // Update debug info in footer
-                    updateDebugInfo();
+                    if (Object.keys(firebaseConfig).length > 0) {
+                        window.firebaseApp = initializeApp(firebaseConfig);
+                        window.db = getFirestore(window.firebaseApp);
+                        window.auth = getAuth(window.firebaseApp);
+                        console.log('Firebase services (app, db, auth) initialized.');
 
-                    // Set up auth state change listener FIRST. This listener will handle
-                    // all subsequent user state changes, including the initial sign-in.
-                    onAuthStateChanged(window.auth, async (user) => {
-                        if (user) {
-                            window.userId = user.uid;
-                            console.log('Firebase Auth State Changed: User signed in. User ID:', window.userId);
-                            window.isFirebaseReady = true; // Set flag to true
-                            updateDebugInfo(); // Update debug info with user ID and ready status
+                        // Update debug info in footer
+                        updateDebugInfo();
 
-                            // After Firebase is ready and user is authenticated, proceed with app initialization
-                            await initializeAppData();
-                            renderCourses(); // Explicitly render courses after data is fetched/seeded
-                            populateChallengeGameLanguageSelect();
-                            populateLearnHebrewLanguageSelect();
-                            showView(homeView);
-                        } else {
-                            console.log('Firebase Auth State Changed: No user. Attempting anonymous sign-in if not already tried.');
-                            // Only try to sign in anonymously if there's no current user (prevents redundant calls)
-                            if (!window.auth.currentUser) {
-                                try {
-                                    // Use a hardcoded initial auth token if it was meant to be used, otherwise proceed with anonymous.
-                                    // IMPORTANT: if __initial_auth_token is provided by Canvas, it is meant to be used.
-                                    // As per the instructions, if __initial_auth_token is not defined, we signInAnonymously.
-                                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
-                                        console.log('Attempting custom token sign-in...');
-                                        await signInWithCustomToken(window.auth, __initial_auth_token);
-                                    } else {
+                        // Set up auth state change listener FIRST. This listener will handle
+                        // all subsequent user state changes, including the initial sign-in.
+                        onAuthStateChanged(window.auth, async (user) => {
+                            if (user) {
+                                window.userId = user.uid;
+                                console.log('Firebase Auth State Changed: User signed in. User ID:', window.userId);
+                                window.isFirebaseReady = true; // Set flag to true
+                                updateDebugInfo(); // Update debug info with user ID and ready status
+
+                                // After Firebase is ready and user is authenticated, proceed with app initialization
+                                await initializeAppData();
+                                renderCourses(); // Explicitly render courses after data is fetched/seeded
+                                populateChallengeGameLanguageSelect();
+                                populateLearnHebrewLanguageSelect();
+                                showView(homeView);
+                            } else {
+                                console.log('Firebase Auth State Changed: No user. Attempting anonymous sign-in if not already tried.');
+                                // Only try to sign in anonymously if there's no current user (prevents redundant calls)
+                                if (!window.auth.currentUser) {
+                                    try {
                                         await signInAnonymously(window.auth);
                                         console.log('Anonymous sign-in attempted.');
+                                    } catch (anonError) {
+                                        console.error('Error during anonymous sign-in:', anonError);
+                                        showMessageBox("Error signing in anonymously. Functionality may be limited.", "error");
+                                        window.isFirebaseReady = false; // Mark as not ready if auth failed
+                                        updateDebugInfo();
                                     }
-                                } catch (anonError) {
-                                    console.error('Error during initial sign-in (anonymous or custom token):', anonError);
-                                    showMessageBox("Error signing in. Functionality may be limited.", "error");
-                                    window.isFirebaseReady = false; // Mark as not ready if auth failed
-                                    updateDebugInfo();
                                 }
+                                // No need to call initializeAppData or renderCourses here,
+                                // the next onAuthStateChanged event (after anonymous sign-in) will handle it.
                             }
+                        });
+
+                        // Attempt to sign in with custom token immediately if available.
+                        // The onAuthStateChanged listener above will then pick up the signed-in user.
+                        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+                        console.log('Initial Auth Token (present if not empty):', initialAuthToken ? 'YES' : 'NO');
+                        if (initialAuthToken) {
+                            try {
+                                console.log('Attempting custom token sign-in...');
+                                await signInWithCustomToken(window.auth, initialAuthToken);
+                                console.log('Custom token sign-in initiated. Waiting for onAuthStateChanged...');
+                            } catch (tokenError) {
+                                console.error('Error during custom token sign-in:', tokenError);
+                                showMessageBox("Error with custom token. Attempting anonymous sign-in.", "error");
+                                // Fallback to anonymous sign-in, which onAuthStateChanged should handle
+                            }
+                        } else {
+                            console.log('No custom token found or empty. Relying on onAuthStateChanged to handle initial anonymous sign-in.');
                         }
-                    });
 
-                    // No need to explicitly call signInWithCustomToken here, onAuthStateChanged handles initial state
-                    // and will trigger anonymous sign-in if no user is found.
-
+                    } else {
+                        console.error("Firebase config is missing or empty. Cannot initialize Firebase.");
+                        showMessageBox("Application cannot load data. Firebase config is missing. Please ensure the environment variables are set up correctly.", "error");
+                        // If Firebase config is missing, the app will run without Firestore.
+                        // window.appData will remain empty.
+                        renderCourses(); // Still call renderCourses to show "No courses added" message
+                        populateChallengeGameLanguageSelect();
+                        populateLearnHebrewLanguageSelect();
+                        showView(homeView);
+                        updateDebugInfo();
+                    }
                 } else {
                     // If Firebase is already initialized (e.g., due to hot reload in dev env)
                     console.log("Firebase already initialized. Re-initializing app data and rendering.");
+                    // Ensure user is set if app is re-initialized and user is already authenticated
                     if (window.auth && window.auth.currentUser) {
                         window.userId = window.auth.currentUser.uid;
                         window.isFirebaseReady = true;
@@ -1315,7 +1324,8 @@
                         showView(homeView);
                     } else {
                         console.log("Firebase initialized but user not yet available. Waiting for auth state change.");
-                        updateDebugInfo();
+                        updateDebugInfo(); // Update current debug info
+                        // Provide a default render while waiting for auth state to resolve
                         renderCourses();
                         populateChallengeGameLanguageSelect();
                         populateLearnHebrewLanguageSelect();
@@ -1325,6 +1335,7 @@
             } catch (error) {
                 console.error("Critical error during Firebase initialization or auth setup:", error);
                 showMessageBox("Critical error loading application. Please check console for details and try again.", "error");
+                // Fallback to rendering courses even if Firebase setup failed, to show the empty state.
                 renderCourses();
                 populateChallengeGameLanguageSelect();
                 populateLearnHebrewLanguageSelect();
@@ -1340,7 +1351,6 @@
                 debugInfoElement.innerHTML = `
                     <p>User ID: <span id="displayUserId">${window.userId || 'N/A (Not authenticated)'}</span></p>
                     <p>Firebase Ready: <span id="displayFirebaseReady">${window.isFirebaseReady ? 'YES' : 'NO'}</span></p>
-                    <p>App ID: <span id="displayAppId">${APP_ID}</span></p>
                 `;
             }
         }
@@ -1351,8 +1361,7 @@
                 console.warn("initializeAppData called before Firebase is ready or db is null.");
                 return;
             }
-            // Use the hardcoded APP_ID constant
-            const appId = APP_ID;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             console.log(`Attempting to initialize app data for appId: ${appId}`);
 
             try {
@@ -1438,13 +1447,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                     Validator Login
-                </button>
-               <button id="becomeValidator">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Become a Validator
                 </button>
                 <button id="challengeGameButton">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1589,8 +1591,6 @@
             </div>
         </div>
 
-
-
         <!-- Linguini Challenge Game View -->
         <div id="challengeGameView" class="view hidden">
             <div class="card text-center">
@@ -1623,39 +1623,6 @@
                 </div>
             </div>
         </div>
-
-        <button id="becomeValidatorBtn" class="bg-header-custom button-styling-here">Become a Validator</button>
-
-<div id="validatorFormContainer" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
-    <form id="validatorForm" class="bg-white p-8 rounded-lg shadow-xl relative w-full max-w-lg mx-auto">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Become a Validator</h2>
-        
-        <div class="mb-4">
-            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
-                Q1: Please enter your Technion Mail:
-            </label>
-            <input type="email" id="validatorEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-6">
-            <label for="trustAgreement" class="block text-gray-700 text-sm font-bold mb-2">
-                Q2: To ensure the integrity of our platform, please type the following phrase exactly: "I trust Linguini to advance my academic learning."
-            </label>
-            <textarea id="trustAgreement" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24" required></textarea>
-        </div>
-
-        <div class="flex justify-end gap-4">
-            <button type="button" id="cancelValidatorFormBtn" class="btn-secondary">Cancel</button>
-            <button type="submit">Submit Application</button>
-        </div>
-
-        <div id="secretKeyDisplay" class="hidden text-center mt-6">
-            <p class="text-lg font-semibold text-gray-700 mb-4">Your Secret Key: V2025</p>
-            <p id="secretKeyValue" class="text-xl font-mono bg-gray-100 p-3 rounded-md break-all mb-4"></p>
-            <button onclick="copySecretKey()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Copy Key</button>
-        </div>
-    </form>
-</div>
 
         <!-- Learn Hebrew View -->
         <div id="learnHebrewView" class="view hidden">
@@ -1718,7 +1685,7 @@
     <script>
         // Global variables for Firebase instances and user ID are declared in the module script
         // window.firebaseApp, window.db, window.auth, window.userId, window.isFirebaseReady
-        // APP_ID constant is now defined directly from firebaseConfig
+
         const VALIDATOR_SECRET_KEY = 'V2025'; // Updated validator key
 
         // Initial application data, moved to global scope in the module script.
@@ -2371,8 +2338,7 @@
                     id: generateId(),
                     name: courseName
                 };
-                // Use the hardcoded APP_ID constant
-                const appId = APP_ID;
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 try {
                     await addDoc(collection(window.db, 'artifacts', appId, 'public', 'data', 'courses'), newCourse);
                     showMessageBox('Course added successfully!', 'success', () => {
@@ -2405,8 +2371,7 @@
             }
 
             let termData = {};
-            // Use the hardcoded APP_ID constant
-            const appId = APP_ID;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
             // Process all language fields
             LANGUAGES.forEach(lang => {
@@ -2472,8 +2437,7 @@
                 return;
             }
             currentTermId = termId;
-            // Use the hardcoded APP_ID constant
-            const appId = APP_ID;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId);
             try {
                 const termDoc = await getDoc(termRef);
@@ -2513,8 +2477,7 @@
             }
             showPromptBox(`Enter validator secret key for ${langKey} translation:`, async (key) => {
                 if (key === VALIDATOR_SECRET_KEY) {
-                    // Use the hardcoded APP_ID constant
-                    const appId = APP_ID;
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId);
                     try {
                         const termDoc = await getDoc(termRef);
@@ -2548,8 +2511,7 @@
                 return;
             }
             showConfirmBox('Are you sure you want to delete this course and all its terms?', async () => {
-                // Use the hardcoded APP_ID constant
-                const appId = APP_ID;
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 try {
                     // Delete course document
                     await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'courses', courseId));
@@ -2581,8 +2543,7 @@
                 return;
             }
             showConfirmBox('Are you sure you want to delete this term?', async () => {
-                // Use the hardcoded APP_ID constant
-                const appId = APP_ID;
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 try {
                     await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId));
                     showMessageBox('Term deleted.', 'info', () => {
@@ -3003,160 +2964,6 @@
             masteredWordsCountDisplay.textContent = masteredWordsCount;
             learnHebrewLanguageSelect.value = ''; // Reset language selection
         };
-        document.addEventListener('DOMContentLoaded', () => {
-    // ... (existing element declarations)
-
-    // New element declarations for the validator feature
-    const becomeValidatorBtn = document.getElementById('becomeValidatorBtn');
-    const validatorFormContainer = document.getElementById('validatorFormContainer');
-    const validatorForm = document.getElementById('validatorForm');
-    const cancelValidatorFormBtn = document.getElementById('cancelValidatorFormBtn');
-    const secretKeyDisplay = document.getElementById('secretKeyDisplay');
-    const secretKeyValue = document.getElementById('secretKeyValue'); // Needed for displaying the key
-    const validatorEmailInput = document.getElementById('validatorEmail'); // Input for email
-    const trustAgreementInput = document.getElementById('trustAgreement'); // Input for trust agreement
-
-
-    // Error checking (recommended for debugging)
-    if (!becomeValidatorBtn) console.error("Error: 'becomeValidatorBtn' not found!");
-    if (!validatorFormContainer) console.error("Error: 'validatorFormContainer' not found!");
-    if (!validatorForm) console.error("Error: 'validatorForm' not found!");
-    if (!cancelValidatorFormBtn) console.error("Error: 'cancelValidatorFormBtn' not found!");
-    if (!secretKeyDisplay) console.error("Error: 'secretKeyDisplay' not found!");
-    if (!secretKeyValue) console.error("Error: 'secretKeyValue' not found!");
-    if (!validatorEmailInput) console.error("Error: 'validatorEmailInput' not found!");
-    if (!trustAgreementInput) console.error("Error: 'trustAgreementInput' not found!");
-
-    // Your new 'becomeValidatorBtn' click handler
-    if (becomeValidatorBtn) {
-        becomeValidatorBtn.onclick = () => {
-            // Assuming 'showView' exists and handles hiding other views
-            // If validatorFormContainer is not a main 'view' in the same way as your other sections,
-            // you might only need to handle its visibility.
-            // For now, let's assume it fits the 'showView' paradigm.
-            showView(validatorFormContainer); // Pass the container as the "view" to show
-
-            // Specific actions for the validator form modal
-            validatorFormContainer.classList.remove('hidden'); // Make sure the modal is visible
-            secretKeyDisplay.classList.add('hidden'); // Hide the secret key display initially
-            validatorForm.classList.remove('hidden'); // Ensure the form itself is visible (if it was hidden after submission)
-            validatorForm.reset(); // Clear any previous form data
-        };
-    }
-
-    // Event listener for the cancel button inside the form
-    if (cancelValidatorFormBtn) {
-        cancelValidatorFormBtn.onclick = () => {
-            validatorFormContainer.classList.add('hidden'); // Hide the entire modal
-        };
-    }
-
-    // Event listener for clicking outside the form (on the backdrop)
-    if (validatorFormContainer) {
-        validatorFormContainer.addEventListener('click', (event) => {
-            if (event.target === validatorFormContainer) {
-                validatorFormContainer.classList.add('hidden');
-            }
-        });
-    }
-
-    // Form submission handler
-    if (validatorForm) {
-        validatorForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent default form submission
-
-            const email = validatorEmailInput.value;
-            const trustAgreement = trustAgreementInput.value;
-
-            // Validation logic
-            const isEmailValid = email.endsWith('@campus.technion.ac.il');
-            const requiredTrustPhrase = "I trust Linguini to advance my academic learning.";
-            const isTrustAgreementProvided = trustAgreement.trim() === requiredTrustPhrase;
-
-            if (isEmailValid && isTrustAgreementProvided) {
-                // Generate a simple secret key
-                const secretKey = `VALIDATOR-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-                secretKeyValue.textContent = secretKey;
-                secretKeyDisplay.classList.remove('hidden'); // Show the secret key
-                validatorForm.classList.add('hidden'); // Hide the form itself
-
-                // Store validation status and secret key in Firestore (assuming Firebase is initialized)
-                if (window.isFirebaseReady && window.userId) {
-                    try {
-                        const userDocRef = doc(window.db, 'users', window.userId);
-                        await updateDoc(userDocRef, {
-                            isValidator: true,
-                            validatorSecretKey: secretKey,
-                            validatorEmail: email,
-                            validatorApplicationDate: new Date()
-                        });
-                        console.log("Validator status updated in Firestore.");
-                    } catch (error) {
-                        console.error("Error updating validator status:", error);
-                        alert("Failed to update validator status in database. Please try again.");
-                        // Keep form visible if database update fails
-                        secretKeyDisplay.classList.add('hidden');
-                        validatorForm.classList.remove('hidden');
-                    }
-                } else {
-                    console.warn("Firebase not ready or user not authenticated. Validator status not saved.");
-                    alert("Application successful, but couldn't save to database (Firebase not ready). Your key is: " + secretKey);
-                }
-
-            } else {
-                let errorMessage = "Your application could not be processed due to incorrect answers.\n";
-                if (!isEmailValid) {
-                    errorMessage += "- Technion Mail must end with '@campus.technion.ac.il'.\n";
-                }
-                if (!isTrustAgreementProvided) {
-                    errorMessage += "- The Trust Agreement must be typed exactly as instructed.\n";
-                }
-                alert(errorMessage);
-                secretKeyDisplay.classList.add('hidden'); // Keep secret key hidden
-                validatorFormContainer.classList.add('hidden'); // Close the form modal on incorrect answers
-            }
-        });
-    }
-
-    // Function to copy the secret key
-    window.copySecretKey = () => {
-        const key = secretKeyValue.textContent;
-        navigator.clipboard.writeText(key).then(() => {
-            alert('Secret key copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy key:', err);
-            alert('Failed to copy the secret key. Please copy it manually: ' + key);
-        });
-    };
-
-    // Placeholder for your 'showView' function if not already defined:
-    function showView(viewToShow) {
-        // Hide all main content views first
-        const allViews = [
-            document.getElementById('welcomeView'),
-            document.getElementById('linguiniChallengeView'),
-            document.getElementById('learnHebrewView'),
-            // Add any other main view containers here
-            validatorFormContainer // Include the validator form container as a "view"
-        ];
-
-        allViews.forEach(view => {
-            if (view) { // Check if the view element actually exists
-                view.classList.add('hidden');
-            }
-        });
-
-        // Show the requested view
-        if (viewToShow) {
-            viewToShow.classList.remove('hidden');
-        }
-    }
-
-    // Example of how you might integrate it with initial view setup
-    // Initial view setup might be handled here or elsewhere
-    // showView(document.getElementById('welcomeView')); // Or whatever your default starting view is
-
-});
 
 
         // --- Navigation Logic ---
@@ -3238,12 +3045,6 @@
             learnHebrewPlayScreen.classList.add('hidden');
             learnHebrewEndScreen.classList.add('hidden');
             populateLearnHebrewLanguageSelect(); // Ensure dropdown is fresh
-        };
-        becomeValidator.onclick = () +> {
-            showView(validatorFormContainer);
-            validatorFormContainer.classList.remove('hidden');
-            secretKeyDisplay.classList.add('hidden');
-            validatorForm.classList.remove('hidden');
         };
     </script>
 </body>
