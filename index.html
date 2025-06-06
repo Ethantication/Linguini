@@ -4,11 +4,241 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linguini - Technion Educational Site</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js for sound effects -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- Google Fonts MUST be loaded before Tailwind to ensure proper font-family application and avoid @import issues if any -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
+    
+    <!-- Tailwind CSS CDN - should be loaded early to process utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tone.js for sound effects - loaded after main CSS/UI libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <!-- Inline styles - placed after Tailwind CDN so @apply directives can correctly resolve -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA; /* Lightest gray for overall background */
+            color: #343A40; /* Dark gray for main text */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem; /* Increased padding */
+        }
+
+        /* Card styling - more prominent shadow, softer corners */
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Softer, more spread out shadow */
+            padding: 2rem; /* Increased padding */
+            margin-bottom: 2rem; /* Increased margin */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Slight lift on hover */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Input and textarea styling - refined borders, clear focus */
+        input[type="text"], textarea, select {
+            border: 1px solid #CED4DA; /* Lighter gray border */
+            border-radius: 0.5rem; /* Slightly more rounded */
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1rem;
+            color: #343A40;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50; /* Accent green for focus */
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25); /* Green shadow for focus */
+        }
+
+        /* Button styling - primary accent color, subtle hover effects */
+        button {
+            background-color: #4CAF50; /* Primary accent green */
+            color: white;
+            padding: 0.85rem 1.75rem; /* More generous padding */
+            border-radius: 0.625rem; /* rounded-lg */
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
+            display: inline-flex; /* For icons to be centered */
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem; /* Space between icon and text */
+        }
+        button:hover {
+            background-color: #43A047; /* Darker green on hover */
+            transform: translateY(-2px); /* Slightly more pronounced lift */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Secondary button style */
+        .btn-secondary {
+            background-color: #98B4AA; /* Muted blue-gray */
+            color: #343A40; /* Dark text for contrast */
+            box-shadow: none; /* No shadow by default for secondary */
+        }
+        .btn-secondary:hover {
+            background-color: #7A908D; /* Darker muted blue-gray */
+            color: white; /* Text turns white on hover for better contrast */
+            transform: translateY(-1px);
+        }
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+
+        /* Specific button styles (kept for functionality, integrated with new palette) */
+        .btn-validate { background-color: #28A745; } /* Bootstrap success green */
+        .btn-validate:hover { background-color: #218838; }
+        .btn-edit { background-color: #FFC107; color: #343A40; } /* Bootstrap warning yellow, dark text */
+        .btn-edit:hover { background-color: #E0A800; }
+        .btn-delete { background-color: #DC3545; } /* Bootstrap danger red */
+        .btn-delete:hover { background-color: #C82333; }
+
+        /* Status colors */
+        .status-pending { color: #FFC107; font-weight: 500; }
+        .status-validated { color: #28A745; font-weight: 500; }
+        .status-not-provided { color: #6C757D; font-style: italic; } /* Muted gray */
+        .status-overall-fully-validated { color: #198754; font-weight: 600; } /* Darker green */
+        .status-overall-partially-validated { color: #FFC107; font-weight: 600; }
+        .status-overall-pending { color: #DC3545; font-weight: 600; }
+
+        /* Message box styling */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 2.5rem; /* More padding */
+            border-radius: 0.75rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Deeper shadow */
+            z-index: 1000;
+            text-align: center;
+            min-width: 320px;
+            max-width: 90%;
+            border: 1px solid #E9ECEF; /* Subtle border */
+        }
+        .message-box-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+            z-index: 999;
+        }
+
+        /* Table styling - refined borders and padding */
+        .term-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem; /* More space */
+            border-radius: 0.5rem; /* Rounded table corners */
+            overflow: hidden; /* Ensures rounded corners are visible */
+        }
+        .term-table th, .term-table td {
+            border: 1px solid #E9ECEF; /* Lighter border for cells */
+            padding: 1rem; /* More padding */
+            text-align: left;
+            vertical-align: middle;
+        }
+        .term-table th {
+            background-color: #F0F2F5; /* Very light gray for header */
+            font-weight: 600;
+            color: #343A40;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+        .term-table tr:nth-child(even) {
+            background-color: #F8F9FA; /* Subtle zebra striping */
+        }
+
+        /* Custom header background color */
+        .bg-header-custom {
+            background-color: #faeddb;
+            color: #343A40; /* Text color for header content */
+            padding: 1rem 0; /* Reduced padding for a tighter header */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Lighter header shadow */
+        }
+        .bg-header-custom .container {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        .bg-header-custom button {
+            background-color: #ffffff; /* White background for header buttons */
+            color: #4CAF50; /* Green text for header buttons */
+            padding: 0.6rem 1.2rem; /* Adjusted padding for header buttons */
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+        .bg-header-custom button:hover {
+            background-color: #F0F2F5; /* Light gray on hover */
+            color: #388E3C; /* Darker green on hover */
+            transform: translateY(-1px);
+        }
+
+        /* Game specific styles (Linguini Challenge and Learn Hebrew) */
+        .game-option-button, .learn-hebrew-option-button {
+            @apply bg-4CAF50 text-white py-4 px-6 rounded-lg text-2xl font-bold w-full transition-all duration-200 ease-in-out shadow-md; /* Larger text, more padding, shadow */
+        }
+        .game-option-button:hover, .learn-hebrew-option-button:hover {
+            @apply bg-43A047 transform scale-102 shadow-lg; /* Darker green, slight scale, deeper shadow */
+        }
+        .game-option-button.correct, .learn-hebrew-option-button.correct {
+            @apply bg-28A745; /* Success green */
+        }
+        .game-option-button.incorrect, .learn-hebrew-option-button.incorrect {
+            @apply bg-DC3545; /* Danger red */
+        }
+
+        /* Learn Hebrew specific styles */
+        #hebrewTermDisplay {
+            font-size: 6rem; /* Even larger for impact */
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        #pronunciationDisplay {
+            font-size: 1.8rem;
+            color: #6C757D;
+        }
+        #learnHebrewFeedback {
+            font-size: 1.8rem;
+        }
+
+        /* Flexbox for footer content */
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem; /* Space between text and mascot */
+        }
+
+        /* Remi the mouse specific style */
+        .remi-mascot {
+            height: 4rem; /* Adjust size as needed */
+            width: auto;
+            border-radius: 9999px; /* Fully rounded */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+
+    <!-- Firebase SDKs - loaded after all styling to ensure UI is ready -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1125,228 +1355,6 @@
             });
         }
     </script>
-    <style>
-        /* Base styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F8F9FA; /* Lightest gray for overall background */
-            color: #343A40; /* Dark gray for main text */
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem; /* Increased padding */
-        }
-
-        /* Card styling - more prominent shadow, softer corners */
-        .card {
-            background-color: #ffffff;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Softer, more spread out shadow */
-            padding: 2rem; /* Increased padding */
-            margin-bottom: 2rem; /* Increased margin */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px); /* Slight lift on hover */
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Input and textarea styling - refined borders, clear focus */
-        input[type="text"], textarea, select {
-            border: 1px solid #CED4DA; /* Lighter gray border */
-            border-radius: 0.5rem; /* Slightly more rounded */
-            padding: 0.75rem 1rem;
-            width: 100%;
-            font-size: 1rem;
-            color: #343A40;
-            background-color: #ffffff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        input[type="text"]:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #4CAF50; /* Accent green for focus */
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25); /* Green shadow for focus */
-        }
-
-        /* Button styling - primary accent color, subtle hover effects */
-        button {
-            background-color: #4CAF50; /* Primary accent green */
-            color: white;
-            padding: 0.85rem 1.75rem; /* More generous padding */
-            border-radius: 0.625rem; /* rounded-lg */
-            font-weight: 600;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
-            display: inline-flex; /* For icons to be centered */
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem; /* Space between icon and text */
-        }
-        button:hover {
-            background-color: #43A047; /* Darker green on hover */
-            transform: translateY(-2px); /* Slightly more pronounced lift */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Secondary button style */
-        .btn-secondary {
-            background-color: #98B4AA; /* Muted blue-gray */
-            color: #343A40; /* Dark text for contrast */
-            box-shadow: none; /* No shadow by default for secondary */
-        }
-        .btn-secondary:hover {
-            background-color: #7A908D; /* Darker muted blue-gray */
-            color: white; /* Text turns white on hover for better contrast */
-            transform: translateY(-1px);
-        }
-        .btn-secondary:active {
-            transform: translateY(0);
-        }
-
-        /* Specific button styles (kept for functionality, integrated with new palette) */
-        .btn-validate { background-color: #28A745; } /* Bootstrap success green */
-        .btn-validate:hover { background-color: #218838; }
-        .btn-edit { background-color: #FFC107; color: #343A40; } /* Bootstrap warning yellow, dark text */
-        .btn-edit:hover { background-color: #E0A800; }
-        .btn-delete { background-color: #DC3545; } /* Bootstrap danger red */
-        .btn-delete:hover { background-color: #C82333; }
-
-        /* Status colors */
-        .status-pending { color: #FFC107; font-weight: 500; }
-        .status-validated { color: #28A745; font-weight: 500; }
-        .status-not-provided { color: #6C757D; font-style: italic; } /* Muted gray */
-        .status-overall-fully-validated { color: #198754; font-weight: 600; } /* Darker green */
-        .status-overall-partially-validated { color: #FFC107; font-weight: 600; }
-        .status-overall-pending { color: #DC3545; font-weight: 600; }
-
-        /* Message box styling */
-        .message-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 2.5rem; /* More padding */
-            border-radius: 0.75rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Deeper shadow */
-            z-index: 1000;
-            text-align: center;
-            min-width: 320px;
-            max-width: 90%;
-            border: 1px solid #E9ECEF; /* Subtle border */
-        }
-        .message-box-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
-            z-index: 999;
-        }
-
-        /* Table styling - refined borders and padding */
-        .term-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1.5rem; /* More space */
-            border-radius: 0.5rem; /* Rounded table corners */
-            overflow: hidden; /* Ensures rounded corners are visible */
-        }
-        .term-table th, .term-table td {
-            border: 1px solid #E9ECEF; /* Lighter border for cells */
-            padding: 1rem; /* More padding */
-            text-align: left;
-            vertical-align: middle;
-        }
-        .term-table th {
-            background-color: #F0F2F5; /* Very light gray for header */
-            font-weight: 600;
-            color: #343A40;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-        }
-        .term-table tr:nth-child(even) {
-            background-color: #F8F9FA; /* Subtle zebra striping */
-        }
-
-        /* Custom header background color */
-        .bg-header-custom {
-            background-color: #faeddb;
-            color: #343A40; /* Text color for header content */
-            padding: 1rem 0; /* Reduced padding for a tighter header */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Lighter header shadow */
-        }
-        .bg-header-custom .container {
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-        }
-        .bg-header-custom button {
-            background-color: #ffffff; /* White background for header buttons */
-            color: #4CAF50; /* Green text for header buttons */
-            padding: 0.6rem 1.2rem; /* Adjusted padding for header buttons */
-            font-weight: 500;
-            font-size: 0.95rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
-        .bg-header-custom button:hover {
-            background-color: #F0F2F5; /* Light gray on hover */
-            color: #388E3C; /* Darker green on hover */
-            transform: translateY(-1px);
-        }
-
-        /* Game specific styles (Linguini Challenge and Learn Hebrew) */
-        .game-option-button, .learn-hebrew-option-button {
-            @apply bg-4CAF50 text-white py-4 px-6 rounded-lg text-2xl font-bold w-full transition-all duration-200 ease-in-out shadow-md; /* Larger text, more padding, shadow */
-        }
-        .game-option-button:hover, .learn-hebrew-option-button:hover {
-            @apply bg-43A047 transform scale-102 shadow-lg; /* Darker green, slight scale, deeper shadow */
-        }
-        .game-option-button.correct, .learn-hebrew-option-button.correct {
-            @apply bg-28A745; /* Success green */
-        }
-        .game-option-button.incorrect, .learn-hebrew-option-button.incorrect {
-            @apply bg-DC3545; /* Danger red */
-        }
-
-        /* Learn Hebrew specific styles */
-        #hebrewTermDisplay {
-            font-size: 6rem; /* Even larger for impact */
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        #pronunciationDisplay {
-            font-size: 1.8rem;
-            color: #6C757D;
-        }
-        #learnHebrewFeedback {
-            font-size: 1.8rem;
-        }
-
-        /* Flexbox for footer content */
-        .footer-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem; /* Space between text and mascot */
-        }
-
-        /* Remi the mouse specific style */
-        .remi-mascot {
-            height: 4rem; /* Adjust size as needed */
-            width: auto;
-            border-radius: 9999px; /* Fully rounded */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-    </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="bg-header-custom p-4 shadow-lg">
@@ -1483,7 +1491,7 @@
                     </div>
                     <div>
                         <label for="termRussian" class="block text-sm font-medium text-gray-700 mb-1">Term (Russian)</label>
-                        <input type="text" id="termRussian" placeholder="Произודנה">
+                        <input type="text" id="termRussian" placeholder="Производная">
                     </div>
                     <div>
                         <label for="termArabic" class="block text-sm font-medium text-gray-700 mb-1">Term (Arabic)</label>
