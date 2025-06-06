@@ -255,6 +255,8 @@
         import { getFirestore, collection, query, getDocs, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, where } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration (hardcoded directly)
+        // This config should ideally come from __firebase_config global variable in Canvas env.
+        // For local testing, you might hardcode it, but for Canvas, use the global variable.
         const firebaseConfig = {
             apiKey: "AIzaSyD9ijB7vwoQbog5JUCO76F5vMlvsvusodk",
             authDomain: "linguini-database.firebaseapp.com",
@@ -265,8 +267,8 @@
             measurementId: "G-0D0KLF5W1V"
         };
 
-        // Define a constant for the app ID directly from firebaseConfig
-        const APP_ID = firebaseConfig.appId;
+        // Define a constant for the app ID, prioritizing __app_id from Canvas environment
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.appId;
 
         // Global variables for Firebase instances and user ID
         window.firebaseApp = null;
@@ -276,6 +278,7 @@
         window.isFirebaseReady = false; // Flag to ensure Firestore operations run only after auth
 
         // Initial application data to seed Firestore if empty
+        // This data will only be used if the Firestore collections are empty.
         window.initialAppData = {
             courses: [
                 { id: 'c1', name: 'Calculus 1' },
@@ -969,7 +972,7 @@
                 },
                 {
                     id: 't_c5_9', courseId: 'c5', definition: 'A type of chemical bond that involves the sharing of electron pairs between atoms.',
-                    hebrew: { text: 'קשר קوולנטי', status: 'Pending', validatedBy: null },
+                    hebrew: { text: 'קשר קוולנטי', status: 'Pending', validatedBy: null },
                     pronunciation: 'kesher kovalenti',
                     english: { text: 'Covalent Bond', status: 'Pending', validatedBy: null },
                     russian: { text: 'Ковалентная связь', status: 'Pending', validatedBy: null },
@@ -1263,7 +1266,8 @@
 
                             // After Firebase is ready and user is authenticated, proceed with app initialization
                             await initializeAppData();
-                            renderCourses(); // Explicitly render courses after data is fetched/seeded
+                            // Initial rendering happens here, subsequent updates by onSnapshot listeners
+                            renderCourses();
                             populateChallengeGameLanguageSelect();
                             populateLearnHebrewLanguageSelect();
                             showView(homeView);
@@ -1292,9 +1296,6 @@
                         }
                     });
 
-                    // No need to explicitly call signInWithCustomToken here, onAuthStateChanged handles initial state
-                    // and will trigger anonymous sign-in if no user is found.
-
                 } else {
                     // If Firebase is already initialized (e.g., due to hot reload in dev env)
                     console.log("Firebase already initialized. Re-initializing app data and rendering.");
@@ -1311,7 +1312,7 @@
                     } else {
                         console.log("Firebase initialized but user not yet available. Waiting for auth state change.");
                         updateDebugInfo();
-                        renderCourses();
+                        renderCourses(); // Still render to show empty state or old data if any
                         populateChallengeGameLanguageSelect();
                         populateLearnHebrewLanguageSelect();
                         showView(homeView);
@@ -1320,7 +1321,7 @@
             } catch (error) {
                 console.error("Critical error during Firebase initialization or auth setup:", error);
                 showMessageBox("Critical error loading application. Please check console for details and try again.", "error");
-                renderCourses();
+                renderCourses(); // Attempt to render even on error, might show empty lists
                 populateChallengeGameLanguageSelect();
                 populateLearnHebrewLanguageSelect();
                 showView(homeView);
@@ -1342,17 +1343,16 @@
 
         // Function to ensure appData is loaded from Firestore or seeded
         async function initializeAppData() {
-            if (!window.isFirebaseReady || !window.db) {
-                console.warn("initializeAppData called before Firebase is ready or db is null.");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                console.warn("initializeAppData called before Firebase is ready, db is null, or userId is null.");
                 return;
             }
-            // Use the hardcoded APP_ID constant
-            const appId = APP_ID;
-            console.log(`Attempting to initialize app data for appId: ${appId}`);
+            console.log(`Attempting to initialize app data for appId: ${APP_ID}, userId: ${window.userId}`);
 
             try {
                 // Check if courses collection is empty and seed if necessary
-                const coursesRef = collection(window.db, 'artifacts', appId, 'public', 'data', 'courses');
+                // Using public/data for courses and terms
+                const coursesRef = collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'courses');
                 console.log('Attempting to get courses snapshot to check for emptiness...');
                 const coursesSnapshot = await getDocs(coursesRef);
                 console.log('Courses snapshot received. Is empty:', coursesSnapshot.empty);
@@ -1360,11 +1360,13 @@
                 if (coursesSnapshot.empty) {
                     console.log("Seeding initial data to Firestore...");
                     for (const course of window.initialAppData.courses) {
+                        // Use setDoc to use the predefined 'id' for courses
                         await setDoc(doc(coursesRef, course.id), course);
                         console.log(`Seeded course: ${course.name}`);
                     }
-                    const termsCollectionRef = collection(window.db, 'artifacts', appId, 'public', 'data', 'terms');
+                    const termsCollectionRef = collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms');
                     for (const term of window.initialAppData.terms) {
+                        // Use setDoc to use the predefined 'id' for terms
                         await setDoc(doc(termsCollectionRef, term.id), term);
                         console.log(`Seeded term: ${term.hebrew ? term.hebrew.text : term.english.text}`);
                     }
@@ -1388,7 +1390,8 @@
                     showMessageBox("Error loading courses. Please refresh.", "error");
                 });
 
-                onSnapshot(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), (snapshot) => {
+                const termsRef = collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms');
+                onSnapshot(termsRef, (snapshot) => {
                     window.appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     console.log("Terms data received from Firestore (onSnapshot):", window.appData.terms);
                     // Re-render terms for current course if active
@@ -1669,9 +1672,6 @@
         // APP_ID constant is now defined directly from firebaseConfig
         const VALIDATOR_SECRET_KEY = 'V2025'; // Updated validator key
 
-        // Initial application data, moved to global scope in the module script.
-        // window.initialAppData
-
         let currentCourseId = null; // Tracks the currently viewed course
         let currentTermId = null;   // Tracks the term being edited (null for new term)
         let isValidatorMode = false; // New state variable for validator mode
@@ -1936,7 +1936,7 @@
                 pronunciation: 'maarechet',
                 english: 'system',
                 russian: 'система',
-                arabic: 'नظام',
+                arabic: 'نظام',
                 french: 'système',
                 mandarin: '系统',
                 spanish: 'sistema',
@@ -2035,7 +2035,7 @@
             viewElement.classList.remove('hidden');
         }
 
-        // Generate a simple unique ID
+        // Generate a simple unique ID (not used for Firestore `addDoc` but kept if needed elsewhere)
         function generateId() {
             return '_' + Math.random().toString(36).substr(2, 9);
         }
@@ -2098,12 +2098,14 @@
                         ${isValidatorMode ? `<button class="btn-delete px-3 py-1 text-sm" data-course-id="${course.id}">Delete</button>` : ''}
                     </div>
                 `;
+                // Add event listener for course name to view details
                 courseCard.querySelector('h3').onclick = () => viewCourseDetails(course.id);
-                // Only attach delete event listener if the button exists
+                
+                // Only attach delete event listener if the button exists and in validator mode
                 const deleteBtn = courseCard.querySelector('.btn-delete');
-                if (deleteBtn) {
+                if (isValidatorMode && deleteBtn) {
                     deleteBtn.onclick = (e) => {
-                        e.stopPropagation(); // Prevent card click
+                        e.stopPropagation(); // Prevent card click from triggering viewCourseDetails
                         deleteCourse(course.id);
                     };
                 }
@@ -2145,7 +2147,7 @@
 
                 // Display the Hebrew term as the main heading
                 const mainHebrewTerm = term.hebrew && term.hebrew.text ? term.hebrew.text : '';
-                const mainEnglishPronunciation = term.pronunciation || (term.english && term.english.text ? term.english.text : ''); // Assuming English pronunciation for now
+                const mainEnglishPronunciation = term.pronunciation || ''; // Assuming English pronunciation for now
                 const mainDefinition = term.definition;
 
                 const termCard = document.createElement('div');
@@ -2207,7 +2209,7 @@
                 `;
                 termList.appendChild(termCard);
 
-                // Add event listener for the "View Translations" button (this one is fine to keep here)
+                // Add event listener for the "View Translations" button
                 const toggleBtn = termCard.querySelector(`.toggle-translations-btn`);
                 toggleBtn.onclick = () => {
                     const translationsDiv = document.getElementById(`termTranslations_${term.id}`);
@@ -2304,20 +2306,19 @@
         // Handle adding a new course
         addCourseForm.onsubmit = async (e) => {
             e.preventDefault();
-            if (!window.isFirebaseReady) {
-                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             const courseName = document.getElementById('courseName').value.trim();
             if (courseName) {
                 const newCourse = {
-                    id: generateId(),
                     name: courseName
+                    // Firestore will generate the ID for addDoc
                 };
-                // Use the hardcoded APP_ID constant
-                const appId = APP_ID;
                 try {
-                    await addDoc(collection(window.db, 'artifacts', appId, 'public', 'data', 'courses'), newCourse);
+                    // Using addDoc to let Firestore generate a unique ID
+                    await addDoc(collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'courses'), newCourse);
                     showMessageBox('Course added successfully!', 'success', () => {
                         addCourseForm.reset();
                         showView(homeView);
@@ -2335,8 +2336,8 @@
         // Handle adding or editing a term
         addTermForm.onsubmit = async (e) => {
             e.preventDefault();
-            if (!window.isFirebaseReady) {
-                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             const termHebrew = document.getElementById('termHebrew').value.trim();
@@ -2347,47 +2348,43 @@
                 return;
             }
 
-            let termData = {};
-            // Use the hardcoded APP_ID constant
-            const appId = APP_ID;
+            let termData = {
+                definition: termDefinition,
+                pronunciation: document.getElementById('pronunciationDisplay').textContent.replace(/[()]/g, '') || '', // Ensure pronunciation is saved
+            };
 
-            // Process all language fields
+            // Process all language fields, ensuring status is handled correctly for updates
+            const currentTermInAppData = window.appData.terms.find(t => t.id === currentTermId);
             LANGUAGES.forEach(lang => {
                 const inputElement = document.getElementById(lang.inputId);
                 const newText = inputElement ? inputElement.value.trim() : '';
 
                 if (newText) {
-                    termData[lang.key] = {
-                        text: newText,
-                        status: 'Pending',
-                        validatedBy: null
-                    };
+                    const existingLangData = currentTermInAppData ? currentTermInAppData[lang.key] : null;
+                    if (existingLangData && existingLangData.text === newText && existingLangData.status === 'Validated') {
+                        // If text hasn't changed and was already validated, preserve status and validatedBy
+                        termData[lang.key] = {
+                            text: newText,
+                            status: 'Validated',
+                            validatedBy: existingLangData.validatedBy
+                        };
+                    } else {
+                        // If text changed or was never validated, set to Pending
+                        termData[lang.key] = {
+                            text: newText,
+                            status: 'Pending',
+                            validatedBy: null
+                        };
+                    }
                 } else {
-                    termData[lang.key] = null;
+                    termData[lang.key] = null; // Clear if input is empty
                 }
             });
 
-            termData.definition = termDefinition;
-            termData.pronunciation = document.getElementById('pronunciationDisplay').textContent.replace(/[()]/g, ''); // Extract pronunciation if available from learn hebrew game
-
             try {
                 if (currentTermId) { // Editing an existing term
-                    const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', currentTermId);
-                    // Fetch current term to preserve existing status for unchanged fields
-                    const currentTermDoc = await getDoc(termRef);
-                    if (currentTermDoc.exists()) {
-                        const existingTermData = currentTermDoc.data();
-                        LANGUAGES.forEach(lang => {
-                            const newText = termData[lang.key]?.text || '';
-                            const oldText = existingTermData[lang.key]?.text || '';
-                            if (newText === oldText && existingTermData[lang.key]?.status === 'Validated') {
-                                // If text hasn't changed and was already validated, keep it validated
-                                termData[lang.key].status = 'Validated';
-                                termData[lang.key].validatedBy = existingTermData[lang.key].validatedBy;
-                            }
-                        });
-                    }
-                    await updateDoc(termRef, termData);
+                    const termRef = doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', currentTermId);
+                    await updateDoc(termRef, termData); // Use updateDoc for partial update
                     showMessageBox('Term updated successfully!', 'success', () => {
                         addTermForm.reset();
                         currentTermId = null; // Clear editing state
@@ -2395,7 +2392,7 @@
                     });
                 } else { // Adding a new term
                     termData.courseId = currentCourseId;
-                    await addDoc(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), termData);
+                    await addDoc(collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms'), termData); // Use addDoc
                     showMessageBox('Term added successfully! Individual translations are pending validation.', 'success', () => {
                         addTermForm.reset();
                         currentTermId = null; // Clear editing state
@@ -2410,14 +2407,12 @@
 
         // Function to prepare the form for editing a term
         async function editTerm(termId) {
-            if (!window.isFirebaseReady) {
-                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             currentTermId = termId;
-            // Use the hardcoded APP_ID constant
-            const appId = APP_ID;
-            const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId);
+            const termRef = doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId);
             try {
                 const termDoc = await getDoc(termRef);
                 if (termDoc.exists()) {
@@ -2426,8 +2421,8 @@
                     addTermSubmitBtn.textContent = 'Save Changes';
 
                     document.getElementById('termDefinition').value = term.definition;
-                    // Assuming pronunciation is directly in term object for this example, adjust if needed
-                    // document.getElementById('termPronunciation').value = term.pronunciation || '';
+                    // If you want to pre-fill pronunciation during edit
+                    // document.getElementById('pronunciationDisplay').textContent = term.pronunciation || '';
 
                     LANGUAGES.forEach(lang => {
                         const inputElement = document.getElementById(lang.inputId);
@@ -2450,15 +2445,13 @@
 
         // Validate a term for a specific language using the secret key
         function validateTerm(termId, langKey) {
-            if (!window.isFirebaseReady) {
-                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             showPromptBox(`Enter validator secret key for ${langKey} translation:`, async (key) => {
                 if (key === VALIDATOR_SECRET_KEY) {
-                    // Use the hardcoded APP_ID constant
-                    const appId = APP_ID;
-                    const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId);
+                    const termRef = doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId);
                     try {
                         const termDoc = await getDoc(termRef);
                         if (termDoc.exists() && termDoc.data()[langKey]) {
@@ -2466,13 +2459,13 @@
                             const validatedByPath = `${langKey}.validatedBy`;
                             await updateDoc(termRef, {
                                 [updatePath]: 'Validated',
-                                [validatedByPath]: window.userId || 'Anonymous Validator' // Use actual user ID if available
+                                [validatedByPath]: window.userId // Use actual user ID
                             });
                             showMessageBox(`${langKey} translation validated successfully!`, 'success', () => {
-                                // renderTerms is called by the onSnapshot listener
+                                // renderTerms is called by the onSnapshot listener, which will update the UI
                             });
                         } else {
-                            showMessageBox(`Could not validate ${langKey} translation.`, 'error');
+                            showMessageBox(`Could not validate ${langKey} translation. It might not exist or already be validated.`, 'error');
                         }
                     } catch (error) {
                         console.error("Error validating term: ", error);
@@ -2486,28 +2479,26 @@
 
         // Delete a course
         function deleteCourse(courseId) {
-            if (!window.isFirebaseReady) {
-                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             showConfirmBox('Are you sure you want to delete this course and all its terms?', async () => {
-                // Use the hardcoded APP_ID constant
-                const appId = APP_ID;
                 try {
-                    // Delete course document
-                    await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'courses', courseId));
-
-                    // Delete associated terms
-                    const termsQuery = query(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), where('courseId', '==', courseId));
+                    // Delete associated terms first
+                    const termsQuery = query(collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms'), where('courseId', '==', courseId));
                     const termsSnapshot = await getDocs(termsQuery);
                     const deletePromises = termsSnapshot.docs.map(d => deleteDoc(d.ref));
                     await Promise.all(deletePromises);
+
+                    // Then delete course document
+                    await deleteDoc(doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'courses', courseId));
 
                     showMessageBox('Course and associated terms deleted.', 'info', () => {
                         // renderCourses and renderTerms are called by onSnapshot listeners
                         if (currentCourseId === courseId) {
                             currentCourseId = null; // Clear current course if deleted
-                            showView(homeView);
+                            showView(homeView); // Go back to home view
                         }
                     });
                 } catch (error) {
@@ -2519,15 +2510,13 @@
 
         // Delete a term
         function deleteTerm(termId) {
-            if (!window.isFirebaseReady) {
-                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+            if (!window.isFirebaseReady || !window.db || !window.userId) {
+                showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             showConfirmBox('Are you sure you want to delete this term?', async () => {
-                // Use the hardcoded APP_ID constant
-                const appId = APP_ID;
                 try {
-                    await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId));
+                    await deleteDoc(doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId));
                     showMessageBox('Term deleted.', 'info', () => {
                         // renderTerms is called by the onSnapshot listener
                     });
@@ -2565,7 +2554,7 @@
                     // Search across all language texts and definition
                     LANGUAGES.some(lang =>
                         term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(queryText)
-                    ) || term.definition.toLowerCase().includes(queryText)
+                    ) || (term.definition && term.definition.toLowerCase().includes(queryText))
                 );
                 renderSearchResults(results);
             } else {
@@ -2737,7 +2726,7 @@
             challengeOption2Button.disabled = true;
 
             const clickedButton = document.getElementById(clickedOptionKey);
-            const correctButton = document.getElementById(challengeGameCorrectOptionKey === 'challengeOption1' ? 'challengeOption1' : 'challengeOption2');
+            const correctButton = document.getElementById(challengeGameCorrectOptionKey); // Use the stored correct key
 
             if (isCorrect) {
                 challengeGameScore++;
