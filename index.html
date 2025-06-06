@@ -8,492 +8,21 @@
     <!-- Tone.js for sound effects -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Base styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F8F9FA; /* Lightest gray for overall background */
-            color: #343A40; /* Dark gray for main text */
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem; /* Increased padding */
-        }
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, getDocs, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        /* Card styling - more prominent shadow, softer corners */
-        .card {
-            background-color: #ffffff;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Softer, more spread out shadow */
-            padding: 2rem; /* Increased padding */
-            margin-bottom: 2rem; /* Increased margin */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px); /* Slight lift on hover */
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
+        // Global variables for Firebase instances and user ID
+        window.firebaseApp = null;
+        window.db = null;
+        window.auth = null;
+        window.userId = null;
+        window.isFirebaseReady = false; // Flag to ensure Firestore operations run only after auth
 
-        /* Input and textarea styling - refined borders, clear focus */
-        input[type="text"], textarea, select {
-            border: 1px solid #CED4DA; /* Lighter gray border */
-            border-radius: 0.5rem; /* Slightly more rounded */
-            padding: 0.75rem 1rem;
-            width: 100%;
-            font-size: 1rem;
-            color: #343A40;
-            background-color: #ffffff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        input[type="text"]:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #4CAF50; /* Accent green for focus */
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25); /* Green shadow for focus */
-        }
-
-        /* Button styling - primary accent color, subtle hover effects */
-        button {
-            background-color: #4CAF50; /* Primary accent green */
-            color: white;
-            padding: 0.85rem 1.75rem; /* More generous padding */
-            border-radius: 0.625rem; /* rounded-lg */
-            font-weight: 600;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
-            display: inline-flex; /* For icons to be centered */
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem; /* Space between icon and text */
-        }
-        button:hover {
-            background-color: #43A047; /* Darker green on hover */
-            transform: translateY(-2px); /* Slightly more pronounced lift */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Secondary button style */
-        .btn-secondary {
-            background-color: #98B4AA; /* Muted blue-gray */
-            color: #343A40; /* Dark text for contrast */
-            box-shadow: none; /* No shadow by default for secondary */
-        }
-        .btn-secondary:hover {
-            background-color: #7A908D; /* Darker muted blue-gray */
-            color: white; /* Text turns white on hover for better contrast */
-            transform: translateY(-1px);
-        }
-        .btn-secondary:active {
-            transform: translateY(0);
-        }
-
-        /* Specific button styles (kept for functionality, integrated with new palette) */
-        .btn-validate { background-color: #28A745; } /* Bootstrap success green */
-        .btn-validate:hover { background-color: #218838; }
-        .btn-edit { background-color: #FFC107; color: #343A40; } /* Bootstrap warning yellow, dark text */
-        .btn-edit:hover { background-color: #E0A800; }
-        .btn-delete { background-color: #DC3545; } /* Bootstrap danger red */
-        .btn-delete:hover { background-color: #C82333; }
-
-        /* Status colors */
-        .status-pending { color: #FFC107; font-weight: 500; }
-        .status-validated { color: #28A745; font-weight: 500; }
-        .status-not-provided { color: #6C757D; font-style: italic; } /* Muted gray */
-        .status-overall-fully-validated { color: #198754; font-weight: 600; } /* Darker green */
-        .status-overall-partially-validated { color: #FFC107; font-weight: 600; }
-        .status-overall-pending { color: #DC3545; font-weight: 600; }
-
-        /* Message box styling */
-        .message-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 2.5rem; /* More padding */
-            border-radius: 0.75rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Deeper shadow */
-            z-index: 1000;
-            text-align: center;
-            min-width: 320px;
-            max-width: 90%;
-            border: 1px solid #E9ECEF; /* Subtle border */
-        }
-        .message-box-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
-            z-index: 999;
-        }
-
-        /* Table styling - refined borders and padding */
-        .term-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1.5rem; /* More space */
-            border-radius: 0.5rem; /* Rounded table corners */
-            overflow: hidden; /* Ensures rounded corners are visible */
-        }
-        .term-table th, .term-table td {
-            border: 1px solid #E9ECEF; /* Lighter border for cells */
-            padding: 1rem; /* More padding */
-            text-align: left;
-            vertical-align: middle;
-        }
-        .term-table th {
-            background-color: #F0F2F5; /* Very light gray for header */
-            font-weight: 600;
-            color: #343A40;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-        }
-        .term-table tr:nth-child(even) {
-            background-color: #F8F9FA; /* Subtle zebra striping */
-        }
-
-        /* Custom header background color */
-        .bg-header-custom {
-            background-color: #faeddb;
-            color: #343A40; /* Text color for header content */
-            padding: 1rem 0; /* Reduced padding for a tighter header */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Lighter header shadow */
-        }
-        .bg-header-custom .container {
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-        }
-        .bg-header-custom button {
-            background-color: #ffffff; /* White background for header buttons */
-            color: #4CAF50; /* Green text for header buttons */
-            padding: 0.6rem 1.2rem; /* Adjusted padding for header buttons */
-            font-weight: 500;
-            font-size: 0.95rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
-        .bg-header-custom button:hover {
-            background-color: #F0F2F5; /* Light gray on hover */
-            color: #388E3C; /* Darker green on hover */
-            transform: translateY(-1px);
-        }
-
-        /* Game specific styles (Linguini Challenge and Learn Hebrew) */
-        .game-option-button, .learn-hebrew-option-button {
-            @apply bg-4CAF50 text-white py-4 px-6 rounded-lg text-2xl font-bold w-full transition-all duration-200 ease-in-out shadow-md; /* Larger text, more padding, shadow */
-        }
-        .game-option-button:hover, .learn-hebrew-option-button:hover {
-            @apply bg-43A047 transform scale-102 shadow-lg; /* Darker green, slight scale, deeper shadow */
-        }
-        .game-option-button.correct, .learn-hebrew-option-button.correct {
-            @apply bg-28A745; /* Success green */
-        }
-        .game-option-button.incorrect, .learn-hebrew-option-button.incorrect {
-            @apply bg-DC3545; /* Danger red */
-        }
-
-        /* Learn Hebrew specific styles */
-        #hebrewTermDisplay {
-            font-size: 6rem; /* Even larger for impact */
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        #pronunciationDisplay {
-            font-size: 1.8rem;
-            color: #6C757D;
-        }
-        #learnHebrewFeedback {
-            font-size: 1.8rem;
-        }
-
-        /* Flexbox for footer content */
-        .footer-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem; /* Space between text and mascot */
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
-    <header class="bg-header-custom p-4 shadow-lg">
-        <div class="container flex flex-col md:flex-row md:justify-between md:items-center">
-            <!-- Logo on the left -->
-            <div class="flex justify-center md:justify-start mb-4 md:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-24 w-24 md:h-20 md:w-20 rounded-full shadow-md">
-            </div>
-            <!-- Navigation buttons below on mobile, to the right on desktop -->
-            <nav class="flex flex-wrap justify-center gap-3 md:gap-4 mt-2 md:mt-0">
-                <button id="homeButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l7 7m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                    Home
-                </button>
-                <button id="validatorAuthButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Validator Login
-                </button>
-                <button id="challengeGameButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
-                    </svg>
-                    Linguini Challenge
-                </button>
-                <button id="searchButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    Search
-                </button>
-                <button id="learnHebrewButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.4M3.344 11.516l-.008.008A9.752 9.752 0 0012 21.75a9.753 9.753 0 008.657-4.929l-.008-.008-1.339-2.679m0 0l-.952-1.904A2.25 2.25 0 0015.688 9.442l4.474-4.474A9.753 9.753 0 0012 2.25c-2.895 0-5.689 1.173-7.776 3.26l-.008.008z"/>
-                    </svg>
-                    Learn Hebrew
-                </button>
-            </nav>
-        </div>
-    </header>
-
-    <main class="flex-grow container py-8">
-        <div id="messageBoxContainer"></div>
-
-        <!-- Home View -->
-        <div id="homeView" class="view">
-            <div class="card">
-                <h2 class="text-3xl font-bold mb-4 text-center">Welcome to Linguini!</h2>
-                <p class="text-lg text-center mb-6 text-gray-700">Your go-to resource for Technion course terms, translated into multiple languages.</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button id="showAddCourseFormBtn" class="w-full sm:w-auto">Add New Course</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4">Available Courses</h2>
-                <div id="courseList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
-            </div>
-        </div>
-
-        <!-- Search View -->
-        <div id="searchView" class="view hidden">
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4">Global Term Search</h2>
-                <div class="relative w-full mb-6">
-                    <input type="text" id="globalSearchInput" placeholder="Search all terms..." class="pr-10">
-                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
-                <p id="noSearchResultsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found matching your search.</p>
-                <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
-            </div>
-        </div>
-
-        <!-- Add Course View -->
-        <div id="addCourseView" class="view hidden">
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
-                <form id="addCourseForm" class="space-y-4">
-                    <div>
-                        <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
-                        <input type="text" id="courseName" placeholder="e.g., Calculus 1" required>
-                    </div>
-                    <div class="flex gap-4">
-                        <button type="submit">Add Course</button>
-                        <button type="button" id="cancelAddCourseBtn" class="btn-secondary">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Course Details View -->
-        <div id="courseDetailsView" class="view hidden">
-            <div class="card">
-                <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
-                <p class="text-gray-700 mb-6">Terms for this course:</p>
-                <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                    <button id="showAddTermFormBtn" class="w-full sm:w-auto">Add New Term to Course</button>
-                    <div class="relative w-full sm:w-1/2">
-                        <input type="text" id="courseSearchInput" placeholder="Search terms in this course..." class="pr-10">
-                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-                <div id="termList" class="grid grid-cols-1 gap-4">
-                    </div>
-                <p id="noTermsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found for this course. Be the first to add one!</p>
-            </div>
-        </div>
-
-        <!-- Add Term View -->
-        <div id="addTermView" class="view hidden">
-            <div class="card">
-                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
-                <form id="addTermForm" class="space-y-4">
-                    <div>
-                        <label for="termHebrew" class="block text-sm font-medium text-gray-700 mb-1">Term (Hebrew) <span class="text-red-500">*</span></label>
-                        <input type="text" id="termHebrew" dir="rtl" placeholder="נגזרת" required>
-                    </div>
-                    <div>
-                        <label for="termDefinition" class="block text-sm font-medium text-gray-700 mb-1">Definition <span class="text-red-500">*</span></label>
-                        <textarea id="termDefinition" rows="3" placeholder="Provide a clear definition..." required></textarea>
-                    </div>
-                    <p class="text-sm text-gray-600">Provide translations in other languages (optional):</p>
-                    <div>
-                        <label for="termEnglish" class="block text-sm font-medium text-gray-700 mb-1">Term (English)</label>
-                        <input type="text" id="termEnglish" placeholder="e.g., Derivative">
-                    </div>
-                    <div>
-                        <label for="termRussian" class="block text-sm font-medium text-gray-700 mb-1">Term (Russian)</label>
-                        <input type="text" id="termRussian" placeholder="Произודנה">
-                    </div>
-                    <div>
-                        <label for="termArabic" class="block text-sm font-medium text-gray-700 mb-1">Term (Arabic)</label>
-                        <input type="text" id="termArabic" dir="rtl" placeholder="مشتقة">
-                    </div>
-                    <div>
-                        <label for="termFrench" class="block text-sm font-medium text-gray-700 mb-1">Term (French)</label>
-                        <input type="text" id="termFrench" placeholder="Dérivée">
-                    </div>
-                    <div>
-                        <label for="termMandarin" class="block text-sm font-medium text-gray-700 mb-1">Term (Mandarin)</label>
-                        <input type="text" id="termMandarin" placeholder="例如：导数">
-                    </div>
-                    <div>
-                        <label for="termSpanish" class="block text-sm font-medium text-gray-700 mb-1">Term (Spanish)</label>
-                        <input type="text" id="termSpanish" placeholder="p. ej., Derivada">
-                    </div>
-                    <div>
-                        <label for="termHindi" class="block text-sm font-medium text-gray-700 mb-1">Term (Hindi)</label>
-                        <input type="text" id="termHindi" placeholder="जैसे, व्युत्पन्न">
-                    </div>
-                    <div class="flex gap-4">
-                        <button type="submit" id="addTermSubmitBtn">Add Term</button>
-                        <button type="button" id="cancelAddTermBtn" class="btn-secondary">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Linguini Challenge Game View -->
-        <div id="challengeGameView" class="view hidden">
-            <div class="card text-center">
-                <h2 class="text-3xl font-bold mb-6">Linguini Challenge!</h2>
-                <div id="challengeGameStartScreen">
-                    <p class="text-lg mb-4 text-gray-700">Choose your native language to start the game:</p>
-                    <select id="challengeGameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
-                        <!-- Options populated by JS -->
-                    </select>
-                    <button id="startChallengeGameButton">Start Game</button>
-                </div>
-
-                <div id="challengeGamePlayScreen" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="text-2xl font-semibold">Score: <span id="challengeGameScore">0</span></div>
-                        <div class="text-2xl font-semibold text-red-500">Time: <span id="challengeGameTimer">30</span>s</div>
-                    </div>
-                    <p class="text-4xl font-bold mb-8" id="challengeGameTermDisplay"></p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="challenge-option-button" id="challengeOption1"></button>
-                        <button class="challenge-option-button" id="challengeOption2"></button>
-                    </div>
-                    <p id="challengeGameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
-                </div>
-
-                <div id="challengeGameOverScreen" class="hidden">
-                    <h3 class="text-3xl font-bold mb-4">Game Over!</h3>
-                    <p class="text-xl mb-6">Your final score: <span id="challengeFinalScore" class="font-bold text-emerald-600"></span></p>
-                    <button id="playAgainChallengeButton">Play Again</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Learn Hebrew View -->
-        <div id="learnHebrewView" class="view hidden">
-            <div class="card text-center">
-                <h2 class="text-3xl font-bold mb-6">Learn Hebrew Vocabulary</h2>
-                <p class="text-lg mb-6 text-gray-700">
-                    This section helps you master essential Hebrew terms for your academic studies at Technion.
-                    Select your native language, and we'll guide you through key vocabulary with interactive games.
-                </p>
-
-                <div id="learnHebrewStartScreen">
-                    <p class="text-lg mb-4 text-gray-700">Choose your native language for learning:</p>
-                    <select id="learnHebrewLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
-                        <!-- Options populated by JS -->
-                    </select>
-                    <button id="startLearningButton">Start Learning</button>
-                </div>
-
-                <div id="learnHebrewPlayScreen" class="hidden">
-                    <div class="flex justify-between items-center w-full mb-6">
-                        <div class="text-xl font-semibold">Words Mastered: <span id="masteredWordsCount">0</span></div>
-                        <div class="text-xl font-semibold">Progress: <span id="learningProgress">0/0</span></div>
-                    </div>
-                    <div class="flex flex-col items-center mb-8">
-                        <p class="text-7xl font-bold mb-2" id="hebrewTermDisplay" dir="rtl"></p>
-                        <p class="text-2xl text-gray-600" id="pronunciationDisplay"></p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="learn-hebrew-option-button" id="learnHebrewOption1"></button>
-                        <button class="learn-hebrew-option-button" id="learnHebrewOption2"></button>
-                    </div>
-                    <p id="learnHebrewFeedback" class="text-xl font-semibold mt-6 h-8"></p>
-                    <button id="learnHebrewNextWordButton" class="btn-secondary mt-4 hidden">Next Word</button>
-                </div>
-
-                <div id="learnHebrewEndScreen" class="hidden">
-                    <h3 class="text-3xl font-bold mb-4">Learning Session Complete!</h3>
-                    <p class="text-xl mb-6">You mastered <span id="finalMasteredCount" class="font-bold text-emerald-600"></span> words.</p>
-                    <button id="startNewLearningSessionButton">Start New Session</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div class="container flex justify-between items-center py-4 px-6">
-        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/proxy-image.png" alt="Left Logo" class="h-20 w-auto">
-        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/LOGO_WIDE_Heb.png" alt="Right Logo" class="h-20 w-auto">
-    </div>
-
-    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
-        <div class="container footer-content">
-            &copy; 2025 Linguini. All rights reserved.
-            <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Mascot" class="h-8 w-8 ml-2 rounded-full">
-        </div>
-    </footer>
-
-    <script>
-        // --- Data Storage and Management ---
-        const STORAGE_KEY = 'linguiniDataV2';
-        const VALIDATOR_SECRET_KEY = 'V2025'; // Updated validator key
-
-        // Function to load data from localStorage (kept for existing user data if any)
-        function loadData() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : null; // Return null if no data exists
-        }
-
-        // Function to save data to localStorage
-        function saveData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
-
-        // Initial application data, will be used if no data is found in local storage
-        const initialAppData = {
+        // Initial application data to seed Firestore if empty
+        window.initialAppData = {
             courses: [
                 { id: 'c1', name: 'Calculus 1' },
                 { id: 'c2', name: 'Algebra 1' },
@@ -550,7 +79,7 @@
                     french: { text: 'Primitive', status: 'Pending', validatedBy: null },
                     mandarin: { text: '反导数', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Antiderivada', status: 'Pending', validatedBy: null },
-                    hindi: { text: 'प्रति-अवकलज', status: 'Pending', validatedBy: null }
+                    hindi: { text: 'प्रति-अवकalaj', status: 'Pending', validatedBy: null }
                 },
                 {
                     id: 't_c1_5', courseId: 'c1', definition: 'The concept of continuity is fundamental to calculus and describes functions that do not have abrupt changes in value.',
@@ -622,7 +151,7 @@
                     french: { text: 'Asymptote horizontale', status: 'Pending', validatedBy: null },
                     mandarin: { text: '水平渐近线', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Asíntota horizontal', status: 'Pending', validatedBy: null },
-                    hindi: { text: 'क्षैтиज स्पर्शोन्मुख', status: 'Pending', validatedBy: null }
+                    hindi: { text: 'क्षैतिज स्पर्शोन्मुख', status: 'Pending', validatedBy: null }
                 },
                 {
                     id: 't_c1_11', courseId: 'c1', definition: 'The definite integral can be interpreted as the area of the region bounded by the graph of a function, the x-axis, and vertical lines.',
@@ -1453,11 +982,596 @@
             ]
         };
 
-        let appData = loadData(); // Try to load from local storage
-        if (!appData) { // If no data found in local storage, use initialAppData
-            appData = initialAppData;
-            saveData(appData); // Save the initial data to local storage for future sessions
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Initialize Firebase only once
+                if (!window.firebaseApp) {
+                    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                    if (Object.keys(firebaseConfig).length > 0) {
+                        window.firebaseApp = initializeApp(firebaseConfig);
+                        window.db = getFirestore(window.firebaseApp);
+                        window.auth = getAuth(window.firebaseApp);
+
+                        // Sign in with custom token or anonymously
+                        if (typeof __initial_auth_token !== 'undefined') {
+                            await signInWithCustomToken(window.auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(window.auth);
+                        }
+
+                        // Set up auth state change listener to get user ID and initialize data
+                        onAuthStateChanged(window.auth, async (user) => {
+                            if (user) {
+                                window.userId = user.uid;
+                                console.log('Firebase initialized. User ID:', window.userId);
+                                window.isFirebaseReady = true; // Set flag to true
+                                // After Firebase is ready, proceed with app initialization
+                                await initializeAppData();
+                                renderCourses();
+                                populateChallengeGameLanguageSelect();
+                                populateLearnHebrewLanguageSelect();
+                                showView(homeView);
+                            } else {
+                                console.log('No user signed in.');
+                                window.userId = null;
+                                window.isFirebaseReady = true; // Still ready for anonymous access
+                                // If not signed in, app might still function but without user-specific data
+                                await initializeAppData();
+                                renderCourses();
+                                populateChallengeGameLanguageSelect();
+                                populateLearnHebrewLanguageSelect();
+                                showView(homeView);
+                            }
+                        });
+                    } else {
+                        console.error("Firebase config is missing. Cannot initialize Firebase.");
+                        // Proceed without Firebase features if config is missing
+                        renderCourses();
+                        populateChallengeGameLanguageSelect();
+                        populateLearnHebrewLanguageSelect();
+                        showView(homeView);
+                    }
+                } else {
+                    // If Firebase is already initialized (e.g., due to hot reload in dev env)
+                    await initializeAppData();
+                    renderCourses();
+                    populateChallengeGameLanguageSelect();
+                    populateLearnHebrewLanguageSelect();
+                    showView(homeView);
+                }
+            } catch (error) {
+                console.error("Error during Firebase initialization or auth:", error);
+                showMessageBox("Error loading application. Please try again.", "error");
+            }
+        });
+
+        // Function to ensure appData is loaded from Firestore or seeded
+        window.appData = { courses: [], terms: [] }; // Global appData
+
+        async function initializeAppData() {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+            // Check if courses collection is empty and seed if necessary
+            const coursesRef = collection(window.db, 'artifacts', appId, 'public', 'data', 'courses');
+            const coursesSnapshot = await getDocs(coursesRef);
+
+            if (coursesSnapshot.empty) {
+                console.log("Seeding initial data to Firestore...");
+                for (const course of window.initialAppData.courses) {
+                    await setDoc(doc(coursesRef, course.id), course);
+                }
+                for (const term of window.initialAppData.terms) {
+                    const termRef = doc(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), term.id);
+                    await setDoc(termRef, term);
+                }
+                console.log("Initial data seeded.");
+            }
+
+            // Set up real-time listeners for courses and terms
+            onSnapshot(coursesRef, (snapshot) => {
+                window.appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCourses(); // Re-render courses whenever data changes
+                // If a course was being viewed, re-render its terms as well
+                if (window.currentCourseId) {
+                    renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+                }
+            }, (error) => {
+                console.error("Error fetching courses:", error);
+                showMessageBox("Error loading courses. Please refresh.", "error");
+            });
+
+            onSnapshot(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), (snapshot) => {
+                window.appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Re-render terms for current course if active
+                if (window.currentCourseId) {
+                    renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+                }
+                // Also update global search results if search view is active
+                if (!searchView.classList.contains('hidden') && globalSearchInput.value.trim().length > 0) {
+                    globalSearchInput.onkeyup(); // Trigger search re-render
+                }
+            }, (error) => {
+                console.error("Error fetching terms:", error);
+                showMessageBox("Error loading terms. Please refresh.", "error");
+            });
         }
+    </script>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA; /* Lightest gray for overall background */
+            color: #343A40; /* Dark gray for main text */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem; /* Increased padding */
+        }
+
+        /* Card styling - more prominent shadow, softer corners */
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Softer, more spread out shadow */
+            padding: 2rem; /* Increased padding */
+            margin-bottom: 2rem; /* Increased margin */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Slight lift on hover */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Input and textarea styling - refined borders, clear focus */
+        input[type="text"], textarea, select {
+            border: 1px solid #CED4DA; /* Lighter gray border */
+            border-radius: 0.5rem; /* Slightly more rounded */
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1rem;
+            color: #343A40;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50; /* Accent green for focus */
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25); /* Green shadow for focus */
+        }
+
+        /* Button styling - primary accent color, subtle hover effects */
+        button {
+            background-color: #4CAF50; /* Primary accent green */
+            color: white;
+            padding: 0.85rem 1.75rem; /* More generous padding */
+            border-radius: 0.625rem; /* rounded-lg */
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
+            display: inline-flex; /* For icons to be centered */
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem; /* Space between icon and text */
+        }
+        button:hover {
+            background-color: #43A047; /* Darker green on hover */
+            transform: translateY(-2px); /* Slightly more pronounced lift */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Secondary button style */
+        .btn-secondary {
+            background-color: #98B4AA; /* Muted blue-gray */
+            color: #343A40; /* Dark text for contrast */
+            box-shadow: none; /* No shadow by default for secondary */
+        }
+        .btn-secondary:hover {
+            background-color: #7A908D; /* Darker muted blue-gray */
+            color: white; /* Text turns white on hover for better contrast */
+            transform: translateY(-1px);
+        }
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+
+        /* Specific button styles (kept for functionality, integrated with new palette) */
+        .btn-validate { background-color: #28A745; } /* Bootstrap success green */
+        .btn-validate:hover { background-color: #218838; }
+        .btn-edit { background-color: #FFC107; color: #343A40; } /* Bootstrap warning yellow, dark text */
+        .btn-edit:hover { background-color: #E0A800; }
+        .btn-delete { background-color: #DC3545; } /* Bootstrap danger red */
+        .btn-delete:hover { background-color: #C82333; }
+
+        /* Status colors */
+        .status-pending { color: #FFC107; font-weight: 500; }
+        .status-validated { color: #28A745; font-weight: 500; }
+        .status-not-provided { color: #6C757D; font-style: italic; } /* Muted gray */
+        .status-overall-fully-validated { color: #198754; font-weight: 600; } /* Darker green */
+        .status-overall-partially-validated { color: #FFC107; font-weight: 600; }
+        .status-overall-pending { color: #DC3545; font-weight: 600; }
+
+        /* Message box styling */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 2.5rem; /* More padding */
+            border-radius: 0.75rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Deeper shadow */
+            z-index: 1000;
+            text-align: center;
+            min-width: 320px;
+            max-width: 90%;
+            border: 1px solid #E9ECEF; /* Subtle border */
+        }
+        .message-box-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+            z-index: 999;
+        }
+
+        /* Table styling - refined borders and padding */
+        .term-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem; /* More space */
+            border-radius: 0.5rem; /* Rounded table corners */
+            overflow: hidden; /* Ensures rounded corners are visible */
+        }
+        .term-table th, .term-table td {
+            border: 1px solid #E9ECEF; /* Lighter border for cells */
+            padding: 1rem; /* More padding */
+            text-align: left;
+            vertical-align: middle;
+        }
+        .term-table th {
+            background-color: #F0F2F5; /* Very light gray for header */
+            font-weight: 600;
+            color: #343A40;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+        .term-table tr:nth-child(even) {
+            background-color: #F8F9FA; /* Subtle zebra striping */
+        }
+
+        /* Custom header background color */
+        .bg-header-custom {
+            background-color: #faeddb;
+            color: #343A40; /* Text color for header content */
+            padding: 1rem 0; /* Reduced padding for a tighter header */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Lighter header shadow */
+        }
+        .bg-header-custom .container {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        .bg-header-custom button {
+            background-color: #ffffff; /* White background for header buttons */
+            color: #4CAF50; /* Green text for header buttons */
+            padding: 0.6rem 1.2rem; /* Adjusted padding for header buttons */
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+        .bg-header-custom button:hover {
+            background-color: #F0F2F5; /* Light gray on hover */
+            color: #388E3C; /* Darker green on hover */
+            transform: translateY(-1px);
+        }
+
+        /* Game specific styles (Linguini Challenge and Learn Hebrew) */
+        .game-option-button, .learn-hebrew-option-button {
+            @apply bg-4CAF50 text-white py-4 px-6 rounded-lg text-2xl font-bold w-full transition-all duration-200 ease-in-out shadow-md; /* Larger text, more padding, shadow */
+        }
+        .game-option-button:hover, .learn-hebrew-option-button:hover {
+            @apply bg-43A047 transform scale-102 shadow-lg; /* Darker green, slight scale, deeper shadow */
+        }
+        .game-option-button.correct, .learn-hebrew-option-button.correct {
+            @apply bg-28A745; /* Success green */
+        }
+        .game-option-button.incorrect, .learn-hebrew-option-button.incorrect {
+            @apply bg-DC3545; /* Danger red */
+        }
+
+        /* Learn Hebrew specific styles */
+        #hebrewTermDisplay {
+            font-size: 6rem; /* Even larger for impact */
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        #pronunciationDisplay {
+            font-size: 1.8rem;
+            color: #6C757D;
+        }
+        #learnHebrewFeedback {
+            font-size: 1.8rem;
+        }
+
+        /* Flexbox for footer content */
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem; /* Space between text and mascot */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="bg-header-custom p-4 shadow-lg">
+        <div class="container flex flex-col md:flex-row md:justify-between md:items-center">
+            <!-- Logo on the left -->
+            <div class="flex justify-center md:justify-start mb-4 md:mb-0">
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-24 w-24 md:h-20 md:w-20 rounded-full shadow-md">
+            </div>
+            <!-- Navigation buttons below on mobile, to the right on desktop -->
+            <nav class="flex flex-wrap justify-center gap-3 md:gap-4 mt-2 md:mt-0">
+                <button id="homeButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l7 7m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Home
+                </button>
+                <button id="validatorAuthButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Validator Login
+                </button>
+                <button id="challengeGameButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                    Linguini Challenge
+                </button>
+                <button id="searchButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+                <button id="learnHebrewButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.4M3.344 11.516l-.008.008A9.752 9.752 0 0012 21.75a9.753 9.753 0 008.657-4.929l-.008-.008-1.339-2.679m0 0l-.952-1.904A2.25 2.25 0 0015.688 9.442l4.474-4.474A9.753 9.753 0 0012 2.25c-2.895 0-5.689 1.173-7.776 3.26l-.008.008z"/>
+                    </svg>
+                    Learn Hebrew
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container py-8">
+        <div id="messageBoxContainer"></div>
+
+        <!-- Home View -->
+        <div id="homeView" class="view">
+            <div class="card">
+                <h2 class="text-3xl font-bold mb-4 text-center">Welcome to Linguini!</h2>
+                <p class="text-lg text-center mb-6 text-gray-700">Your go-to resource for Technion course terms, translated into multiple languages.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button id="showAddCourseFormBtn" class="w-full sm:w-auto">Add New Course</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4">Available Courses</h2>
+                <div id="courseList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+            </div>
+        </div>
+
+        <!-- Search View -->
+        <div id="searchView" class="view hidden">
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4">Global Term Search</h2>
+                <div class="relative w-full mb-6">
+                    <input type="text" id="globalSearchInput" placeholder="Search all terms..." class="pr-10">
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+                <p id="noSearchResultsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found matching your search.</p>
+                <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
+            </div>
+        </div>
+
+        <!-- Add Course View -->
+        <div id="addCourseView" class="view hidden">
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
+                <form id="addCourseForm" class="space-y-4">
+                    <div>
+                        <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
+                        <input type="text" id="courseName" placeholder="e.g., Calculus 1" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit">Add Course</button>
+                        <button type="button" id="cancelAddCourseBtn" class="btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Course Details View -->
+        <div id="courseDetailsView" class="view hidden">
+            <div class="card">
+                <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
+                <p class="text-gray-700 mb-6">Terms for this course:</p>
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <button id="showAddTermFormBtn" class="w-full sm:w-auto">Add New Term to Course</button>
+                    <div class="relative w-full sm:w-1/2">
+                        <input type="text" id="courseSearchInput" placeholder="Search terms in this course..." class="pr-10">
+                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+                <div id="termList" class="grid grid-cols-1 gap-4">
+                    </div>
+                <p id="noTermsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found for this course. Be the first to add one!</p>
+            </div>
+        </div>
+
+        <!-- Add Term View -->
+        <div id="addTermView" class="view hidden">
+            <div class="card">
+                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
+                <form id="addTermForm" class="space-y-4">
+                    <div>
+                        <label for="termHebrew" class="block text-sm font-medium text-gray-700 mb-1">Term (Hebrew) <span class="text-red-500">*</span></label>
+                        <input type="text" id="termHebrew" dir="rtl" placeholder="נגזרת" required>
+                    </div>
+                    <div>
+                        <label for="termDefinition" class="block text-sm font-medium text-gray-700 mb-1">Definition <span class="text-red-500">*</span></label>
+                        <textarea id="termDefinition" rows="3" placeholder="Provide a clear definition..." required></textarea>
+                    </div>
+                    <p class="text-sm text-gray-600">Provide translations in other languages (optional):</p>
+                    <div>
+                        <label for="termEnglish" class="block text-sm font-medium text-gray-700 mb-1">Term (English)</label>
+                        <input type="text" id="termEnglish" placeholder="e.g., Derivative">
+                    </div>
+                    <div>
+                        <label for="termRussian" class="block text-sm font-medium text-gray-700 mb-1">Term (Russian)</label>
+                        <input type="text" id="termRussian" placeholder="Произודנה">
+                    </div>
+                    <div>
+                        <label for="termArabic" class="block text-sm font-medium text-gray-700 mb-1">Term (Arabic)</label>
+                        <input type="text" id="termArabic" dir="rtl" placeholder="مشتقة">
+                    </div>
+                    <div>
+                        <label for="termFrench" class="block text-sm font-medium text-gray-700 mb-1">Term (French)</label>
+                        <input type="text" id="termFrench" placeholder="Dérivée">
+                    </div>
+                    <div>
+                        <label for="termMandarin" class="block text-sm font-medium text-gray-700 mb-1">Term (Mandarin)</label>
+                        <input type="text" id="termMandarin" placeholder="例如：导数">
+                    </div>
+                    <div>
+                        <label for="termSpanish" class="block text-sm font-medium text-gray-700 mb-1">Term (Spanish)</label>
+                        <input type="text" id="termSpanish" placeholder="p. ej., Derivada">
+                    </div>
+                    <div>
+                        <label for="termHindi" class="block text-sm font-medium text-gray-700 mb-1">Term (Hindi)</label>
+                        <input type="text" id="termHindi" placeholder="जैसे, व्युत्पन्न">
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" id="addTermSubmitBtn">Add Term</button>
+                        <button type="button" id="cancelAddTermBtn" class="btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Linguini Challenge Game View -->
+        <div id="challengeGameView" class="view hidden">
+            <div class="card text-center">
+                <h2 class="text-3xl font-bold mb-6">Linguini Challenge!</h2>
+                <div id="challengeGameStartScreen">
+                    <p class="text-lg mb-4 text-gray-700">Choose your native language to start the game:</p>
+                    <select id="challengeGameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                        <!-- Options populated by JS -->
+                    </select>
+                    <button id="startChallengeGameButton">Start Game</button>
+                </div>
+
+                <div id="challengeGamePlayScreen" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-2xl font-semibold">Score: <span id="challengeGameScore">0</span></div>
+                        <div class="text-2xl font-semibold text-red-500">Time: <span id="challengeGameTimer">30</span>s</div>
+                    </div>
+                    <p class="text-4xl font-bold mb-8" id="challengeGameTermDisplay"></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="challenge-option-button" id="challengeOption1"></button>
+                        <button class="challenge-option-button" id="challengeOption2"></button>
+                    </div>
+                    <p id="challengeGameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                </div>
+
+                <div id="challengeGameOverScreen" class="hidden">
+                    <h3 class="text-3xl font-bold mb-4">Game Over!</h3>
+                    <p class="text-xl mb-6">Your final score: <span id="challengeFinalScore" class="font-bold text-emerald-600"></span></p>
+                    <button id="playAgainChallengeButton">Play Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learn Hebrew View -->
+        <div id="learnHebrewView" class="view hidden">
+            <div class="card text-center">
+                <h2 class="text-3xl font-bold mb-6">Learn Hebrew Vocabulary</h2>
+                <p class="text-lg mb-6 text-gray-700">
+                    This section helps you master essential Hebrew terms for your academic studies at Technion.
+                    Select your native language, and we'll guide you through key vocabulary with interactive games.
+                </p>
+
+                <div id="learnHebrewStartScreen">
+                    <p class="text-lg mb-4 text-gray-700">Choose your native language for learning:</p>
+                    <select id="learnHebrewLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                        <!-- Options populated by JS -->
+                    </select>
+                    <button id="startLearningButton">Start Learning</button>
+                </div>
+
+                <div id="learnHebrewPlayScreen" class="hidden">
+                    <div class="flex justify-between items-center w-full mb-6">
+                        <div class="text-xl font-semibold">Words Mastered: <span id="masteredWordsCount">0</span></div>
+                        <div class="text-xl font-semibold">Progress: <span id="learningProgress">0/0</span></div>
+                    </div>
+                    <div class="flex flex-col items-center mb-8">
+                        <p class="text-7xl font-bold mb-2" id="hebrewTermDisplay" dir="rtl"></p>
+                        <p class="text-2xl text-gray-600" id="pronunciationDisplay"></p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="learn-hebrew-option-button" id="learnHebrewOption1"></button>
+                        <button class="learn-hebrew-option-button" id="learnHebrewOption2"></button>
+                    </div>
+                    <p id="learnHebrewFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                    <button id="learnHebrewNextWordButton" class="btn-secondary mt-4 hidden">Next Word</button>
+                </div>
+
+                <div id="learnHebrewEndScreen" class="hidden">
+                    <h3 class="text-3xl font-bold mb-4">Learning Session Complete!</h3>
+                    <p class="text-xl mb-6">You mastered <span id="finalMasteredCount" class="font-bold text-emerald-600"></span> words.</p>
+                    <button id="startNewLearningSessionButton">Start New Session</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="container flex justify-between items-center py-4 px-6">
+        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/proxy-image.png" alt="Left Logo" class="h-20 w-auto">
+        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/LOGO_WIDE_Heb.png" alt="Right Logo" class="h-20 w-auto">
+    </div>
+
+    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
+        <div class="container footer-content">
+            &copy; 2025 Linguini. All rights reserved.
+            <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Mascot" class="h-8 w-8 ml-2 rounded-full">
+        </div>
+    </footer>
+
+    <script>
+        // Global variables for Firebase instances and user ID are declared in the module script
+        // window.firebaseApp, window.db, window.auth, window.userId, window.isFirebaseReady
+
+        const VALIDATOR_SECRET_KEY = 'V2025'; // Updated validator key
+
+        // Initial application data, moved to global scope in the module script.
+        // window.initialAppData
 
         let currentCourseId = null; // Tracks the currently viewed course
         let currentTermId = null;   // Tracks the term being edited (null for new term)
@@ -1583,7 +1697,7 @@
                 french: 'peut-être',
                 mandarin: '可能',
                 spanish: 'quizás',
-                hindi: 'शायद'
+                hindi: 'शायד'
             },
             {
                 hebrew: 'ייתכן',
@@ -1870,11 +1984,11 @@
         // Renders the list of courses
         function renderCourses() {
             courseList.innerHTML = '';
-            if (appData.courses.length === 0) {
+            if (window.appData.courses.length === 0) {
                 courseList.innerHTML = '<p class="text-gray-500 text-center col-span-full">No courses added yet. Be the first!</p>';
                 return;
             }
-            appData.courses.forEach(course => {
+            window.appData.courses.forEach(course => {
                 const courseCard = document.createElement('div');
                 courseCard.className = 'card cursor-pointer hover:bg-blue-50 transition flex justify-between items-center';
                 courseCard.innerHTML = `
@@ -1899,7 +2013,7 @@
         // Renders the list of terms for a specific course
         function renderTerms(courseId, searchTerm = '') {
             termList.innerHTML = '';
-            const termsForCourse = appData.terms.filter(term => term.courseId === courseId);
+            const termsForCourse = window.appData.terms.filter(term => term.courseId === courseId);
             const filteredTerms = searchTerm
                 ? termsForCourse.filter(term =>
                     // Search across all language texts and definition
@@ -2048,7 +2162,7 @@
                 termCard.innerHTML = `
                     <h3 class="text-lg font-semibold mb-1" dir="rtl">${mainTermDisplay}</h3>
                     <p class="text-gray-700 text-sm mb-2">${term.definition.substring(0, 100)}${term.definition.length > 100 ? '...' : ''}</p>
-                    <p class="text-xs text-gray-500">Course: ${appData.courses.find(c => c.id === term.courseId)?.name || 'Unknown'}</p>
+                    <p class="text-xs text-gray-500">Course: ${window.appData.courses.find(c => c.id === term.courseId)?.name || 'Unknown'}</p>
                     <span class="text-xs ${overallStatusClass}">
                         Overall Status: ${termOverallStatus}
                     </span>
@@ -2061,6 +2175,10 @@
 
         // Handle validator login/logout
         validatorAuthButton.onclick = () => {
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
             if (isValidatorMode) {
                 // Logout
                 isValidatorMode = false;
@@ -2088,29 +2206,42 @@
 
 
         // Handle adding a new course
-        addCourseForm.onsubmit = (e) => {
+        addCourseForm.onsubmit = async (e) => {
             e.preventDefault();
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
             const courseName = document.getElementById('courseName').value.trim();
             if (courseName) {
                 const newCourse = {
                     id: generateId(),
                     name: courseName
                 };
-                appData.courses.push(newCourse);
-                saveData(appData);
-                showMessageBox('Course added successfully!', 'success', () => {
-                    addCourseForm.reset();
-                    showView(homeView);
-                    renderCourses();
-                });
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                try {
+                    await addDoc(collection(window.db, 'artifacts', appId, 'public', 'data', 'courses'), newCourse);
+                    showMessageBox('Course added successfully!', 'success', () => {
+                        addCourseForm.reset();
+                        showView(homeView);
+                        // renderCourses is called by the onSnapshot listener
+                    });
+                } catch (error) {
+                    console.error("Error adding course: ", error);
+                    showMessageBox('Error adding course. Please try again.', 'error');
+                }
             } else {
                 showMessageBox('Course name cannot be empty.', 'error');
             }
         };
 
         // Handle adding or editing a term
-        addTermForm.onsubmit = (e) => {
+        addTermForm.onsubmit = async (e) => {
             e.preventDefault();
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
             const termHebrew = document.getElementById('termHebrew').value.trim();
             const termDefinition = document.getElementById('termDefinition').value.trim();
 
@@ -2119,108 +2250,133 @@
                 return;
             }
 
-            let termToUpdate = null;
-            let termIndex = -1;
-
-            if (currentTermId) { // Editing an existing term
-                termIndex = appData.terms.findIndex(t => t.id === currentTermId);
-                if (termIndex !== -1) {
-                    termToUpdate = appData.terms[termIndex];
-                }
-            }
-
-            if (!termToUpdate) { // Adding a new term
-                termToUpdate = {
-                    id: generateId(),
-                    courseId: currentCourseId,
-                };
-                appData.terms.push(termToUpdate);
-            }
-
-            termToUpdate.definition = termDefinition;
-
-            // Optional: Add a pronunciation field for English if needed
-            // For simplicity in this example, it's not directly in the form but could be added.
-            // termToUpdate.pronunciation = document.getElementById('termPronunciation').value.trim();
+            let termData = {};
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
             // Process all language fields
             LANGUAGES.forEach(lang => {
                 const inputElement = document.getElementById(lang.inputId);
-                const newText = inputElement ? inputElement.value.trim() : ''; // Get current input value
+                const newText = inputElement ? inputElement.value.trim() : '';
 
-                const oldLangData = termToUpdate[lang.key];
-                const oldText = oldLangData ? oldLangData.text : '';
-
-                if (newText) { // If new text is provided
-                    if (!oldLangData || newText !== oldText) {
-                        // If it's a new translation or the text has changed, reset status to Pending
-                        termToUpdate[lang.key] = {
-                            text: newText,
-                            status: 'Pending',
-                            validatedBy: null
-                        };
-                    } else {
-                        // If text is provided and hasn't changed, keep existing status
-                        termToUpdate[lang.key] = {
-                            text: newText,
-                            status: oldLangData.status,
-                            validatedBy: oldLangData.validatedBy
-                        };
-                    }
-                } else { // If new text is empty (translation removed or not provided)
-                    termToUpdate[lang.key] = null;
+                if (newText) {
+                    termData[lang.key] = {
+                        text: newText,
+                        status: 'Pending',
+                        validatedBy: null
+                    };
+                } else {
+                    termData[lang.key] = null;
                 }
             });
 
-            saveData(appData);
-            showMessageBox(currentTermId ? 'Term updated successfully!' : 'Term added successfully! Individual translations are pending validation.', 'success', () => {
-                addTermForm.reset();
-                currentTermId = null; // Clear editing state
-                viewCourseDetails(currentCourseId); // Go back to course details
-            });
+            termData.definition = termDefinition;
+            termData.pronunciation = document.getElementById('pronunciationDisplay').textContent.replace(/[()]/g, ''); // Extract pronunciation if available from learn hebrew game
+
+            try {
+                if (currentTermId) { // Editing an existing term
+                    const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', currentTermId);
+                    // Fetch current term to preserve existing status for unchanged fields
+                    const currentTermDoc = await getDoc(termRef);
+                    if (currentTermDoc.exists()) {
+                        const existingTermData = currentTermDoc.data();
+                        LANGUAGES.forEach(lang => {
+                            const newText = termData[lang.key]?.text || '';
+                            const oldText = existingTermData[lang.key]?.text || '';
+                            if (newText === oldText && existingTermData[lang.key]?.status === 'Validated') {
+                                // If text hasn't changed and was already validated, keep it validated
+                                termData[lang.key].status = 'Validated';
+                                termData[lang.key].validatedBy = existingTermData[lang.key].validatedBy;
+                            }
+                        });
+                    }
+                    await updateDoc(termRef, termData);
+                    showMessageBox('Term updated successfully!', 'success', () => {
+                        addTermForm.reset();
+                        currentTermId = null; // Clear editing state
+                        viewCourseDetails(currentCourseId); // Go back to course details
+                    });
+                } else { // Adding a new term
+                    termData.courseId = currentCourseId;
+                    await addDoc(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), termData);
+                    showMessageBox('Term added successfully! Individual translations are pending validation.', 'success', () => {
+                        addTermForm.reset();
+                        currentTermId = null; // Clear editing state
+                        viewCourseDetails(currentCourseId); // Go back to course details
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding/updating term: ", error);
+                showMessageBox('Error saving term. Please try again.', 'error');
+            }
         };
 
         // Function to prepare the form for editing a term
-        function editTerm(termId) {
+        async function editTerm(termId) {
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
             currentTermId = termId;
-            const term = appData.terms.find(t => t.id === termId);
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId);
+            try {
+                const termDoc = await getDoc(termRef);
+                if (termDoc.exists()) {
+                    const term = termDoc.data();
+                    addTermFormTitle.textContent = 'Edit Term';
+                    addTermSubmitBtn.textContent = 'Save Changes';
 
-            if (term) {
-                addTermFormTitle.textContent = 'Edit Term';
-                addTermSubmitBtn.textContent = 'Save Changes';
+                    document.getElementById('termDefinition').value = term.definition;
+                    // Assuming pronunciation is directly in term object for this example, adjust if needed
+                    // document.getElementById('termPronunciation').value = term.pronunciation || '';
 
-                document.getElementById('termDefinition').value = term.definition;
-                // document.getElementById('termPronunciation').value = term.pronunciation || ''; // If pronunciation field exists
+                    LANGUAGES.forEach(lang => {
+                        const inputElement = document.getElementById(lang.inputId);
+                        if (inputElement) {
+                            inputElement.value = term[lang.key] && term[lang.key].text ? term[lang.key].text : '';
+                        }
+                    });
 
-                LANGUAGES.forEach(lang => {
-                    const inputElement = document.getElementById(lang.inputId);
-                    if (inputElement) {
-                        inputElement.value = term[lang.key] && term[lang.key].text ? term[lang.key].text : '';
-                    }
-                });
-
-                showView(addTermView);
-            } else {
-                showMessageBox('Term not found for editing.', 'error');
-                currentTermId = null; // Reset if term not found
+                    showView(addTermView);
+                } else {
+                    showMessageBox('Term not found for editing.', 'error');
+                    currentTermId = null; // Reset if term not found
+                }
+            } catch (error) {
+                console.error("Error fetching term for edit: ", error);
+                showMessageBox('Error fetching term data. Please try again.', 'error');
             }
         }
 
 
         // Validate a term for a specific language using the secret key
         function validateTerm(termId, langKey) {
-            showPromptBox(`Enter validator secret key for ${langKey} translation:`, (key) => {
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
+            showPromptBox(`Enter validator secret key for ${langKey} translation:`, async (key) => {
                 if (key === VALIDATOR_SECRET_KEY) {
-                    const termIndex = appData.terms.findIndex(t => t.id === termId);
-                    if (termIndex !== -1 && appData.terms[termIndex][langKey]) {
-                        appData.terms[termIndex][langKey].status = 'Validated';
-                        appData.terms[termIndex][langKey].validatedBy = 'Validator'; // Placeholder for validator ID
-                        saveData(appData);
-                        showMessageBox(`${langKey} translation validated successfully!`, 'success', () => {
-                            renderTerms(currentCourseId); // Re-render terms for current course
-                        });
-                    } else {
-                        showMessageBox(`Could not validate ${langKey} translation.`, 'error');
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const termRef = doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId);
+                    try {
+                        const termDoc = await getDoc(termRef);
+                        if (termDoc.exists() && termDoc.data()[langKey]) {
+                            const updatePath = `${langKey}.status`;
+                            const validatedByPath = `${langKey}.validatedBy`;
+                            await updateDoc(termRef, {
+                                [updatePath]: 'Validated',
+                                [validatedByPath]: window.userId || 'Anonymous Validator' // Use actual user ID if available
+                            });
+                            showMessageBox(`${langKey} translation validated successfully!`, 'success', () => {
+                                // renderTerms is called by the onSnapshot listener
+                            });
+                        } else {
+                            showMessageBox(`Could not validate ${langKey} translation.`, 'error');
+                        }
+                    } catch (error) {
+                        console.error("Error validating term: ", error);
+                        showMessageBox('Error validating translation. Please try again.', 'error');
                     }
                 } else {
                     showMessageBox('Invalid secret key. Translation not validated.', 'error');
@@ -2230,40 +2386,65 @@
 
         // Delete a course
         function deleteCourse(courseId) {
-            showConfirmBox('Are you sure you want to delete this course and all its terms?', () => {
-                appData.courses = appData.courses.filter(c => c.id !== courseId);
-                appData.terms = appData.terms.filter(t => t.courseId !== courseId); // Also delete associated terms
-                saveData(appData);
-                showMessageBox('Course and associated terms deleted.', 'info', () => {
-                    renderCourses();
-                    if (currentCourseId === courseId) {
-                        currentCourseId = null; // Clear current course if deleted
-                        showView(homeView);
-                    }
-                });
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
+            showConfirmBox('Are you sure you want to delete this course and all its terms?', async () => {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                try {
+                    // Delete course document
+                    await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'courses', courseId));
+
+                    // Delete associated terms
+                    const termsQuery = query(collection(window.db, 'artifacts', appId, 'public', 'data', 'terms'), where('courseId', '==', courseId));
+                    const termsSnapshot = await getDocs(termsQuery);
+                    const deletePromises = termsSnapshot.docs.map(d => deleteDoc(d.ref));
+                    await Promise.all(deletePromises);
+
+                    showMessageBox('Course and associated terms deleted.', 'info', () => {
+                        // renderCourses and renderTerms are called by onSnapshot listeners
+                        if (currentCourseId === courseId) {
+                            currentCourseId = null; // Clear current course if deleted
+                            showView(homeView);
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error deleting course: ", error);
+                    showMessageBox('Error deleting course. Please try again.', 'error');
+                }
             });
         }
 
         // Delete a term
         function deleteTerm(termId) {
-            showConfirmBox('Are you sure you want to delete this term?', () => {
-                appData.terms = appData.terms.filter(t => t.id !== termId);
-                saveData(appData);
-                showMessageBox('Term deleted.', 'info', () => {
-                    renderTerms(currentCourseId); // Re-render terms for current course
-                });
+            if (!window.isFirebaseReady) {
+                showMessageBox("Firebase is not ready. Please wait a moment.", "error");
+                return;
+            }
+            showConfirmBox('Are you sure you want to delete this term?', async () => {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                try {
+                    await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'terms', termId));
+                    showMessageBox('Term deleted.', 'info', () => {
+                        // renderTerms is called by the onSnapshot listener
+                    });
+                } catch (error) {
+                    console.error("Error deleting term: ", error);
+                    showMessageBox('Error deleting term. Please try again.', 'error');
+                }
             });
         }
 
         // Global search functionality
         globalSearchInput.onkeyup = () => {
-            const query = globalSearchInput.value.trim().toLowerCase();
-            if (query.length > 0) {
-                const results = appData.terms.filter(term =>
+            const queryText = globalSearchInput.value.trim().toLowerCase();
+            if (queryText.length > 0) {
+                const results = window.appData.terms.filter(term =>
                     // Search across all language texts and definition
                     LANGUAGES.some(lang =>
-                        term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(query)
-                    ) || term.definition.toLowerCase().includes(query)
+                        term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(queryText)
+                    ) || term.definition.toLowerCase().includes(queryText)
                 );
                 renderSearchResults(results);
             } else {
@@ -2321,7 +2502,7 @@
 
             // Filter terms to only include those that have a translation in the selected native language
             // and have at least one other language translation to be the source term.
-            const playableTerms = appData.terms.filter(term => {
+            const playableTerms = window.appData.terms.filter(term => {
                 const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
                     lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
@@ -2369,7 +2550,7 @@
             challengeOption1Button.disabled = false;
             challengeOption2Button.disabled = false;
 
-            const playableTerms = appData.terms.filter(term => {
+            const playableTerms = window.appData.terms.filter(term => {
                 const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
                     lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
@@ -2670,7 +2851,7 @@
         // Function to view course details
         function viewCourseDetails(id) {
             currentCourseId = id;
-            const course = appData.courses.find(c => c.id === id);
+            const course = window.appData.courses.find(c => c.id === id);
             if (course) {
                 courseDetailsTitle.textContent = course.name;
                 courseSearchInput.value = ''; // Clear course search when navigating
@@ -2685,18 +2866,18 @@
             }
         }
 
-        // Initial render on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCourses(); // Initial render to show courses (with or without delete buttons)
-            populateChallengeGameLanguageSelect(); // Populate language options for the challenge game
-            populateLearnHebrewLanguageSelect(); // Populate language options for the learn Hebrew game
-            showView(homeView);
-        });
+        // Initial render on page load - Now handled by Firebase auth state change listener
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     renderCourses(); // Initial render to show courses (with or without delete buttons)
+        //     populateChallengeGameLanguageSelect(); // Populate language options for the challenge game
+        //     populateLearnHebrewLanguageSelect(); // Populate language options for the learn Hebrew game
+        //     showView(homeView);
+        // });
 
         // Event listeners for navigation buttons
         homeButton.onclick = () => {
             showView(homeView);
-            renderCourses();
+            // renderCourses is called by the onSnapshot listener
             // Reset search and game states when returning home
             globalSearchInput.value = '';
             searchResultsList.innerHTML = '';
