@@ -3050,6 +3050,123 @@
             learnHebrewEndScreen.classList.add('hidden');
             populateLearnHebrewLanguageSelect(); // Ensure dropdown is fresh
         };
+        <div id="validatorFormContainer" class="message-box-backdrop hidden">
+    <div class="message-box">
+        <h3 class="text-2xl font-semibold mb-4 text-gray-800">Become a Validator</h3>
+        <form id="validatorForm" class="space-y-4">
+            <div>
+                <label for="validatorName" class="block text-left text-gray-700 text-sm font-medium mb-1">1. Name:</label>
+                <input type="text" id="validatorName" name="name" class="input-field" required>
+            </div>
+            <div>
+                <label for="validatorLanguage" class="block text-left text-gray-700 text-sm font-medium mb-1">2. Native Language:</label>
+                <input type="text" id="validatorLanguage" name="nativeLanguage" class="input-field" required>
+            </div>
+            <div>
+                <label for="validatorEmail" class="block text-left text-gray-700 text-sm font-medium mb-1">3. Technion Mail (e.g., user@campus.technion.ac.il):</label>
+                <input type="email" id="validatorEmail" name="technionMail" class="input-field" required>
+            </div>
+            <div>
+                <label for="trustAgreement" class="block text-left text-gray-700 text-sm font-medium mb-1">4. Trust Agreement:</label>
+                <textarea id="trustAgreement" name="trustAgreement" rows="4" class="input-field" placeholder="I agree to insert only valid and true terms, and uphold the integrity of the Linguini platform." required></textarea>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" id="cancelValidatorForm" class="btn-secondary">Cancel</button>
+                <button type="submit" class="button">Submit Application</button>
+            </div>
+        </form>
+        <div id="secretKeyDisplay" class="hidden mt-6 p-4 bg-green-100 border border-green-300 text-green-800 rounded-md">
+            <p class="font-bold text-lg">Congratulations! Your Secret Key is:</p>
+            <p class="text-xl font-mono mt-2" id="secretKeyValue"></p>
+            <button onclick="copySecretKey()" class="button mt-4 bg-blue-500 hover:bg-blue-600">Copy Key</button>
+        </div>
+    </div>
+</div>
+
+        // ... (your existing Firebase SDK imports and global variables) ...
+
+// === Validator Application Logic ===
+document.addEventListener('DOMContentLoaded', () => {
+    const becomeValidatorBtn = document.getElementById('becomeValidatorBtn');
+    const validatorFormContainer = document.getElementById('validatorFormContainer');
+    const validatorForm = document.getElementById('validatorForm');
+    const cancelValidatorFormBtn = document.getElementById('cancelValidatorForm');
+    const secretKeyDisplay = document.getElementById('secretKeyDisplay');
+    const secretKeyValue = document.getElementById('secretKeyValue');
+
+    // Show the validator form when the button is clicked
+    if (becomeValidatorBtn) {
+        becomeValidatorBtn.addEventListener('click', () => {
+            validatorFormContainer.classList.remove('hidden');
+            secretKeyDisplay.classList.add('hidden'); // Ensure secret key is hidden when form opens
+            validatorForm.classList.remove('hidden'); // Ensure form is visible when opened
+            validatorForm.reset(); // Clear form fields
+        });
+    }
+
+    // Hide the validator form when cancel button is clicked or backdrop is clicked
+    if (cancelValidatorFormBtn) {
+        cancelValidatorFormBtn.addEventListener('click', () => {
+            validatorFormContainer.classList.add('hidden');
+        });
+    }
+
+    if (validatorFormContainer) {
+        validatorFormContainer.addEventListener('click', (event) => {
+            if (event.target === validatorFormContainer) {
+                validatorFormContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // Handle form submission
+    if (validatorForm) {
+        validatorForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const name = document.getElementById('validatorName').value;
+            const nativeLanguage = document.getElementById('validatorLanguage').value;
+            const technionMail = document.getElementById('validatorEmail').value;
+            const trustAgreement = document.getElementById('trustAgreement').value;
+
+            // Simple validation for questions 3 and 4
+            const isEmailValid = technionMail.endsWith('@campus.technion.ac.il');
+            const isTrustAgreementProvided = trustAgreement.trim().toLowerCase() === 'i agree to insert only valid and true terms, and uphold the integrity of the linguini platform.'; // Changed to exact match for security/control
+
+            if (isEmailValid && isTrustAgreementProvided) {
+                // Generate a simple secret key (you might want a more robust generation)
+                const secret = `VALIDATOR-KEY-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+                secretKeyValue.textContent = secret;
+                secretKeyDisplay.classList.remove('hidden');
+                validatorForm.classList.add('hidden'); // Hide the form after success
+            } else {
+                let errorMessage = "Your application could not be processed due to incorrect answers.\n";
+                if (!isEmailValid) {
+                    errorMessage += "- Technion Mail must end with '@campus.technion.ac.il'.\n";
+                }
+                if (!isTrustAgreementProvided) {
+                    // Provide a hint for the user
+                    errorMessage += "- The Trust Agreement must be typed exactly as instructed.\n";
+                }
+                alert(errorMessage);
+                secretKeyDisplay.classList.add('hidden'); // Keep secret key hidden
+                validatorFormContainer.classList.add('hidden'); // Close the form container
+            }
+        });
+    }
+
+    // Function to copy the secret key to clipboard
+    window.copySecretKey = () => {
+        const keyText = secretKeyValue.textContent;
+        navigator.clipboard.writeText(keyText).then(() => {
+            alert('Secret key copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy the secret key. Please copy it manually.');
+        });
+    };
+});
+        
     </script>
 </body>
 </html>
