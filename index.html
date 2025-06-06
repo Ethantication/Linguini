@@ -502,7 +502,7 @@
                     pronunciation: 'hofchi',
                     english: { text: 'Reciprocal', status: 'Pending', validatedBy: null },
                     russian: { text: 'Взаимный', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'مقلوب', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'מقلوب', status: 'Pending', validatedBy: null },
                     french: { text: 'Inverse', status: 'Pending', validatedBy: null },
                     mandarin: { text: '倒数', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Recíproco', status: 'Pending', validatedBy: null },
@@ -806,7 +806,7 @@
                     pronunciation: 'inertzia',
                     english: { text: 'Inertia', status: 'Pending', validatedBy: null },
                     russian: { text: 'Инерция', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'قصور ذاتي', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'قصור ذاتي', status: 'Pending', validatedBy: null },
                     french: { text: 'Inertie', status: 'Pending', validatedBy: null },
                     mandarin: { text: '惯性', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Inercia', status: 'Pending', validatedBy: null },
@@ -1543,6 +1543,10 @@
                         <label for="termDefinition" class="block text-sm font-medium text-gray-700 mb-1">Definition <span class="text-red-500">*</span></label>
                         <textarea id="termDefinition" rows="3" placeholder="Provide a clear definition..." required></textarea>
                     </div>
+                    <div>
+                        <label for="termPronunciation" class="block text-sm font-medium text-gray-700 mb-1">Pronunciation (English approximation)</label>
+                        <input type="text" id="termPronunciation" placeholder="e.g., nigzeret">
+                    </div>
                     <p class="text-sm text-gray-600">Provide translations in other languages (optional):</p>
                     <div>
                         <label for="termEnglish" class="block text-sm font-medium text-gray-700 mb-1">Term (English)</label>
@@ -1709,7 +1713,7 @@
         const cancelAddCourseBtn = document.getElementById('cancelAddCourseBtn');
         const courseList = document.getElementById('courseList');
         const courseDetailsTitle = document.getElementById('courseDetailsTitle');
-        const showAddTermFormBtn = document.getElementById('showAddTermFormBtn');
+        const showAddTermFormBtn = document = document.getElementById('showAddTermFormBtn');
         const addTermForm = document.getElementById('addTermForm');
         const addTermFormTitle = document.getElementById('addTermFormTitle');
         const addTermSubmitBtn = document.getElementById('addTermSubmitBtn');
@@ -1721,6 +1725,10 @@
         const noSearchResultsMessage = document.getElementById('noSearchResultsMessage'); // New message for search
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         const courseSearchInput = document.getElementById('courseSearchInput');
+
+        // New pronunciation input element
+        const termPronunciationInput = document.getElementById('termPronunciation');
+
 
         // Linguini Challenge Game UI Elements
         const challengeGameStartScreen = document.getElementById('challengeGameStartScreen');
@@ -2123,7 +2131,7 @@
                     // Search across all language texts and definition
                     LANGUAGES.some(lang =>
                         term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(searchTerm.toLowerCase())
-                    ) || term.definition.toLowerCase().includes(searchTerm.toLowerCase())
+                    ) || (term.definition && term.definition.toLowerCase().includes(searchTerm.toLowerCase()))
                 )
                 : termsForCourse;
 
@@ -2147,7 +2155,7 @@
 
                 // Display the Hebrew term as the main heading
                 const mainHebrewTerm = term.hebrew && term.hebrew.text ? term.hebrew.text : '';
-                const mainEnglishPronunciation = term.pronunciation || ''; // Assuming English pronunciation for now
+                const mainEnglishPronunciation = term.pronunciation || ''; // Use the stored pronunciation
                 const mainDefinition = term.definition;
 
                 const termCard = document.createElement('div');
@@ -2180,6 +2188,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr>
+                                    <td>Pronunciation</td>
+                                    <td>${mainEnglishPronunciation || 'N/A'}</td>
+                                    <td class="status-not-provided">N/A</td>
+                                    <td></td>
+                                </tr>
                                 ${LANGUAGES.map(lang => {
                                     if (lang.key === 'hebrew') return ''; // Hebrew term is already displayed
                                     const termLang = term[lang.key];
@@ -2342,6 +2356,7 @@
             }
             const termHebrew = document.getElementById('termHebrew').value.trim();
             const termDefinition = document.getElementById('termDefinition').value.trim();
+            const termPronunciation = termPronunciationInput.value.trim(); // Get value from the new input
 
             if (!termHebrew || !termDefinition || !currentCourseId) {
                 showMessageBox('Hebrew term and definition are required.', 'error');
@@ -2350,7 +2365,7 @@
 
             let termData = {
                 definition: termDefinition,
-                pronunciation: document.getElementById('pronunciationDisplay').textContent.replace(/[()]/g, '') || '', // Ensure pronunciation is saved
+                pronunciation: termPronunciation, // Use the value from the new input
             };
 
             // Process all language fields, ensuring status is handled correctly for updates
@@ -2421,8 +2436,7 @@
                     addTermSubmitBtn.textContent = 'Save Changes';
 
                     document.getElementById('termDefinition').value = term.definition;
-                    // If you want to pre-fill pronunciation during edit
-                    // document.getElementById('pronunciationDisplay').textContent = term.pronunciation || '';
+                    termPronunciationInput.value = term.pronunciation || ''; // Pre-fill pronunciation
 
                     LANGUAGES.forEach(lang => {
                         const inputElement = document.getElementById(lang.inputId);
@@ -2999,6 +3013,8 @@
             addTermFormTitle.textContent = 'Add New Term';
             addTermSubmitBtn.textContent = 'Add Term';
             currentTermId = null; // Ensure we're in "add new" mode
+            // Clear the new pronunciation input when adding a new term
+            termPronunciationInput.value = '';
             showView(addTermView);
         };
         cancelAddTermBtn.onclick = () => {
