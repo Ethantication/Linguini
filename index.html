@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linguini - Technion Educational Site</title>
     
-    <!-- Google Fonts MUST be loaded before Tailwind to ensure proper font-family application and avoid @import issues if any -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN - should be loaded early to process utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tone.js for sound effects - loaded after main CSS/UI libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
-    <!-- Inline styles - placed after Tailwind CDN so @apply directives can correctly resolve -->
     <style>
         /* Base styles */
         body {
@@ -250,7 +246,6 @@
         }
     </style>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
@@ -710,7 +705,7 @@
                     pronunciation: 'protokol',
                     english: { text: 'Protocol', status: 'Pending', validatedBy: null },
                     russian: { text: 'Протокол', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'بروتوكول', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'بروتוקول', status: 'Pending', validatedBy: null },
                     french: { text: 'Protocole', status: 'Pending', validatedBy: null },
                     mandarin: { text: '协议', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Protocolo', status: 'Pending', validatedBy: null },
@@ -1420,11 +1415,9 @@
 <body class="min-h-screen flex flex-col">
     <header class="bg-header-custom p-4 shadow-lg">
         <div class="container flex flex-col md:flex-row md:justify-between md:items-center">
-            <!-- Logo on the left -->
             <div class="flex justify-center md:justify-start mb-4 md:mb-0">
                 <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-24 w-24 md:h-20 md:w-20 rounded-full shadow-md">
             </div>
-            <!-- Navigation buttons below on mobile, to the right on desktop -->
             <nav class="flex flex-wrap justify-center gap-3 md:gap-4 mt-2 md:mt-0">
                 <button id="homeButton">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1472,7 +1465,6 @@
     <main class="flex-grow container py-8">
         <div id="messageBoxContainer"></div>
 
-        <!-- Home View -->
         <div id="homeView" class="view">
             <div class="card">
                 <h2 class="text-3xl font-bold mb-4 text-center">Welcome to Linguini! <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
@@ -1489,7 +1481,6 @@
             </div>
         </div>
 
-        <!-- Search View -->
         <div id="searchView" class="view hidden">
             <div class="card">
                 <h2 class="text-2xl font-semibold mb-4">Global Term Search <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
@@ -1504,7 +1495,6 @@
             </div>
         </div>
 
-        <!-- Add Course View -->
         <div id="addCourseView" class="view hidden">
             <div class="card">
                 <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
@@ -1521,7 +1511,6 @@
             </div>
         </div>
 
-        <!-- Course Details View -->
         <div id="courseDetailsView" class="view hidden">
             <div class="card">
                 <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
@@ -1539,7 +1528,6 @@
             </div>
         </div>
 
-        <!-- Add Term View -->
         <div id="addTermView" class="view hidden">
             <div class="card">
                 <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
@@ -1589,15 +1577,13 @@
             </div>
         </div>
 
-        <!-- Linguini Challenge Game View -->
         <div id="challengeGameView" class="view hidden">
             <div class="card text-center">
                 <h2 class="text-3xl font-bold mb-6">Linguini Challenge! <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
                 <div id="challengeGameStartScreen">
                     <p class="text-lg mb-4 text-gray-700">Choose your native language to start the game:</p>
                     <select id="challengeGameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
-                        <!-- Options populated by JS -->
-                    </select>
+                        </select>
                     <button id="startChallengeGameButton">Start Game</button>
                 </div>
 
@@ -1622,7 +1608,6 @@
             </div>
         </div>
 
-        <!-- Learn Hebrew View -->
         <div id="learnHebrewView" class="view hidden">
             <div class="card text-center">
                 <h2 class="text-3xl font-bold mb-6">Learn Hebrew Vocabulary <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
@@ -1634,8 +1619,7 @@
                 <div id="learnHebrewStartScreen">
                     <p class="text-lg mb-4 text-gray-700">Choose your native language for learning:</p>
                     <select id="learnHebrewLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
-                        <!-- Options populated by JS -->
-                    </select>
+                        </select>
                     <button id="startLearningButton">Start Learning</button>
                 </div>
 
@@ -1676,8 +1660,7 @@
             <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse Footer" class="remi-mascot ml-2">
         </div>
         <div id="debugInfo" class="mt-2">
-            <!-- Debug information will be displayed here -->
-        </div>
+            </div>
     </footer>
 
     <script>
@@ -1717,6 +1700,7 @@
 
         const homeButton = document.getElementById('homeButton');
         const validatorAuthButton = document.getElementById('validatorAuthButton');
+		const becomeValidator = document.getElementById('becomeValidator');
         const challengeGameButton = document.getElementById('challengeGameButton'); // Renamed button
         const searchButton = document.getElementById('searchButton'); // New search button
         const learnHebrewButton = document.getElementById('learnHebrewButton'); // New learn Hebrew button
@@ -1952,7 +1936,7 @@
                 pronunciation: 'maarechet',
                 english: 'system',
                 russian: 'система',
-                arabic: 'نظام',
+                arabic: 'नظام',
                 french: 'système',
                 mandarin: '系统',
                 spanish: 'sistema',
@@ -2321,6 +2305,14 @@
                 });
             }
         };
+
+		// Handle "Become a Validator" button click
+		becomeValidator.onclick = () => {
+			const agreementText = "By becoming a validator, you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?";
+			showConfirmBox(agreementText, () => {
+				showMessageBox(`Thank you for your commitment! The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
+			});
+		};
 
 
         // Handle adding a new course
