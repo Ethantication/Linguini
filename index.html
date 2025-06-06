@@ -1793,79 +1793,971 @@
         if (appData.courses.length === 0 && appData.terms.length === 0) {
             appData = {
                 courses: [
-                    { id: 'c1', name: 'Calculus 1' },
-                    { id: 'c2', name: 'Algebra' },
-                    { id: 'c3', name: 'Introduction to Python' },
-                    { id: 'c4', name: 'General Biology' },
-                    { id: 'c5', name: 'Organic Chemistry' }
-                ],
-                terms: [
-                    {
-                        id: 't1', courseId: 'c1', definition: 'The rate at which the value of a function changes with respect to a change in the independent variable.',
-                        hebrew: { text: 'נגזרת', status: 'Validated', validatedBy: 'Admin' },
-                        english: { text: 'Derivative', status: 'Pending', validatedBy: null },
-                        russian: { text: 'Производная', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'مشتقة', status: 'Pending', validatedBy: null },
-                        french: { text: 'Dérivée', status: 'Validated', validatedBy: 'Admin' }
-                    },
-                    {
-                        id: 't2', courseId: 'c1', definition: 'A mathematical object that can be interpreted as an area, a generalization of mass, or the total change of a quantity whose rate of change is known.',
-                        hebrew: { text: 'אינטגרל', status: 'Pending', validatedBy: null },
-                        english: { text: 'Integral', status: 'Pending', validatedBy: null },
-                        russian: null, // Not provided
-                        arabic: { text: 'تكامل', status: 'Pending', validatedBy: null }, // Arabic for 'integral'
-                        french: null // Not provided
-                    },
-                    {
-                        id: 't3', courseId: 'c2', definition: 'A rectangular array of numbers, symbols, or expressions, arranged in rows and columns.',
-                        hebrew: { text: 'מטריצה', status: 'Validated', validatedBy: 'Admin' },
-                        english: { text: 'Matrix', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'Матрица', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'מصفوفة', status: 'Validated', validatedBy: 'Admin' },
-                        french: { text: 'Matrice', status: 'Validated', validatedBy: 'Admin' }
-                    },
-                    {
-                        id: 't4', courseId: 'c3', definition: 'A named storage location that contains a value.',
-                        hebrew: { text: 'משתנה', status: 'Validated', validatedBy: 'Admin' },
-                        english: { text: 'Variable', status: 'Pending', validatedBy: null },
-                        russian: { text: 'Переменная', status: 'Pending', validatedBy: null },
-                        arabic: null,
-                        french: null
-                    },
-                    {
-                        id: 't5', courseId: 'c4', definition: 'The powerhouse of the cell, responsible for cellular respiration.',
-                        hebrew: { text: 'מיטוכונדריה', status: 'Validated', validatedBy: 'Admin' },
-                        english: { text: 'Mitochondria', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'Митохондрии', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'الميتوكوندريا', status: 'Validated', validatedBy: 'Admin' },
-                        french: { text: 'Mitochondrie', status: 'Validated', validatedBy: 'Admin' }
-                    },
-                    {
-                        id: 't6', courseId: 'c1', definition: 'The process of finding the derivative of a function.',
-                        hebrew: { text: 'גזירה', status: 'Pending', validatedBy: null },
-                        english: { text: 'Differentiation', status: 'Pending', validatedBy: null },
-                        russian: { text: 'Дифференцирование', status: 'Pending', validatedBy: null },
-                        arabic: { text: 'التفاضل', status: 'Pending', validatedBy: null },
-                        french: { text: 'Différenciation', status: 'Pending', validatedBy: null }
-                    },
-                    {
-                        id: 't7', courseId: 'c3', definition: 'A sequence of characters.',
-                        hebrew: { text: 'מחרוזת', status: 'Validated', validatedBy: 'Admin' },
-                        english: { text: 'String', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'Строка', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'سلسلة', status: 'Validated', validatedBy: 'Admin' },
-                        french: { text: 'Chaîne', status: 'Validated', validatedBy: 'Admin' }
-                    },
-                    {
-                        id: 't8', courseId: 'c5', definition: 'A chemical compound containing carbon, hydrogen, and oxygen, often with a ring structure.',
-                        hebrew: { text: 'בנזן', status: 'Validated', validatedBy: 'Admin' },
-                        english: { text: 'Benzene', status: 'Validated', validatedBy: 'Admin' },
-                        russian: { text: 'Бензол', status: 'Validated', validatedBy: 'Admin' },
-                        arabic: { text: 'بنزين', status: 'Validated', validatedBy: 'Admin' },
-                        french: { text: 'Benzène', status: 'Validated', validatedBy: 'Admin' }
-                    }
-                ]
-            };
+        { id: 'c1', name: 'Calculus 1' },
+        { id: 'c2', name: 'Algebra 1' }, // Renamed from Linear Algebra
+        { id: 'c3', name: 'Intro to CS' }, // Renamed from Introduction to Programming
+        { id: 'c4', name: 'Physics 1' }, // Renamed from Physics I
+        { id: 'c5', name: 'Chemistry 1' }, // Renamed from Chemistry Principles
+        { id: 'c6', name: 'Biology 1' } // Renamed from Biochemistry
+    ],
+    terms: [
+        // Calculus 1 Terms (c1)
+        {
+            id: 't1', courseId: 'c1', definition: 'The rate at which the value of a function changes with respect to a change in the independent variable.',
+            hebrew: { text: 'נגזרת', status: 'Pending', validatedBy: null },
+            pronunciation: 'nigzeret',
+            english: { text: 'Derivative', status: 'Pending', validatedBy: null },
+            russian: { text: 'Производная', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مشتقة', status: 'Pending', validatedBy: null },
+            french: { text: 'Dérivée', status: 'Pending', validatedBy: null },
+            mandarin: { text: '导数', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Derivada', status: 'Pending', validatedBy: null },
+            hindi: { text: 'व्युत्पन्न', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't2', courseId: 'c1', definition: 'A mathematical object that can be interpreted as an area, a generalization of mass, or the total change of a quantity whose rate of change is known.',
+            hebrew: { text: 'אינטגרל', status: 'Pending', validatedBy: null },
+            pronunciation: 'integral',
+            english: { text: 'Integral', status: 'Pending', validatedBy: null },
+            russian: { text: 'Интеграл', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تكامل', status: 'Pending', validatedBy: null },
+            french: { text: 'Intégrale', status: 'Pending', validatedBy: null },
+            mandarin: { text: '积分', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Integral', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अभिन्न', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't12', courseId: 'c1', definition: 'A limit of a function in calculus that defines the value a function approaches as the input (or index) approaches some value.',
+            hebrew: { text: 'גבול', status: 'Pending', validatedBy: null },
+            pronunciation: 'gvul',
+            english: { text: 'Limit', status: 'Pending', validatedBy: null },
+            russian: { text: 'Предел', status: 'Pending', validatedBy: null },
+            arabic: { text: 'نهاية', status: 'Pending', validatedBy: null },
+            french: { text: 'Limite', status: 'Pending', validatedBy: null },
+            mandarin: { text: '极限', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Límite', status: 'Pending', validatedBy: null },
+            hindi: { text: 'सीमा', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't21', courseId: 'c1', definition: 'The inverse operation of differentiation, used to find functions whose derivative is known.',
+            hebrew: { text: 'אנטי-נגזרת', status: 'Pending', validatedBy: null },
+            pronunciation: 'anti-nigzeret',
+            english: { text: 'Antiderivative', status: 'Pending', validatedBy: null },
+            russian: { text: 'Первообразная', status: 'Pending', validatedBy: null },
+            arabic: { text: 'المشتقة العكسية', status: 'Pending', validatedBy: null },
+            french: { text: 'Primitive', status: 'Pending', validatedBy: null },
+            mandarin: { text: '反导数', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Antiderivada', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रति-अवकलज', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_5', courseId: 'c1', definition: 'The concept of continuity is fundamental to calculus and describes functions that do not have abrupt changes in value.',
+            hebrew: { text: 'רציפות', status: 'Pending', validatedBy: null },
+            pronunciation: 'retsifut',
+            english: { text: 'Continuity', status: 'Pending', validatedBy: null },
+            russian: { text: 'Непрерывность', status: 'Pending', validatedBy: null },
+            arabic: { text: 'استمرارية', status: 'Pending', validatedBy: null },
+            french: { text: 'Continuité', status: 'Pending', validatedBy: null },
+            mandarin: { text: '连续性', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Continuidad', status: 'Pending', validatedBy: null },
+            hindi: { text: 'निरंतरता', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_6', courseId: 'c1', definition: 'The process of finding the maximum or minimum value of a function.',
+            hebrew: { text: 'אופטימיזציה', status: 'Pending', validatedBy: null },
+            pronunciation: 'optimitzatsya',
+            english: { text: 'Optimization', status: 'Pending', validatedBy: null },
+            russian: { text: 'Оптимизация', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تحسين', status: 'Pending', validatedBy: null },
+            french: { text: 'Optimisation', status: 'Pending', validatedBy: null },
+            mandarin: { text: '优化', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Optimización', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अनुकूलन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_7', courseId: 'c1', definition: 'The set of all points where a function is defined.',
+            hebrew: { text: 'תחום הגדרה', status: 'Pending', validatedBy: null },
+            pronunciation: 'tchum hagdara',
+            english: { text: 'Domain', status: 'Pending', validatedBy: null },
+            russian: { text: 'Область определения', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مجال التعريف', status: 'Pending', validatedBy: null },
+            french: { text: 'Domaine de définition', status: 'Pending', validatedBy: null },
+            mandarin: { text: '定义域', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Dominio', status: 'Pending', validatedBy: null },
+            hindi: { text: 'डोमेन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_8', courseId: 'c1', definition: 'The set of all possible output values of a function.',
+            hebrew: { text: 'טווח', status: 'Pending', validatedBy: null },
+            pronunciation: 'tvach',
+            english: { text: 'Range', status: 'Pending', validatedBy: null },
+            russian: { text: 'Область значений', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مدى', status: 'Pending', validatedBy: null },
+            french: { text: 'Image', status: 'Pending', validatedBy: null },
+            mandarin: { text: '值域', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Rango', status: 'Pending', validatedBy: null },
+            hindi: { text: 'श्रेणी', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_9', courseId: 'c1', definition: 'A vertical asymptote is a vertical line that the graph of a function approaches but never touches as the input value approaches a certain number.',
+            hebrew: { text: 'אסימפטוטה אנכית', status: 'Pending', validatedBy: null },
+            pronunciation: 'asimptota anachit',
+            english: { text: 'Vertical Asymptote', status: 'Pending', validatedBy: null },
+            russian: { text: 'Вертикальная асимптота', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مقارب رأسي', status: 'Pending', validatedBy: null },
+            french: { text: 'Asymptote verticale', status: 'Pending', validatedBy: null },
+            mandarin: { text: '垂直渐近线', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Asíntota vertical', status: 'Pending', validatedBy: null },
+            hindi: { text: 'ऊर्ध्वाधर स्पर्शोन्मुख', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_10', courseId: 'c1', definition: 'A horizontal asymptote is a horizontal line that the graph of a function approaches as the input value tends towards positive or negative infinity.',
+            hebrew: { text: 'אסימפטוטה אופקית', status: 'Pending', validatedBy: null },
+            pronunciation: 'asimptota ofkit',
+            english: { text: 'Horizontal Asymptote', status: 'Pending', validatedBy: null },
+            russian: { text: 'Горизонтальная асимптота', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مقارب أفقي', status: 'Pending', validatedBy: null },
+            french: { text: 'Asymptote horizontale', status: 'Pending', validatedBy: null },
+            mandarin: { text: '水平渐近线', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Asíntota horizontal', status: 'Pending', validatedBy: null },
+            hindi: { text: 'क्षैतिज स्पर्शोन्मुख', status: 'Pending', validatedBy: null }
+        },
+
+        // Algebra 1 Terms (c2)
+        {
+            id: 't3', courseId: 'c2', definition: 'A rectangular array of numbers, symbols, or expressions, arranged in rows and columns.',
+            hebrew: { text: 'מטריצה', status: 'Pending', validatedBy: null },
+            pronunciation: 'matritza',
+            english: { text: 'Matrix', status: 'Pending', validatedBy: null },
+            russian: { text: 'Матрица', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مصفوفة', status: 'Pending', validatedBy: null },
+            french: { text: 'Matrice', status: 'Pending', validatedBy: null },
+            mandarin: { text: '矩阵', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Matriz', status: 'Pending', validatedBy: null },
+            hindi: { text: 'आव्यूह', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't13', courseId: 'c2', definition: 'A scalar value that is a function of the entries of a square matrix.',
+            hebrew: { text: 'דטרמיננטה', status: 'Pending', validatedBy: null },
+            pronunciation: 'determinanta',
+            english: { text: 'Determinant', status: 'Pending', validatedBy: null },
+            russian: { text: 'Определитель', status: 'Pending', validatedBy: null },
+            arabic: { text: 'محدد', status: 'Pending', validatedBy: null },
+            french: { text: 'Déterminant', status: 'Pending', validatedBy: null },
+            mandarin: { text: '行列式', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Determinante', status: 'Pending', validatedBy: null },
+            hindi: { text: 'निर्धारक', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't22', courseId: 'c2', definition: 'A vector space is a set of objects, called vectors, on which two operations are defined: vector addition and scalar multiplication.',
+            hebrew: { text: 'מרחב וקטורי', status: 'Pending', validatedBy: null },
+            pronunciation: 'merchav vektori',
+            english: { text: 'Vector Space', status: 'Pending', validatedBy: null },
+            russian: { text: 'Векторное пространство', status: 'Pending', validatedBy: null },
+            arabic: { text: 'فضاء متجه', status: 'Pending', validatedBy: null },
+            french: { text: 'Espace vectoriel', status: 'Pending', validatedBy: null },
+            mandarin: { text: '向量空间', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Espacio vectorial', status: 'Pending', validatedBy: null },
+            hindi: { text: 'सदिश समष्टि', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_4', courseId: 'c2', definition: 'An equation containing variables raised to the first power, with no products of variables.',
+            hebrew: { text: 'משוואה ליניארית', status: 'Pending', validatedBy: null },
+            pronunciation: 'mishvaah linearit',
+            english: { text: 'Linear Equation', status: 'Pending', validatedBy: null },
+            russian: { text: 'Линейное уравнение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'معادلة خطية', status: 'Pending', validatedBy: null },
+            french: { text: 'Équation linéaire', status: 'Pending', validatedBy: null },
+            mandarin: { text: '线性方程', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Ecuación lineal', status: 'Pending', validatedBy: null },
+            hindi: { text: 'रेखीय समीकरण', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_5', courseId: 'c2', definition: 'A collection of linear equations involving the same set of variables.',
+            hebrew: { text: 'מערכת משוואות', status: 'Pending', validatedBy: null },
+            pronunciation: 'maarechet mishvaot',
+            english: { text: 'System of Equations', status: 'Pending', validatedBy: null },
+            russian: { text: 'Система уравнений', status: 'Pending', validatedBy: null },
+            arabic: { text: 'نظام معادلات', status: 'Pending', validatedBy: null },
+            french: { text: 'Système d\'équations', status: 'Pending', validatedBy: null },
+            mandarin: { text: '方程组', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Sistema de ecuaciones', status: 'Pending', validatedBy: null },
+            hindi: { text: 'समीकरणों का तंत्र', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_6', courseId: 'c2', definition: 'A number that, when multiplied by another number, yields 1.',
+            hebrew: { text: 'הופכי', status: 'Pending', validatedBy: null },
+            pronunciation: 'hofchi',
+            english: { text: 'Reciprocal', status: 'Pending', validatedBy: null },
+            russian: { text: 'Взаимный', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مقلوب', status: 'Pending', validatedBy: null },
+            french: { text: 'Inverse', status: 'Pending', validatedBy: null },
+            mandarin: { text: '倒数', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Recíproco', status: 'Pending', validatedBy: null },
+            hindi: { text: 'व्युत्क्रम', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_7', courseId: 'c2', definition: 'A value that describes the steepness and direction of a line.',
+            hebrew: { text: 'שיפוע', status: 'Pending', validatedBy: null },
+            pronunciation: 'shipuach',
+            english: { text: 'Slope', status: 'Pending', validatedBy: null },
+            russian: { text: 'Наклон', status: 'Pending', validatedBy: null },
+            arabic: { text: 'ميل', status: 'Pending', validatedBy: null },
+            french: { text: 'Pente', status: 'Pending', validatedBy: null },
+            mandarin: { text: '斜率', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Pendiente', status: 'Pending', validatedBy: null },
+            hindi: { text: 'ढलान', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_8', courseId: 'c2', definition: 'A mathematical statement that two expressions are equal.',
+            hebrew: { text: 'שוויון', status: 'Pending', validatedBy: null },
+            pronunciation: 'shivyon',
+            english: { text: 'Equality', status: 'Pending', validatedBy: null },
+            russian: { text: 'Равенство', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مساواة', status: 'Pending', validatedBy: null },
+            french: { text: 'Égalité', status: 'Pending', validatedBy: null },
+            mandarin: { text: '相等', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Igualdad', status: 'Pending', validatedBy: null },
+            hindi: { text: 'समानता', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_9', courseId: 'c2', definition: 'A number that can be expressed as a fraction p/q, where p and q are integers and q is not zero.',
+            hebrew: { text: 'מספר רציונלי', status: 'Pending', validatedBy: null },
+            pronunciation: 'mispar ratsyionali',
+            english: { text: 'Rational Number', status: 'Pending', validatedBy: null },
+            russian: { text: 'Рациональное число', status: 'Pending', validatedBy: null },
+            arabic: { text: 'عدد نسبي', status: 'Pending', validatedBy: null },
+            french: { text: 'Nombre rationnel', status: 'Pending', validatedBy: null },
+            mandarin: { text: '有理数', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Número racional', status: 'Pending', validatedBy: null },
+            hindi: { text: 'परिमेय संख्या', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_10', courseId: 'c2', definition: 'A symbol that represents a quantity in a mathematical expression, usually a letter.',
+            hebrew: { text: 'נעלם', status: 'Pending', validatedBy: null },
+            pronunciation: 'naalam',
+            english: { text: 'Unknown (variable)', status: 'Pending', validatedBy: null },
+            russian: { text: 'Неизвестная', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مجهول', status: 'Pending', validatedBy: null },
+            french: { text: 'Inconnue', status: 'Pending', validatedBy: null },
+            mandarin: { text: '未知数', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Incógnita', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अज्ञात', status: 'Pending', validatedBy: null }
+        },
+
+        // Intro to CS Terms (c3)
+        {
+            id: 't4', courseId: 'c3', definition: 'A named storage location that contains a value.',
+            hebrew: { text: 'משתנה', status: 'Pending', validatedBy: null },
+            pronunciation: 'mishtaneh',
+            english: { text: 'Variable', status: 'Pending', validatedBy: null },
+            russian: { text: 'Переменная', status: 'Pending', validatedBy: null },
+            arabic: { text: 'متغير', status: 'Pending', validatedBy: null },
+            french: { text: 'Variable', status: 'Pending', validatedBy: null },
+            mandarin: { text: '变量', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Variable', status: 'Pending', validatedBy: null },
+            hindi: { text: 'चर', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't14', courseId: 'c3', definition: 'A step-by-step procedure for solving a problem or accomplishing a task.',
+            hebrew: { text: 'אלגוריתם', status: 'Pending', validatedBy: null },
+            pronunciation: 'algoritm',
+            english: { text: 'Algorithm', status: 'Pending', validatedBy: null },
+            russian: { text: 'Алгоритм', status: 'Pending', validatedBy: null },
+            arabic: { text: 'خوارزمية', status: 'Pending', validatedBy: null },
+            french: { text: 'Algorithme', status: 'Pending', validatedBy: null },
+            mandarin: { text: '算法', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Algoritmo', status: 'Pending', validatedBy: null },
+            hindi: { text: 'एल्गोरिथम', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't23', courseId: 'c3', definition: 'A sequence of characters, used for text in programming languages.',
+            hebrew: { text: 'מחרוזת', status: 'Pending', validatedBy: null },
+            pronunciation: 'machrozhet',
+            english: { text: 'String', status: 'Pending', validatedBy: null },
+            russian: { text: 'Строка', status: 'Pending', validatedBy: null },
+            arabic: { text: 'سلسلة', status: 'Pending', validatedBy: null },
+            french: { text: 'Chaîne de caractères', status: 'Pending', validatedBy: null },
+            mandarin: { text: '字符串', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Cadena', status: 'Pending', validatedBy: null },
+            hindi: { text: 'स्ट्रिंग', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't27', courseId: 'c3', definition: 'A method for storing and organizing data in a computer\'s memory or disk.',
+            hebrew: { text: 'מבנה נתונים', status: 'Pending', validatedBy: null },
+            pronunciation: 'mivne netunim',
+            english: { text: 'Data Structure', status: 'Pending', validatedBy: null },
+            russian: { text: 'Структура данных', status: 'Pending', validatedBy: null },
+            arabic: { text: 'هيكل البيانات', status: 'Pending', validatedBy: null },
+            french: { text: 'Structure de données', status: 'Pending', validatedBy: null },
+            mandarin: { text: '数据结构', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Estructura de datos', status: 'Pending', validatedBy: null },
+            hindi: { text: 'डेटा संरचना', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_5', courseId: 'c3', definition: 'A set of rules for writing code that a computer can understand.',
+            hebrew: { text: 'שפת תכנות', status: 'Pending', validatedBy: null },
+            pronunciation: 'sfat tichnut',
+            english: { text: 'Programming Language', status: 'Pending', validatedBy: null },
+            russian: { text: 'Язык программирования', status: 'Pending', validatedBy: null },
+            arabic: { text: 'لغة برمجة', status: 'Pending', validatedBy: null },
+            french: { text: 'Langage de programmation', status: 'Pending', validatedBy: null },
+            mandarin: { text: '编程语言', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Lenguaje de programación', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रोग्रामिंग भाषा', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_6', courseId: 'c3', definition: 'A logical concept in programming that checks if a condition is true or false.',
+            hebrew: { text: 'תנאי', status: 'Pending', validatedBy: null },
+            pronunciation: 'tnai',
+            english: { text: 'Condition', status: 'Pending', validatedBy: null },
+            russian: { text: 'Условие', status: 'Pending', validatedBy: null },
+            arabic: { text: 'شرط', status: 'Pending', validatedBy: null },
+            french: { text: 'Condition', status: 'Pending', validatedBy: null },
+            mandarin: { text: '条件', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Condición', status: 'Pending', validatedBy: null },
+            hindi: { text: 'शर्त', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_7', courseId: 'c3', definition: 'A block of code that is designed to perform a specific task and can be reused.',
+            hebrew: { text: 'פונקציה', status: 'Pending', validatedBy: null },
+            pronunciation: 'funktsia',
+            english: { text: 'Function', status: 'Pending', validatedBy: null },
+            russian: { text: 'Функция', status: 'Pending', validatedBy: null },
+            arabic: { text: 'دالة', status: 'Pending', validatedBy: null },
+            french: { text: 'Fonction', status: 'Pending', validatedBy: null },
+            mandarin: { text: '函数', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Función', status: 'Pending', validatedBy: null },
+            hindi: { text: 'फ़ंक्शन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_8', courseId: 'c3', definition: 'A control flow statement that allows code to be executed repeatedly based on a condition.',
+            hebrew: { text: 'לולאה', status: 'Pending', validatedBy: null },
+            pronunciation: 'lulaa',
+            english: { text: 'Loop', status: 'Pending', validatedBy: null },
+            russian: { text: 'Цикл', status: 'Pending', validatedBy: null },
+            arabic: { text: 'حلقة', status: 'Pending', validatedBy: null },
+            french: { text: 'Boucle', status: 'Pending', validatedBy: null },
+            mandarin: { text: '循环', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Bucle', status: 'Pending', validatedBy: null },
+            hindi: { text: 'लूप', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_9', courseId: 'c3', definition: 'A value that can be either true or false.',
+            hebrew: { text: 'בוליאני', status: 'Pending', validatedBy: null },
+            pronunciation: 'buliani',
+            english: { text: 'Boolean', status: 'Pending', validatedBy: null },
+            russian: { text: 'Булево значение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'منطقي', status: 'Pending', validatedBy: null },
+            french: { text: 'Booléen', status: 'Pending', validatedBy: null },
+            mandarin: { text: '布尔值', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Booleano', status: 'Pending', validatedBy: null },
+            hindi: { text: 'बूलियन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_10', courseId: 'c3', definition: 'A piece of data or value that can be assigned to a variable or passed as an argument.',
+            hebrew: { text: 'ערך', status: 'Pending', validatedBy: null },
+            pronunciation: 'erech',
+            english: { text: 'Value', status: 'Pending', validatedBy: null },
+            russian: { text: 'Значение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'قيمة', status: 'Pending', validatedBy: null },
+            french: { text: 'Valeur', status: 'Pending', validatedBy: null },
+            mandarin: { text: '值', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Valor', status: 'Pending', validatedBy: null },
+            hindi: { text: 'मूल्य', status: 'Pending', validatedBy: null }
+        },
+
+        // Physics 1 Terms (c4)
+        {
+            id: 't5', courseId: 'c4', definition: 'The force that causes objects to fall toward the center of the Earth.',
+            hebrew: { text: 'כוח כבידה', status: 'Pending', validatedBy: null },
+            pronunciation: 'koach kfida',
+            english: { text: 'Gravity', status: 'Pending', validatedBy: null },
+            russian: { text: 'Гравитация', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الجاذبية', status: 'Pending', validatedBy: null },
+            french: { text: 'Gravité', status: 'Pending', validatedBy: null },
+            mandarin: { text: '重力', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Gravedad', status: 'Pending', validatedBy: null },
+            hindi: { text: 'गुरुत्वाकर्षण', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't15', courseId: 'c4', definition: 'The rate at which an object changes its velocity.',
+            hebrew: { text: 'תאוצה', status: 'Pending', validatedBy: null },
+            pronunciation: 'teutza',
+            english: { text: 'Acceleration', status: 'Pending', validatedBy: null },
+            russian: { text: 'Ускорение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تسارع', status: 'Pending', validatedBy: null },
+            french: { text: 'Accélération', status: 'Pending', validatedBy: null },
+            mandarin: { text: '加速度', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Aceleración', status: 'Pending', validatedBy: null },
+            hindi: { text: 'त्वरण', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't24', courseId: 'c4', definition: 'The study of motion and its causes.',
+            hebrew: { text: 'מכניקה', status: 'Pending', validatedBy: null },
+            pronunciation: 'mechanika',
+            english: { text: 'Mechanics', status: 'Pending', validatedBy: null },
+            russian: { text: 'Механика', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الميكانيكا', status: 'Pending', validatedBy: null },
+            french: { text: 'Mécanique', status: 'Pending', validatedBy: null },
+            mandarin: { text: '力学', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Mecánica', status: 'Pending', validatedBy: null },
+            hindi: { text: 'यांत्रिकी', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_4', courseId: 'c4', definition: 'The product of an object\'s mass and its velocity.',
+            hebrew: { text: 'תנע', status: 'Pending', validatedBy: null },
+            pronunciation: 'tena',
+            english: { text: 'Momentum', status: 'Pending', validatedBy: null },
+            russian: { text: 'Импульс', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الزخم', status: 'Pending', validatedBy: null },
+            french: { text: 'Quantité de mouvement', status: 'Pending', validatedBy: null },
+            mandarin: { text: '动量', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Momento lineal', status: 'Pending', validatedBy: null },
+            hindi: { text: 'संवेग', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_5', courseId: 'c4', definition: 'The capacity to do work.',
+            hebrew: { text: 'אנרגיה', status: 'Pending', validatedBy: null },
+            pronunciation: 'energiyah',
+            english: { text: 'Energy', status: 'Pending', validatedBy: null },
+            russian: { text: 'Энергия', status: 'Pending', validatedBy: null },
+            arabic: { text: 'طاقة', status: 'Pending', validatedBy: null },
+            french: { text: 'Énergie', status: 'Pending', validatedBy: null },
+            mandarin: { text: '能量', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Energía', status: 'Pending', validatedBy: null },
+            hindi: { text: 'ऊर्जा', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_6', courseId: 'c4', definition: 'The change in an object\'s position.',
+            hebrew: { text: 'העתק', status: 'Pending', validatedBy: null },
+            pronunciation: 'heteq',
+            english: { text: 'Displacement', status: 'Pending', validatedBy: null },
+            russian: { text: 'Смещение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'إزاحة', status: 'Pending', validatedBy: null },
+            french: { text: 'Déplacement', status: 'Pending', validatedBy: null },
+            mandarin: { text: '位移', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Desplazamiento', status: 'Pending', validatedBy: null },
+            hindi: { text: 'विस्थापन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_7', courseId: 'c4', definition: 'The resistance of an object to any change in its state of motion.',
+            hebrew: { text: 'אינרציה', status: 'Pending', validatedBy: null },
+            pronunciation: 'inertzia',
+            english: { text: 'Inertia', status: 'Pending', validatedBy: null },
+            russian: { text: 'Инерция', status: 'Pending', validatedBy: null },
+            arabic: { text: 'قصور ذاتي', status: 'Pending', validatedBy: null },
+            french: { text: 'Inertie', status: 'Pending', validatedBy: null },
+            mandarin: { text: '惯性', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Inercia', status: 'Pending', validatedBy: null },
+            hindi: { text: 'जड़ता', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_8', courseId: 'c4', definition: 'The rate at which work is done.',
+            hebrew: { text: 'הספק', status: 'Pending', validatedBy: null },
+            pronunciation: 'hespeq',
+            english: { text: 'Power', status: 'Pending', validatedBy: null },
+            russian: { text: 'Мощность', status: 'Pending', validatedBy: null },
+            arabic: { text: 'طاقة (قوة)', status: 'Pending', validatedBy: null },
+            french: { text: 'Puissance', status: 'Pending', validatedBy: null },
+            mandarin: { text: '功率', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Potencia', status: 'Pending', validatedBy: null },
+            hindi: { text: 'शक्ति', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_9', courseId: 'c4', definition: 'A push or a pull upon an object resulting from the object\'s interaction with another object.',
+            hebrew: { text: 'כוח', status: 'Pending', validatedBy: null },
+            pronunciation: 'koach',
+            english: { text: 'Force', status: 'Pending', validatedBy: null },
+            russian: { text: 'Сила', status: 'Pending', validatedBy: null },
+            arabic: { text: 'قوة', status: 'Pending', validatedBy: null },
+            french: { text: 'Force', status: 'Pending', validatedBy: null },
+            mandarin: { text: '力', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Fuerza', status: 'Pending', validatedBy: null },
+            hindi: { text: 'बल', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_10', courseId: 'c4', definition: 'The resistance to motion caused by the contact of two surfaces.',
+            hebrew: { text: 'חיכוך', status: 'Pending', validatedBy: null },
+            pronunciation: 'chikuch',
+            english: { text: 'Friction', status: 'Pending', validatedBy: null },
+            russian: { text: 'Трение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'احت frictionكاك', status: 'Pending', validatedBy: null },
+            french: { text: 'Frottement', status: 'Pending', validatedBy: null },
+            mandarin: { text: '摩擦力', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Fricción', status: 'Pending', validatedBy: null },
+            hindi: { text: 'घर्षण', status: 'Pending', validatedBy: null }
+        },
+
+        // Chemistry 1 Terms (c5)
+        {
+            id: 't6', courseId: 'c5', definition: 'The smallest unit of matter that retains an element\'s chemical identity.',
+            hebrew: { text: 'אטום', status: 'Pending', validatedBy: null },
+            pronunciation: 'atom',
+            english: { text: 'Atom', status: 'Pending', validatedBy: null },
+            russian: { text: 'Атом', status: 'Pending', validatedBy: null },
+            arabic: { text: 'ذرة', status: 'Pending', validatedBy: null },
+            french: { text: 'Atome', status: 'Pending', validatedBy: null },
+            mandarin: { text: '原子', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Átomo', status: 'Pending', validatedBy: null },
+            hindi: { text: 'परमाणु', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't25', courseId: 'c5', definition: 'A substance that produces hydrogen ions (H+) in solution and can accept electrons.',
+            hebrew: { text: 'חומצה', status: 'Pending', validatedBy: null },
+            pronunciation: 'chumtza',
+            english: { text: 'Acid', status: 'Pending', validatedBy: null },
+            russian: { text: 'Кислота', status: 'Pending', validatedBy: null },
+            arabic: { text: 'حمض', status: 'Pending', validatedBy: null },
+            french: { text: 'Acide', status: 'Pending', validatedBy: null },
+            mandarin: { text: '酸', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Ácido', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अम्ल', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_3', courseId: 'c5', definition: 'A substance that can neutralize acids by reacting with hydrogen ions (H+) in solution.',
+            hebrew: { text: 'בסיס', status: 'Pending', validatedBy: null },
+            pronunciation: 'basis',
+            english: { text: 'Base', status: 'Pending', validatedBy: null },
+            russian: { text: 'Основание', status: 'Pending', validatedBy: null },
+            arabic: { text: 'قاعدة', status: 'Pending', validatedBy: null },
+            french: { text: 'Base', status: 'Pending', validatedBy: null },
+            mandarin: { text: '碱', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Base', status: 'Pending', validatedBy: null },
+            hindi: { text: 'आधार', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_4', courseId: 'c5', definition: 'A process that involves rearrangement of the molecular or ionic structure of a substance, as distinct from a change in physical form or a nuclear reaction.',
+            hebrew: { text: 'תגובה כימית', status: 'Pending', validatedBy: null },
+            pronunciation: 'tguva chimit',
+            english: { text: 'Chemical Reaction', status: 'Pending', validatedBy: null },
+            russian: { text: 'Химическая реакция', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تفاعل كيميائي', status: 'Pending', validatedBy: null },
+            french: { text: 'Réaction chimique', status: 'Pending', validatedBy: null },
+            mandarin: { text: '化学反应', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Reacción química', status: 'Pending', validatedBy: null },
+            hindi: { text: 'रासायनिक अभिक्रिया', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_5', courseId: 'c5', definition: 'A substance formed when two or more chemical elements are chemically bonded together.',
+            hebrew: { text: 'תרכובת', status: 'Pending', validatedBy: null },
+            pronunciation: 'tirkovet',
+            english: { text: 'Compound', status: 'Pending', validatedBy: null },
+            russian: { text: 'Соединение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مركب', status: 'Pending', validatedBy: null },
+            french: { text: 'Composé', status: 'Pending', validatedBy: null },
+            mandarin: { text: '化合物', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Compuesto', status: 'Pending', validatedBy: null },
+            hindi: { text: 'यौगिक', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_6', courseId: 'c5', definition: 'A table that organizes all of the known chemical elements in order of increasing atomic number.',
+            hebrew: { text: 'טבלה מחזורית', status: 'Pending', validatedBy: null },
+            pronunciation: 'tavla machzorit',
+            english: { text: 'Periodic Table', status: 'Pending', validatedBy: null },
+            russian: { text: 'Периодическая таблица', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الجدول الدوري', status: 'Pending', validatedBy: null },
+            french: { text: 'Tableau périodique', status: 'Pending', validatedBy: null },
+            mandarin: { text: '元素周期表', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Tabla periódica', status: 'Pending', validatedBy: null },
+            hindi: { text: 'आवर्त सारणी', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_7', courseId: 'c5', definition: 'The smallest particle of a substance that retains its chemical and physical properties and is composed of two or more atoms held together by chemical bonds.',
+            hebrew: { text: 'מולקולה', status: 'Pending', validatedBy: null },
+            pronunciation: 'molekula',
+            english: { text: 'Molecule', status: 'Pending', validatedBy: null },
+            russian: { text: 'Молекула', status: 'Pending', validatedBy: null },
+            arabic: { text: 'جزيء', status: 'Pending', validatedBy: null },
+            french: { text: 'Molécule', status: 'Pending', validatedBy: null },
+            mandarin: { text: '分子', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Molécula', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अणु', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_8', courseId: 'c5', definition: 'A measure of the concentration of hydrogen ions in a solution, indicating its acidity or alkalinity.',
+            hebrew: { text: 'pH', status: 'Pending', validatedBy: null },
+            pronunciation: 'pi-eytch',
+            english: { text: 'pH', status: 'Pending', validatedBy: null },
+            russian: { text: 'pH', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الأس الهيدروجيني', status: 'Pending', validatedBy: null },
+            french: { text: 'pH', status: 'Pending', validatedBy: null },
+            mandarin: { text: 'pH', status: 'Pending', validatedBy: null },
+            spanish: { text: 'pH', status: 'Pending', validatedBy: null },
+            hindi: { text: 'पीएच', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_9', courseId: 'c5', definition: 'A type of chemical bond that involves the sharing of electron pairs between atoms.',
+            hebrew: { text: 'קשר קוולנטי', status: 'Pending', validatedBy: null },
+            pronunciation: 'kesher kovalenti',
+            english: { text: 'Covalent Bond', status: 'Pending', validatedBy: null },
+            russian: { text: 'Ковалентная связь', status: 'Pending', validatedBy: null },
+            arabic: { text: 'رابطة تساهمية', status: 'Pending', validatedBy: null },
+            french: { text: 'Liaison covalente', status: 'Pending', validatedBy: null },
+            mandarin: { text: '共价键', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Enlace covalente', status: 'Pending', validatedBy: null },
+            hindi: { text: 'सहसंयोजक बंधन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_10', courseId: 'c5', definition: 'A type of chemical bond that involves the electrostatic attraction between oppositely charged ions.',
+            hebrew: { text: 'קשר יוני', status: 'Pending', validatedBy: null },
+            pronunciation: 'kesher yoni',
+            english: { text: 'Ionic Bond', status: 'Pending', validatedBy: null },
+            russian: { text: 'Ионная связь', status: 'Pending', validatedBy: null },
+            arabic: { text: 'رابطة أيونية', status: 'Pending', validatedBy: null },
+            french: { text: 'Liaison ionique', status: 'Pending', validatedBy: null },
+            mandarin: { text: '离子键', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Enlace iónico', status: 'Pending', validatedBy: null },
+            hindi: { text: 'आयनिक बंधन', status: 'Pending', validatedBy: null }
+        },
+
+        // Biology 1 Terms (c6)
+        {
+            id: 't7', courseId: 'c6', definition: 'The metabolic pathway that converts glucose into pyruvate, which is then used in cellular respiration.',
+            hebrew: { text: 'גליקוליזה', status: 'Pending', validatedBy: null },
+            pronunciation: 'glikoliza',
+            english: { text: 'Glycolysis', status: 'Pending', validatedBy: null },
+            russian: { text: 'Гликолиз', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تحلل الجلوكوز', status: 'Pending', validatedBy: null },
+            french: { text: 'Glycolyse', status: 'Pending', validatedBy: null },
+            mandarin: { text: '糖酵解', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Glucólisis', status: 'Pending', validatedBy: null },
+            hindi: { text: 'ग्लाइकोलाइसिस', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't26', courseId: 'c6', definition: 'Large biological molecules (macromolecules) made of amino acid subunits.',
+            hebrew: { text: 'חלבון', status: 'Pending', validatedBy: null },
+            pronunciation: 'chalbon',
+            english: { text: 'Protein', status: 'Pending', validatedBy: null },
+            russian: { text: 'Белок', status: 'Pending', validatedBy: null },
+            arabic: { text: 'بروتين', status: 'Pending', validatedBy: null },
+            french: { text: 'Protéine', status: 'Pending', validatedBy: null },
+            mandarin: { text: '蛋白质', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Proteína', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रोटीन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_3', courseId: 'c6', definition: 'The fundamental structural and functional unit of all known organisms.',
+            hebrew: { text: 'תא', status: 'Pending', validatedBy: null },
+            pronunciation: 'ta',
+            english: { text: 'Cell', status: 'Pending', validatedBy: null },
+            russian: { text: 'Клетка', status: 'Pending', validatedBy: null },
+            arabic: { text: 'خلية', status: 'Pending', validatedBy: null },
+            french: { text: 'Cellule', status: 'Pending', validatedBy: null },
+            mandarin: { text: '细胞', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Célula', status: 'Pending', validatedBy: null },
+            hindi: { text: 'कोशिका', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_4', courseId: 'c6', definition: 'The process by which green plants and some other organisms use sunlight to synthesize foods from carbon dioxide and water.',
+            hebrew: { text: 'פוטוסינתזה', status: 'Pending', validatedBy: null },
+            pronunciation: 'fotosinteza',
+            english: { text: 'Photosynthesis', status: 'Pending', validatedBy: null },
+            russian: { text: 'Фотосинтез', status: 'Pending', validatedBy: null },
+            arabic: { text: 'التمثيل الضوئي', status: 'Pending', validatedBy: null },
+            french: { text: 'Photosynthèse', status: 'Pending', validatedBy: null },
+            mandarin: { text: '光合作用', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Fotosíntesis', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रकाश संश्लेषण', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_5', courseId: 'c6', definition: 'The process in which organisms combine oxygen with foodstuff molecules, diverting the chemical energy in these substances into life-sustaining activities and discarding waste products.',
+            hebrew: { text: 'נשימה תאית', status: 'Pending', validatedBy: null },
+            pronunciation: 'neshima tait',
+            english: { text: 'Cellular Respiration', status: 'Pending', validatedBy: null },
+            russian: { text: 'Клеточное дыхание', status: 'Pending', validatedBy: null },
+            arabic: { text: 'التنفس الخلوي', status: 'Pending', validatedBy: null },
+            french: { text: 'Respiration cellulaire', status: 'Pending', validatedBy: null },
+            mandarin: { text: '细胞呼吸', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Respiración celular', status: 'Pending', validatedBy: null },
+            hindi: { text: 'कोशिकीय श्वसन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_6', courseId: 'c6', definition: 'A molecule carrying the genetic instructions used in the growth, development, functioning, and reproduction of all known organisms and many viruses.',
+            hebrew: { text: 'DNA', status: 'Pending', validatedBy: null },
+            pronunciation: 'di-en-ey',
+            english: { text: 'DNA', status: 'Pending', validatedBy: null },
+            russian: { text: 'ДНК', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الحمض النووي', status: 'Pending', validatedBy: null },
+            french: { text: 'ADN', status: 'Pending', validatedBy: null },
+            mandarin: { text: 'DNA', status: 'Pending', validatedBy: null },
+            spanish: { text: 'ADN', status: 'Pending', validatedBy: null },
+            hindi: { text: 'डीएनए', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_7', courseId: 'c6', definition: 'The branch of biology that deals with the relations of organisms to one another and to their physical surroundings.',
+            hebrew: { text: 'אקולוגיה', status: 'Pending', validatedBy: null },
+            pronunciation: 'ekologiya',
+            english: { text: 'Ecology', status: 'Pending', validatedBy: null },
+            russian: { text: 'Экология', status: 'Pending', validatedBy: null },
+            arabic: { text: 'علم البيئة', status: 'Pending', validatedBy: null },
+            french: { text: 'Écologie', status: 'Pending', validatedBy: null },
+            mandarin: { text: '生态学', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Ecología', status: 'Pending', validatedBy: null },
+            hindi: { text: 'पारिस्थितिकी', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_8', courseId: 'c6', definition: 'A group of living organisms consisting of similar individuals capable of exchanging genes or interbreeding.',
+            hebrew: { text: 'מין (ביולוגיה)', status: 'Pending', validatedBy: null },
+            pronunciation: 'min (biologia)',
+            english: { text: 'Species', status: 'Pending', validatedBy: null },
+            russian: { text: 'Вид', status: 'Pending', validatedBy: null },
+            arabic: { text: 'نوع (بيولوجيا)', status: 'Pending', validatedBy: null },
+            french: { text: 'Espèce', status: 'Pending', validatedBy: null },
+            mandarin: { text: '物种', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Especie', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रजाति', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_9', courseId: 'c6', definition: 'The process by which organisms with traits better suited to an environment tend to survive and reproduce more offspring.',
+            hebrew: { text: 'ברירה טבעית', status: 'Pending', validatedBy: null },
+            pronunciation: 'brira tivit',
+            english: { text: 'Natural Selection', status: 'Pending', validatedBy: null },
+            russian: { text: 'Естественный отбор', status: 'Pending', validatedBy: null },
+            arabic: { text: 'الانتخاب الطبيعي', status: 'Pending', validatedBy: null },
+            french: { text: 'Sélection naturelle', status: 'Pending', validatedBy: null },
+            mandarin: { text: '自然选择', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Selección natural', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्राकृतिक चयन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_10', courseId: 'c6', definition: 'An inherited characteristic that increases an organism\'s chance of survival and reproduction in its environment.',
+            hebrew: { text: 'התאמה', status: 'Pending', validatedBy: null },
+            pronunciation: 'hataama',
+            english: { text: 'Adaptation', status: 'Pending', validatedBy: null },
+            russian: { text: 'Адаптация', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تكيف', status: 'Pending', validatedBy: null },
+            french: { text: 'Adaptation', status: 'Pending', validatedBy: null },
+            mandarin: { text: '适应', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Adaptación', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अनुकूलन', status: 'Pending', validatedBy: null }
+        },
+
+        // Add more terms for existing IDs if needed, or create new IDs
+        // Example for c1 (Calculus 1)
+        {
+            id: 't_c1_11', courseId: 'c1', definition: 'The definite integral can be interpreted as the area of the region bounded by the graph of a function, the x-axis, and vertical lines.',
+            hebrew: { text: 'אינטגרל מסוים', status: 'Pending', validatedBy: null },
+            pronunciation: 'integral meyuham',
+            english: { text: 'Definite Integral', status: 'Pending', validatedBy: null },
+            russian: { text: 'Определенный интеграл', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تكامل محدد', status: 'Pending', validatedBy: null },
+            french: { text: 'Intégrale définie', status: 'Pending', validatedBy: null },
+            mandarin: { text: '定积分', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Integral definida', status: 'Pending', validatedBy: null },
+            hindi: { text: 'निश्चित समाकल', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c1_12', courseId: 'c1', definition: 'A tangent line to a curve at a given point is a straight line that "just touches" the curve at that point.',
+            hebrew: { text: 'קו משיק', status: 'Pending', validatedBy: null },
+            pronunciation: 'kav mashik',
+            english: { text: 'Tangent Line', status: 'Pending', validatedBy: null },
+            russian: { text: 'Касательная', status: 'Pending', validatedBy: null },
+            arabic: { text: 'خط مماس', status: 'Pending', validatedBy: null },
+            french: { text: 'Tangente', status: 'Pending', validatedBy: null },
+            mandarin: { text: '切线', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Recta tangente', status: 'Pending', validatedBy: null },
+            hindi: { text: 'स्पर्श रेखा', status: 'Pending', validatedBy: null }
+        },
+        // More terms for Algebra 1 (c2)
+        {
+            id: 't_c2_11', courseId: 'c2', definition: 'A number that, when multiplied by a matrix, scales its rows or columns.',
+            hebrew: { text: 'סקאלר', status: 'Pending', validatedBy: null },
+            pronunciation: 'skalar',
+            english: { text: 'Scalar', status: 'Pending', validatedBy: null },
+            russian: { text: 'Скаляр', status: 'Pending', validatedBy: null },
+            arabic: { text: 'كمية قياسية', status: 'Pending', validatedBy: null },
+            french: { text: 'Scalaire', status: 'Pending', validatedBy: null },
+            mandarin: { text: '标量', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Escalar', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अदिश', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c2_12', courseId: 'c2', definition: 'A set of vectors that are linearly independent and span the entire vector space.',
+            hebrew: { text: 'בסיס', status: 'Pending', validatedBy: null },
+            pronunciation: 'basis',
+            english: { text: 'Basis', status: 'Pending', validatedBy: null },
+            russian: { text: 'Базис', status: 'Pending', validatedBy: null },
+            arabic: { text: 'أساس', status: 'Pending', validatedBy: null },
+            french: { text: 'Base', status: 'Pending', validatedBy: null },
+            mandarin: { text: '基', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Base', status: 'Pending', validatedBy: null },
+            hindi: { text: 'आधार', status: 'Pending', validatedBy: null }
+        },
+        // More terms for Intro to CS (c3)
+        {
+            id: 't_c3_11', courseId: 'c3', definition: 'A predefined set of rules that dictate how data can be exchanged between computers.',
+            hebrew: { text: 'פרוטוקול', status: 'Pending', validatedBy: null },
+            pronunciation: 'protokol',
+            english: { text: 'Protocol', status: 'Pending', validatedBy: null },
+            russian: { text: 'Протокол', status: 'Pending', validatedBy: null },
+            arabic: { text: 'بروتوكول', status: 'Pending', validatedBy: null },
+            french: { text: 'Protocole', status: 'Pending', validatedBy: null },
+            mandarin: { text: '协议', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Protocolo', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रोटोकॉल', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c3_12', courseId: 'c3', definition: 'A software program that helps to manage and coordinate computer hardware and software resources.',
+            hebrew: { text: 'מערכת הפעלה', status: 'Pending', validatedBy: null },
+            pronunciation: 'maarechet hafaala',
+            english: { text: 'Operating System', status: 'Pending', validatedBy: null },
+            russian: { text: 'Операционная система', status: 'Pending', validatedBy: null },
+            arabic: { text: 'نظام تشغيل', status: 'Pending', validatedBy: null },
+            french: { text: 'Système d\'exploitation', status: 'Pending', validatedBy: null },
+            mandarin: { text: '操作系统', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Sistema operativo', status: 'Pending', validatedBy: null },
+            hindi: { text: 'ऑपरेटिंग सिस्टम', status: 'Pending', validatedBy: null }
+        },
+        // More terms for Physics 1 (c4)
+        {
+            id: 't_c4_11', courseId: 'c4', definition: 'The total energy of an isolated system remains constant; it can only transform from one form to another.',
+            hebrew: { text: 'שימור אנרגיה', status: 'Pending', validatedBy: null },
+            pronunciation: 'shimur energiyah',
+            english: { text: 'Conservation of Energy', status: 'Pending', validatedBy: null },
+            russian: { text: 'Сохранение энергии', status: 'Pending', validatedBy: null },
+            arabic: { text: 'حفظ الطاقة', status: 'Pending', validatedBy: null },
+            french: { text: 'Conservation de l\'énergie', status: 'Pending', validatedBy: null },
+            mandarin: { text: '能量守恒', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Conservación de la energía', status: 'Pending', validatedBy: null },
+            hindi: { text: 'ऊर्जा का संरक्षण', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c4_12', courseId: 'c4', definition: 'The path taken by an object thrown or projected into the air, subject to the force of gravity.',
+            hebrew: { text: 'מסלול בליסטי', status: 'Pending', validatedBy: null },
+            pronunciation: 'maslul balisti',
+            english: { text: 'Projectile Motion', status: 'Pending', validatedBy: null },
+            russian: { text: 'Баллистическое движение', status: 'Pending', validatedBy: null },
+            arabic: { text: 'حركة المقذوفات', status: 'Pending', validatedBy: null },
+            french: { text: 'Mouvement de projectile', status: 'Pending', validatedBy: null },
+            mandarin: { text: '抛物运动', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Movimiento parabólico', status: 'Pending', validatedBy: null },
+            hindi: { text: 'प्रक्षेप्य गति', status: 'Pending', validatedBy: null }
+        },
+        // More terms for Chemistry 1 (c5)
+        {
+            id: 't_c5_11', courseId: 'c5', definition: 'A solution that resists changes in pH upon the addition of small amounts of acid or base.',
+            hebrew: { text: 'בופר', status: 'Pending', validatedBy: null },
+            pronunciation: 'buffer',
+            english: { text: 'Buffer (chemistry)', status: 'Pending', validatedBy: null },
+            russian: { text: 'Буфер', status: 'Pending', validatedBy: null },
+            arabic: { text: 'محلول منظم', status: 'Pending', validatedBy: null },
+            french: { text: 'Tampon (chimie)', status: 'Pending', validatedBy: null },
+            mandarin: { text: '缓冲液', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Amortiguador (química)', status: 'Pending', validatedBy: null },
+            hindi: { text: 'बफर', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c5_12', courseId: 'c5', definition: 'A measure of the tendency of an atom to attract a bonding pair of electrons.',
+            hebrew: { text: 'אלקטרושליליות', status: 'Pending', validatedBy: null },
+            pronunciation: 'elektroshliliut',
+            english: { text: 'Electronegativity', status: 'Pending', validatedBy: null },
+            russian: { text: 'Электроотрицательность', status: 'Pending', validatedBy: null },
+            arabic: { text: 'كهروسلبية', status: 'Pending', validatedBy: null },
+            french: { text: 'Électronégativité', status: 'Pending', validatedBy: null },
+            mandarin: { text: '电负性', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Electronegatividad', status: 'Pending', validatedBy: null },
+            hindi: { text: 'विद्युतऋणात्मकता', status: 'Pending', validatedBy: null }
+        },
+        // More terms for Biology 1 (c6)
+        {
+            id: 't_c6_11', courseId: 'c6', definition: 'The process by which DNA is copied to make a new DNA molecule.',
+            hebrew: { text: 'שכפול DNA', status: 'Pending', validatedBy: null },
+            pronunciation: 'shichpul DNA',
+            english: { text: 'DNA Replication', status: 'Pending', validatedBy: null },
+            russian: { text: 'Репликация ДНК', status: 'Pending', validatedBy: null },
+            arabic: { text: 'تضاعف الحمض النووي', status: 'Pending', validatedBy: null },
+            french: { text: 'Réplication de l\'ADN', status: 'Pending', validatedBy: null },
+            mandarin: { text: 'DNA复制', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Replicación del ADN', status: 'Pending', validatedBy: null },
+            hindi: { text: 'डीएनए प्रतिकृति', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_12', courseId: 'c6', definition: 'The genetic makeup of an organism, as opposed to its physical appearance.',
+            hebrew: { text: 'גנוטיפ', status: 'Pending', validatedBy: null },
+            pronunciation: 'genotip',
+            english: { text: 'Genotype', status: 'Pending', validatedBy: null },
+            russian: { text: 'Генотип', status: 'Pending', validatedBy: null },
+            arabic: { text: 'النمط الجيني', status: 'Pending', validatedBy: null },
+            french: { text: 'Génotype', status: 'Pending', validatedBy: null },
+            mandarin: { text: '基因型', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Genotipo', status: 'Pending', validatedBy: null },
+            hindi: { text: 'जीनोटाइप', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_13', courseId: 'c6', definition: 'The observable physical or biochemical characteristics of an organism, as determined by both genetic makeup and environmental influences.',
+            hebrew: { text: 'פנוטיפ', status: 'Pending', validatedBy: null },
+            pronunciation: 'fenotip',
+            english: { text: 'Phenotype', status: 'Pending', validatedBy: null },
+            russian: { text: 'Фенотип', status: 'Pending', validatedBy: null },
+            arabic: { text: 'النمط الظاهري', status: 'Pending', validatedBy: null },
+            french: { text: 'Phénotype', status: 'Pending', validatedBy: null },
+            mandarin: { text: '表型', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Fenotipo', status: 'Pending', validatedBy: null },
+            hindi: { text: 'फीनोटाइप', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_14', courseId: 'c6', definition: 'The process of producing two identical daughter cells from a single parent cell.',
+            hebrew: { text: 'מיטוזה', status: 'Pending', validatedBy: null },
+            pronunciation: 'mitoza',
+            english: { text: 'Mitosis', status: 'Pending', validatedBy: null },
+            russian: { text: 'Митоз', status: 'Pending', validatedBy: null },
+            arabic: { text: 'انقسام متساو', status: 'Pending', validatedBy: null },
+            french: { text: 'Mitose', status: 'Pending', validatedBy: null },
+            mandarin: { text: '有丝分裂', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Mitosis', status: 'Pending', validatedBy: null },
+            hindi: { text: 'माइटोसिस', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_15', courseId: 'c6', definition: 'A type of cell division that reduces the number of chromosomes in the parent cell by half and produces four gamete cells.',
+            hebrew: { text: 'מיוזה', status: 'Pending', validatedBy: null },
+            pronunciation: 'meioza',
+            english: { text: 'Meiosis', status: 'Pending', validatedBy: null },
+            russian: { text: 'Мейоз', status: 'Pending', validatedBy: null },
+            arabic: { text: 'انقسام اختزالي', status: 'Pending', validatedBy: null },
+            french: { text: 'Méiose', status: 'Pending', validatedBy: null },
+            mandarin: { text: '减数分裂', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Meiosis', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अर्धसूत्रीविभाजन', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_16', courseId: 'c6', definition: 'An organism that produces its own food, usually by photosynthesis, and forms the base of a food chain.',
+            hebrew: { text: 'יצרן', status: 'Pending', validatedBy: null },
+            pronunciation: 'yatzran',
+            english: { text: 'Producer (biology)', status: 'Pending', validatedBy: null },
+            russian: { text: 'Производитель', status: 'Pending', validatedBy: null },
+            arabic: { text: 'منتج (بيولوجيا)', status: 'Pending', validatedBy: null },
+            french: { text: 'Producteur (biologie)', status: 'Pending', validatedBy: null },
+            mandarin: { text: '生产者', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Productor (biología)', status: 'Pending', validatedBy: null },
+            hindi: { text: 'उत्पादक (जीव विज्ञान)', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_17', courseId: 'c6', definition: 'An organism that obtains energy by feeding on other organisms.',
+            hebrew: { text: 'צרכן', status: 'Pending', validatedBy: null },
+            pronunciation: 'tzarchan',
+            english: { text: 'Consumer (biology)', status: 'Pending', validatedBy: null },
+            russian: { text: 'Потребитель', status: 'Pending', validatedBy: null },
+            arabic: { text: 'مستهلك (بيولوجيا)', status: 'Pending', validatedBy: null },
+            french: { text: 'Consommateur (biologie)', status: 'Pending', validatedBy: null },
+            mandarin: { text: '消费者', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Consumidor (biología)', status: 'Pending', validatedBy: null },
+            hindi: { text: 'उपभोक्ता (जीव विज्ञान)', status: 'Pending', validatedBy: null }
+        },
+        {
+            id: 't_c6_18', courseId: 'c6', definition: 'An organism, especially a soil bacterium, fungus, or invertebrate, that decomposes organic material.',
+            hebrew: { text: 'מפרק', status: 'Pending', validatedBy: null },
+            pronunciation: 'meafreq',
+            english: { text: 'Decomposer', status: 'Pending', validatedBy: null },
+            russian: { text: 'Разлагатель', status: 'Pending', validatedBy: null },
+            arabic: { text: 'محلل', status: 'Pending', validatedBy: null },
+            french: { text: 'Décomposeur', status: 'Pending', validatedBy: null },
+            mandarin: { text: '分解者', status: 'Pending', validatedBy: null },
+            spanish: { text: 'Descomponedor', status: 'Pending', validatedBy: null },
+            hindi: { text: 'अपघटक', status: 'Pending', validatedBy: null }
+        }
+    ]
+};
             saveData(appData);
         }
         
