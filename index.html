@@ -368,6 +368,18 @@
                         <label for="termFrench" class="block text-sm font-medium text-gray-700 mb-1">Term (French)</label>
                         <input type="text" id="termFrench" placeholder="Dérivée">
                     </div>
+                    <div>
+                        <label for="termMandarin" class="block text-sm font-medium text-gray-700 mb-1">Term (Mandarin)</label>
+                        <input type="text" id="termMandarin" placeholder="例如：导数">
+                    </div>
+                    <div>
+                        <label for="termSpanish" class="block text-sm font-medium text-gray-700 mb-1">Term (Spanish)</label>
+                        <input type="text" id="termSpanish" placeholder="p. ej., Derivada">
+                    </div>
+                    <div>
+                        <label for="termHindi" class="block text-sm font-medium text-gray-700 mb-1">Term (Hindi)</label>
+                        <input type="text" id="termHindi" placeholder="जैसे, व्युत्पन्न">
+                    </div>
                     <div class="flex gap-4">
                         <button type="submit" id="addTermSubmitBtn">Add Term</button>
                         <button type="button" id="cancelAddTermBtn" class="btn-secondary">Cancel</button>
@@ -491,7 +503,10 @@
             { key: 'english', name: 'English', dir: 'ltr', inputId: 'termEnglish' },
             { key: 'russian', name: 'Russian', dir: 'ltr', inputId: 'termRussian' },
             { key: 'arabic', name: 'Arabic', dir: 'rtl', inputId: 'termArabic' },
-            { key: 'french', name: 'French', dir: 'ltr', inputId: 'termFrench' }
+            { key: 'french', name: 'French', dir: 'ltr', inputId: 'termFrench' },
+            { key: 'mandarin', name: 'Mandarin', dir: 'ltr', inputId: 'termMandarin' },
+            { key: 'spanish', name: 'Spanish', dir: 'ltr', inputId: 'termSpanish' },
+            { key: 'hindi', name: 'Hindi', dir: 'ltr', inputId: 'termHindi' }
         ];
 
         // --- UI Elements ---
@@ -587,7 +602,10 @@
                 english: 'also',
                 russian: 'тоже',
                 arabic: 'أيضا',
-                french: 'aussi'
+                french: 'aussi',
+                mandarin: '也',
+                spanish: 'también',
+                hindi: 'भी'
             },
             {
                 hebrew: 'אולי',
@@ -595,7 +613,10 @@
                 english: 'maybe',
                 russian: 'может быть',
                 arabic: 'ربما',
-                french: 'peut-être'
+                french: 'peut-être',
+                mandarin: '可能',
+                spanish: 'quizás',
+                hindi: 'शायद'
             },
             {
                 hebrew: 'ייתכן',
@@ -603,7 +624,10 @@
                 english: 'possible',
                 russian: 'возможно',
                 arabic: 'ممكن',
-                french: 'possible'
+                french: 'possible',
+                mandarin: '可能',
+                spanish: 'posible',
+                hindi: 'संभव'
             },
             {
                 hebrew: 'להוכיח',
@@ -611,7 +635,10 @@
                 english: 'to prove',
                 russian: 'доказать',
                 arabic: 'لإثبات',
-                french: 'prouver'
+                french: 'prouver',
+                mandarin: '证明',
+                spanish: 'probar',
+                hindi: 'सिद्ध करना'
             },
             {
                 hebrew: 'מצא',
@@ -619,7 +646,10 @@
                 english: 'found (he/it)',
                 russian: 'нашел',
                 arabic: 'وجد',
-                french: 'trouvé'
+                french: 'trouvé',
+                mandarin: '找到',
+                spanish: 'encontró',
+                hindi: 'पाया'
             },
             {
                 hebrew: 'כאשר',
@@ -627,7 +657,10 @@
                 english: 'when (as)',
                 russian: 'когда',
                 arabic: 'عندما',
-                french: 'lorsque'
+                french: 'lorsque',
+                mandarin: '当...时',
+                spanish: 'cuando',
+                hindi: 'जब'
             },
             {
                 hebrew: 'לכן',
@@ -635,7 +668,10 @@
                 english: 'therefore',
                 russian: 'поэтому',
                 arabic: 'لذلك',
-                french: 'donc'
+                french: 'donc',
+                mandarin: '因此',
+                spanish: 'por lo tanto',
+                hindi: 'इसलिए'
             },
             {
                 hebrew: 'בנוסף',
@@ -643,7 +679,10 @@
                 english: 'in addition',
                 russian: 'кроме того',
                 arabic: 'بالإضافة إلى ذلك',
-                french: 'en plus'
+                french: 'en plus',
+                mandarin: '此外',
+                spanish: 'además',
+                hindi: 'इसके अतिरिक्त'
             },
             {
                 hebrew: 'בדרך כלל',
@@ -651,7 +690,10 @@
                 english: 'usually',
                 russian: 'обычно',
                 arabic: 'عادة',
-                french: 'habituellement'
+                french: 'habituellement',
+                mandarin: '通常',
+                spanish: 'normalmente',
+                hindi: 'आमतौर पर'
             },
             {
                 hebrew: 'חשוב',
@@ -659,7 +701,10 @@
                 english: 'important',
                 russian: 'важный',
                 arabic: 'مهم',
-                french: 'important'
+                french: 'important',
+                mandarin: '重要的',
+                spanish: 'importante',
+                hindi: 'महत्वपूर्ण'
             },
             {
                 hebrew: 'פתרון',
@@ -667,7 +712,10 @@
                 english: 'solution',
                 russian: 'решение',
                 arabic: 'حل',
-                french: 'solution'
+                french: 'solution',
+                mandarin: '解决方案',
+                spanish: 'solución',
+                hindi: 'समाधान'
             },
             {
                 hebrew: 'קבוע',
@@ -675,7 +723,10 @@
                 english: 'constant',
                 russian: 'постоянный',
                 arabic: 'ثابت',
-                french: 'constant'
+                french: 'constant',
+                mandarin: '常数',
+                spanish: 'constante',
+                hindi: 'स्थिर'
             },
             {
                 hebrew: 'פונקציה',
@@ -683,7 +734,10 @@
                 english: 'function',
                 russian: 'функция',
                 arabic: 'دالة',
-                french: 'fonction'
+                french: 'fonction',
+                mandarin: '函数',
+                spanish: 'función',
+                hindi: 'फ़ंक्शन'
             },
             {
                 hebrew: 'משוואה',
@@ -691,7 +745,10 @@
                 english: 'equation',
                 russian: 'уравнение',
                 arabic: 'معادلة',
-                french: 'équation'
+                french: 'équation',
+                mandarin: '方程',
+                spanish: 'ecuación',
+                hindi: 'समीकरण'
             },
             {
                 hebrew: 'מערכת',
@@ -699,7 +756,10 @@
                 english: 'system',
                 russian: 'система',
                 arabic: 'نظام',
-                french: 'système'
+                french: 'système',
+                mandarin: '系统',
+                spanish: 'sistema',
+                hindi: 'प्रणाली'
             }
         ];
 
@@ -901,50 +961,19 @@
                 }
 
                 // Display the Hebrew term as the main heading
-                const mainTermDisplay = term.hebrew && term.hebrew.text ? term.hebrew.text : (term.english && term.english.text ? term.english.text : 'Untitled Term');
+                const mainHebrewTerm = term.hebrew && term.hebrew.text ? term.hebrew.text : '';
+                const mainEnglishPronunciation = term.pronunciation || (term.english && term.english.text ? term.english.text : ''); // Assuming English pronunciation for now
+                const mainDefinition = term.definition;
 
                 const termCard = document.createElement('div');
                 termCard.className = 'card';
                 termCard.innerHTML = `
-                    <h3 class="text-xl font-semibold mb-2" dir="rtl">${mainTermDisplay}</h3>
-                    <p class="text-gray-700 mb-4">${term.definition}</p>
-
-                    <table class="term-table mb-4">
-                        <thead>
-                            <tr>
-                                <th>Language</th>
-                                <th>Translation</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${LANGUAGES.map(lang => {
-                                const termLang = term[lang.key];
-                                const hasText = termLang && termLang.text;
-                                const status = hasText ? termLang.status : 'Not Provided';
-                                const statusClass = hasText
-                                    ? (status === 'Validated' ? 'status-validated' : 'status-pending')
-                                    : 'status-not-provided';
-                                const translationText = hasText ? termLang.text : 'N/A';
-                                const dirAttribute = lang.dir === 'rtl' ? 'dir="rtl"' : '';
-
-                                return `
-                                    <tr>
-                                        <td>${lang.name}</td>
-                                        <td ${dirAttribute}>${translationText}</td>
-                                        <td class="${statusClass}">${status}</td>
-                                        <td>
-                                            ${isValidatorMode && hasText && status === 'Pending' ?
-                                                `<button class="btn-validate px-3 py-1 text-xs" data-term-id="${term.id}" data-lang-key="${lang.key}">Validate</button>` : ''}
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
+                    <h3 class="text-xl font-semibold mb-2" dir="rtl">${mainHebrewTerm}</h3>
+                    <p class="text-gray-600 mb-2">${mainEnglishPronunciation ? `(${mainEnglishPronunciation})` : ''}</p>
+                    <p class="text-gray-700 mb-4">${mainDefinition}</p>
 
                     <div class="flex justify-between items-center mt-4">
+                        <button class="btn-secondary toggle-translations-btn px-4 py-2 text-sm" data-term-id="${term.id}">View Translations</button>
                         <span class="text-sm ${overallStatusClass}">
                             Overall Status: ${termOverallStatus}
                         </span>
@@ -952,6 +981,44 @@
                             <button class="btn-edit px-3 py-1 text-sm" data-term-id="${term.id}">Edit</button>
                             <button class="btn-delete px-3 py-1 text-sm" data-term-id="${term.id}">Delete Term</button>
                         </div>
+                    </div>
+
+                    <div id="termTranslations_${term.id}" class="hidden">
+                        <table class="term-table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th>Translation</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${LANGUAGES.map(lang => {
+                                    if (lang.key === 'hebrew') return ''; // Hebrew term is already displayed
+                                    const termLang = term[lang.key];
+                                    const hasText = termLang && termLang.text;
+                                    const status = hasText ? termLang.status : 'Not Provided';
+                                    const statusClass = hasText
+                                        ? (status === 'Validated' ? 'status-validated' : 'status-pending')
+                                        : 'status-not-provided';
+                                    const translationText = hasText ? termLang.text : 'N/A';
+                                    const dirAttribute = lang.dir === 'rtl' ? 'dir="rtl"' : '';
+
+                                    return `
+                                        <tr>
+                                            <td>${lang.name}</td>
+                                            <td ${dirAttribute}>${translationText}</td>
+                                            <td class="${statusClass}">${status}</td>
+                                            <td>
+                                                ${isValidatorMode && hasText && status === 'Pending' ?
+                                                    `<button class="btn-validate px-3 py-1 text-xs" data-term-id="${term.id}" data-lang-key="${lang.key}">Validate</button>` : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `;
                 termList.appendChild(termCard);
@@ -970,6 +1037,19 @@
 
                 // Add event listener for delete button
                 termCard.querySelector('.btn-delete').onclick = () => deleteTerm(term.id);
+
+                // Add event listener for the new "View Translations" button
+                const toggleBtn = termCard.querySelector(`.toggle-translations-btn`);
+                toggleBtn.onclick = () => {
+                    const translationsDiv = document.getElementById(`termTranslations_${term.id}`);
+                    translationsDiv.classList.toggle('hidden');
+                    // Change button text
+                    if (translationsDiv.classList.contains('hidden')) {
+                        toggleBtn.textContent = 'View Translations';
+                    } else {
+                        toggleBtn.textContent = 'Hide Translations';
+                    }
+                };
             });
         }
 
@@ -1092,6 +1172,10 @@
 
             termToUpdate.definition = termDefinition;
 
+            // Optional: Add a pronunciation field for English if needed
+            // For simplicity in this example, it's not directly in the form but could be added.
+            // termToUpdate.pronunciation = document.getElementById('termPronunciation').value.trim();
+
             // Process all language fields
             LANGUAGES.forEach(lang => {
                 const inputElement = document.getElementById(lang.inputId);
@@ -1139,6 +1223,7 @@
                 addTermSubmitBtn.textContent = 'Save Changes';
 
                 document.getElementById('termDefinition').value = term.definition;
+                // document.getElementById('termPronunciation').value = term.pronunciation || ''; // If pronunciation field exists
 
                 LANGUAGES.forEach(lang => {
                     const inputElement = document.getElementById(lang.inputId);
