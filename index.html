@@ -245,6 +245,261 @@
             color: #E0E0E0;
         }
     </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="bg-header-custom p-4 shadow-lg">
+        <div class="container flex flex-col md:flex-row md:justify-between md:items-center">
+            <div class="flex justify-center md:justify-start mb-4 md:mb-0">
+                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-24 w-24 md:h-20 md:w-20 rounded-full shadow-md">
+            </div>
+            <nav class="flex flex-wrap justify-center gap-3 md:gap-4 mt-2 md:mt-0">
+                <button id="homeButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l7 7m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Home
+                </button>
+                <button id="validatorAuthButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Validator Login
+                </button>
+               <button id="becomeValidator">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Become a Validator
+                </button>
+                <button id="challengeGameButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                    Linguini Challenge
+                </button>
+                <button id="searchButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+                <button id="learnHebrewButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.4M3.344 11.516l-.008.008A9.752 9.752 0 0012 21.75a9.753 9.753 0 008.657-4.929l-.008-.008-1.339-2.679m0 0l-.952-1.904A2.25 2.25 0 0015.688 9.442l4.474-4.474A9.753 9.753 0 0012 2.25c-2.895 0-5.689 1.173-7.776 3.26l-.008.008z"/>
+                    </svg>
+                    Learn Hebrew
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container py-8">
+        <div id="messageBoxContainer"></div>
+
+        <div id="homeView" class="view">
+            <div class="card">
+                <h2 class="text-3xl font-bold mb-4 text-center">Welcome to Linguini! <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
+                <p class="text-lg text-center mb-6 text-gray-700">Your go-to resource for Technion course terms, translated into multiple languages.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button id="showAddCourseFormBtn" class="w-full sm:w-auto">Add New Course</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4">Available Courses</h2>
+                <div id="courseList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+            </div>
+        </div>
+
+        <div id="searchView" class="view hidden">
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4">Global Term Search <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
+                <div class="relative w-full mb-6">
+                    <input type="text" id="globalSearchInput" placeholder="Search all terms..." class="pr-10">
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+                <p id="noSearchResultsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found matching your search.</p>
+                <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
+            </div>
+        </div>
+
+        <div id="addCourseView" class="view hidden">
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
+                <form id="addCourseForm" class="space-y-4">
+                    <div>
+                        <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
+                        <input type="text" id="courseName" placeholder="e.g., Calculus 1" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit">Add Course</button>
+                        <button type="button" id="cancelAddCourseBtn" class="btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="courseDetailsView" class="view hidden">
+            <div class="card">
+                <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
+                <p class="text-gray-700 mb-6">Terms for this course:</p>
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <button id="showAddTermFormBtn" class="w-full sm:w-auto">Add New Term to Course</button>
+                    <div class="relative w-full sm:w-1/2">
+                        <input type="text" id="courseSearchInput" placeholder="Search terms in this course..." class="pr-10">
+                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+                <div id="termList" class="grid grid-cols-1 gap-4">
+                    </div>
+                <p id="noTermsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found for this course. Be the first to add one!</p>
+            </div>
+        </div>
+
+        <div id="addTermView" class="view hidden">
+            <div class="card">
+                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
+                <form id="addTermForm" class="space-y-4">
+                    <div>
+                        <label for="termHebrew" class="block text-sm font-medium text-gray-700 mb-1">Term (Hebrew) <span class="text-red-500">*</span></label>
+                        <input type="text" id="termHebrew" dir="rtl" placeholder="נגזרת" required>
+                    </div>
+                    <div>
+                        <label for="termDefinition" class="block text-sm font-medium text-gray-700 mb-1">Definition <span class="text-red-500">*</span></label>
+                        <textarea id="termDefinition" rows="3" placeholder="Provide a clear definition..." required></textarea>
+                    </div>
+                    <div>
+                        <label for="termPronunciation" class="block text-sm font-medium text-gray-700 mb-1">Pronunciation (English approximation)</label>
+                        <input type="text" id="termPronunciation" placeholder="e.g., nigzeret">
+                    </div>
+                    <p class="text-sm text-gray-600">Provide translations in other languages (optional):</p>
+                    <div>
+                        <label for="termEnglish" class="block text-sm font-medium text-gray-700 mb-1">Term (English)</label>
+                        <input type="text" id="termEnglish" placeholder="e.g., Derivative">
+                    </div>
+                    <div>
+                        <label for="termRussian" class="block text-sm font-medium text-gray-700 mb-1">Term (Russian)</label>
+                        <input type="text" id="termRussian" placeholder="Производная">
+                    </div>
+                    <div>
+                        <label for="termArabic" class="block text-sm font-medium text-gray-700 mb-1">Term (Arabic)</label>
+                        <input type="text" id="termArabic" dir="rtl" placeholder="مشتقة">
+                    </div>
+                    <div>
+                        <label for="termFrench" class="block text-sm font-medium text-gray-700 mb-1">Term (French)</label>
+                        <input type="text" id="termFrench" placeholder="Dérivée">
+                    </div>
+                    <div>
+                        <label for="termMandarin" class="block text-sm font-medium text-gray-700 mb-1">Term (Mandarin)</label>
+                        <input type="text" id="termMandarin" placeholder="例如：导数">
+                    </div>
+                    <div>
+                        <label for="termSpanish" class="block text-sm font-medium text-gray-700 mb-1">Term (Spanish)</label>
+                        <input type="text" id="termSpanish" placeholder="p. ej., Derivada">
+                    </div>
+                    <div>
+                        <label for="termHindi" class="block text-sm font-medium text-gray-700 mb-1">Term (Hindi)</label>
+                        <input type="text" id="termHindi" placeholder="जैसे, व्युत्पन्न">
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" id="addTermSubmitBtn">Add Term</button>
+                        <button type="button" id="cancelAddTermBtn" class="btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="challengeGameView" class="view hidden">
+            <div class="card text-center">
+                <h2 class="text-3xl font-bold mb-6">Linguini Challenge! <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
+                <div id="challengeGameStartScreen">
+                    <p class="text-lg mb-4 text-gray-700">Choose your native language to start the game:</p>
+                    <select id="challengeGameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                        </select>
+                    <button id="startChallengeGameButton">Start Game</button>
+                </div>
+
+                <div id="challengeGamePlayScreen" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-2xl font-semibold">Score: <span id="challengeGameScore">0</span></div>
+                        <div class="text-2xl font-semibold text-red-500">Time: <span id="challengeGameTimer">30</span>s</div>
+                    </div>
+                    <p class="text-4xl font-bold mb-8" id="challengeGameTermDisplay"></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="challenge-option-button" id="challengeOption1"></button>
+                        <button class="challenge-option-button" id="challengeOption2"></button>
+                    </div>
+                    <p id="challengeGameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                </div>
+
+                <div id="challengeGameOverScreen" class="hidden">
+                    <h3 class="text-3xl font-bold mb-4">Game Over!</h3>
+                    <p class="text-xl mb-6">Your final score: <span id="challengeFinalScore" class="font-bold text-emerald-600"></span></p>
+                    <button id="playAgainChallengeButton">Play Again</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="learnHebrewView" class="view hidden">
+            <div class="card text-center">
+                <h2 class="text-3xl font-bold mb-6">Learn Hebrew Vocabulary <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
+                <p class="text-lg mb-6 text-gray-700">
+                    This section helps you master essential Hebrew terms for your academic studies at Technion.
+                    Select your native language, and we'll guide you through key vocabulary with interactive games.
+                </p>
+
+                <div id="learnHebrewStartScreen">
+                    <p class="text-lg mb-4 text-gray-700">Choose your native language for learning:</p>
+                    <select id="learnHebrewLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
+                        </select>
+                    <button id="startLearningButton">Start Learning</button>
+                </div>
+
+                <div id="learnHebrewPlayScreen" class="hidden">
+                    <div class="flex justify-between items-center w-full mb-6">
+                        <div class="text-xl font-semibold">Words Mastered: <span id="masteredWordsCount">0</span></div>
+                        <div class="text-xl font-semibold">Progress: <span id="learningProgress">0/0</span></div>
+                    </div>
+                    <div class="flex flex-col items-center mb-8">
+                        <p class="text-7xl font-bold mb-2" id="hebrewTermDisplay" dir="rtl"></p>
+                        <p class="text-2xl text-gray-600" id="pronunciationDisplay"></p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="learn-hebrew-option-button" id="learnHebrewOption1"></button>
+                        <button class="learn-hebrew-option-button" id="learnHebrewOption2"></button>
+                    </div>
+                    <p id="learnHebrewFeedback" class="text-xl font-semibold mt-6 h-8"></p>
+                    <button id="learnHebrewNextWordButton" class="btn-secondary mt-4 hidden">Next Word</button>
+                </div>
+
+                <div id="learnHebrewEndScreen" class="hidden">
+                    <h3 class="text-3xl font-bold mb-4">Learning Session Complete!</h3>
+                    <p class="text-xl mb-6">You mastered <span id="finalMasteredCount" class="font-bold text-emerald-600"></span> words.</p>
+                    <button id="startNewLearningSessionButton">Start New Session</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="container flex justify-between items-center py-4 px-6">
+        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/proxy-image.png" alt="Technion Logo" class="h-20 w-auto">
+        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/LOGO_WIDE_Heb.png" alt="T-Hub Logo" class="h-20 w-auto">
+    </div>
+
+    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
+        <div class="container footer-content">
+            &copy; 2025 Linguini. All rights reserved.
+            <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse Footer" class="remi-mascot ml-2">
+        </div>
+        <div id="debugInfo" class="mt-2">
+            </div>
+    </footer>
 
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -271,15 +526,16 @@
         const APP_ID = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.appId;
 
         // Global variables for Firebase instances and user ID
-        window.firebaseApp = null;
-        window.db = null;
-        window.auth = null;
-        window.userId = null;
-        window.isFirebaseReady = false; // Flag to ensure Firestore operations run only after auth
+        // Note: These are now `let` to allow reassignment and better reflect their dynamic nature
+        let firebaseApp = null;
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let isFirebaseReady = false; // Flag to ensure Firestore operations run only after auth
 
         // Initial application data to seed Firestore if empty
         // This data will only be used if the Firestore collections are empty.
-        window.initialAppData = {
+        const initialAppData = {
             courses: [
                 { id: 'c1', name: 'Calculus 1' },
                 { id: 'c2', name: 'Algebra 1' },
@@ -708,7 +964,7 @@
                     pronunciation: 'protokol',
                     english: { text: 'Protocol', status: 'Pending', validatedBy: null },
                     russian: { text: 'Протокол', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'بروتوكול', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'بروتوكول', status: 'Pending', validatedBy: null },
                     french: { text: 'Protocole', status: 'Pending', validatedBy: null },
                     mandarin: { text: '协议', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Protocolo', status: 'Pending', validatedBy: null },
@@ -1239,17 +1495,18 @@
             ]
         };
 
-        window.appData = { courses: [], terms: [] }; // Global appData, initialized empty
+        const appData = { courses: [], terms: [] }; // Global appData, initialized empty
 
+        // IMPORTANT: All application logic now resides within this module script.
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOM Content Loaded. Starting Firebase initialization...');
             try {
                 // Initialize Firebase only once
-                if (!window.firebaseApp) {
-                    window.firebaseApp = initializeApp(firebaseConfig);
-                    window.db = getFirestore(window.firebaseApp);
-                    window.auth = getAuth(window.firebaseApp);
-                    getAnalytics(window.firebaseApp); // Initialize Analytics
+                if (!firebaseApp) {
+                    firebaseApp = initializeApp(firebaseConfig);
+                    db = getFirestore(firebaseApp);
+                    auth = getAuth(firebaseApp);
+                    getAnalytics(firebaseApp); // Initialize Analytics
                     console.log('Firebase services (app, db, auth, analytics) initialized with hardcoded config.');
 
                     // Update debug info in footer
@@ -1257,12 +1514,12 @@
 
                     // Set up auth state change listener FIRST. This listener will handle
                     // all subsequent user state changes, including the initial sign-in.
-                    onAuthStateChanged(window.auth, async (user) => {
+                    onAuthStateChanged(auth, async (user) => {
                         console.log('onAuthStateChanged triggered. User:', user);
                         if (user) {
-                            window.userId = user.uid;
-                            console.log('Firebase Auth State Changed: User signed in. User ID:', window.userId);
-                            window.isFirebaseReady = true; // Set flag to true
+                            userId = user.uid;
+                            console.log('Firebase Auth State Changed: User signed in. User ID:', userId);
+                            isFirebaseReady = true; // Set flag to true
                             updateDebugInfo(); // Update debug info with user ID and ready status
 
                             // After Firebase is ready and user is authenticated, proceed with app initialization
@@ -1276,23 +1533,22 @@
                         } else {
                             console.log('Firebase Auth State Changed: No user. Attempting anonymous sign-in if not already tried.');
                             // Only try to sign in anonymously if there's no current user (prevents redundant calls)
-                            if (!window.auth.currentUser) {
+                            if (!auth.currentUser) {
                                 try {
                                     // Use a hardcoded initial auth token if it was meant to be used, otherwise proceed with anonymous.
-                                    // IMPORTANT: if __initial_auth_token is provided by Canvas, it is meant to be used.
                                     // As per the instructions, if __initial_auth_token is not defined, we signInAnonymously.
                                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
                                         console.log('Attempting custom token sign-in...');
-                                        await signInWithCustomToken(window.auth, __initial_auth_token);
+                                        await signInWithCustomToken(auth, __initial_auth_token);
                                     } else {
                                         console.log('__initial_auth_token not defined. Attempting anonymous sign-in...');
-                                        await signInAnonymously(window.auth);
+                                        await signInAnonymously(auth);
                                         console.log('Anonymous sign-in attempted.');
                                     }
                                 } catch (anonError) {
                                     console.error('Error during initial sign-in (anonymous or custom token):', anonError);
                                     showMessageBox("Error signing in. Functionality may be limited.", "error");
-                                    window.isFirebaseReady = false; // Mark as not ready if auth failed
+                                    isFirebaseReady = false; // Mark as not ready if auth failed
                                     updateDebugInfo();
                                 }
                             }
@@ -1302,10 +1558,10 @@
                 } else {
                     // If Firebase is already initialized (e.g., due to hot reload in dev env)
                     console.log("Firebase already initialized. Re-initializing app data and rendering.");
-                    if (window.auth && window.auth.currentUser) {
-                        window.userId = window.auth.currentUser.uid;
-                        window.isFirebaseReady = true;
-                        console.log('Firebase already initialized and user found. User ID:', window.userId);
+                    if (auth && auth.currentUser) {
+                        userId = auth.currentUser.uid;
+                        isFirebaseReady = true;
+                        console.log('Firebase already initialized and user found. User ID:', userId);
                         updateDebugInfo();
                         await initializeAppData();
                         renderCourses();
@@ -1337,8 +1593,8 @@
             const debugInfoElement = document.getElementById('debugInfo');
             if (debugInfoElement) {
                 debugInfoElement.innerHTML = `
-                    <p>User ID: <span id="displayUserId">${window.userId || 'N/A (Not authenticated)'}</span></p>
-                    <p>Firebase Ready: <span id="displayFirebaseReady">${window.isFirebaseReady ? 'YES' : 'NO'}</span></p>
+                    <p>User ID: <span id="displayUserId">${userId || 'N/A (Not authenticated)'}</span></p>
+                    <p>Firebase Ready: <span id="displayFirebaseReady">${isFirebaseReady ? 'YES' : 'NO'}</span></p>
                     <p>App ID: <span id="displayAppId">${APP_ID}</span></p>
                 `;
             }
@@ -1347,28 +1603,28 @@
         // Function to ensure appData is loaded from Firestore or seeded
         async function initializeAppData() {
             console.log('initializeAppData called.');
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
+            if (!isFirebaseReady || !db || !userId) {
                 console.warn("initializeAppData: Firebase is not ready, db is null, or userId is null. Skipping data operations.");
                 return;
             }
-            console.log(`initializeAppData: Attempting to initialize app data for appId: ${APP_ID}, userId: ${window.userId}`);
+            console.log(`initializeAppData: Attempting to initialize app data for appId: ${APP_ID}, userId: ${userId}`);
 
             try {
                 // Check if courses collection is empty and seed if necessary
                 // Using public/data for courses and terms
-                const coursesRef = collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'courses');
+                const coursesRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'courses');
                 console.log('initializeAppData: Attempting to get courses snapshot to check for emptiness...');
                 const coursesSnapshot = await getDocs(coursesRef);
                 console.log('initializeAppData: Courses snapshot received. Is empty:', coursesSnapshot.empty);
 
                 if (coursesSnapshot.empty) {
                     console.log("initializeAppData: Seeding initial data to Firestore...");
-                    for (const course of window.initialAppData.courses) {
+                    for (const course of initialAppData.courses) {
                         console.log(`initializeAppData: Seeding course: ${course.name} with ID: ${course.id}`);
                         await setDoc(doc(coursesRef, course.id), course);
                     }
-                    const termsCollectionRef = collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms');
-                    for (const term of window.initialAppData.terms) {
+                    const termsCollectionRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'terms');
+                    for (const term of initialAppData.terms) {
                         console.log(`initializeAppData: Seeding term: ${term.hebrew ? term.hebrew.text : term.english.text} with ID: ${term.id}`);
                         await setDoc(doc(termsCollectionRef, term.id), term);
                     }
@@ -1380,25 +1636,25 @@
                 // Set up real-time listeners for courses and terms
                 console.log('initializeAppData: Setting up real-time listeners for courses and terms...');
                 onSnapshot(coursesRef, (snapshot) => {
-                    window.appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    console.log("onSnapshot (courses): Data received. Courses count:", window.appData.courses.length, window.appData.courses);
+                    appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log("onSnapshot (courses): Data received. Courses count:", appData.courses.length, appData.courses);
                     renderCourses(); // Re-render courses whenever data changes
                     // If a course was being viewed, re-render its terms as well
-                    if (window.currentCourseId) {
-                        renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+                    if (currentCourseId) {
+                        renderTerms(currentCourseId, courseSearchInput.value.trim());
                     }
                 }, (error) => {
                     console.error("onSnapshot (courses): Error fetching courses:", error);
                     showMessageBox("Error loading courses. Please refresh.", "error");
                 });
 
-                const termsRef = collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms');
+                const termsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'terms');
                 onSnapshot(termsRef, (snapshot) => {
-                    window.appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    console.log("onSnapshot (terms): Data received. Terms count:", window.appData.terms.length, window.appData.terms);
+                    appData.terms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log("onSnapshot (terms): Data received. Terms count:", appData.terms.length, appData.terms);
                     // Re-render terms for current course if active
-                    if (window.currentCourseId) {
-                        renderTerms(window.currentCourseId, window.courseSearchInput.value.trim());
+                    if (currentCourseId) {
+                        renderTerms(currentCourseId, courseSearchInput.value.trim());
                     }
                     // Also update global search results if search view is active
                     if (!searchView.classList.contains('hidden') && globalSearchInput.value.trim().length > 0) {
@@ -1415,267 +1671,7 @@
                 showMessageBox("Error initializing application data. Please check your network connection and Firebase security rules.", "error");
             }
         }
-    </script>
-</head>
-<body class="min-h-screen flex flex-col">
-    <header class="bg-header-custom p-4 shadow-lg">
-        <div class="container flex flex-col md:flex-row md:justify-between md:items-center">
-            <div class="flex justify-center md:justify-start mb-4 md:mb-0">
-                <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" alt="Linguini Logo" class="h-24 w-24 md:h-20 md:w-20 rounded-full shadow-md">
-            </div>
-            <nav class="flex flex-wrap justify-center gap-3 md:gap-4 mt-2 md:mt-0">
-                <button id="homeButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l7 7m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                    Home
-                </button>
-                <button id="validatorAuthButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Validator Login
-                </button>
-               <button id="becomeValidator">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Become a Validator
-                </button>
-                <button id="challengeGameButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
-                    </svg>
-                    Linguini Challenge
-                </button>
-                <button id="searchButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    Search
-                </button>
-                <button id="learnHebrewButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.4M3.344 11.516l-.008.008A9.752 9.752 0 0012 21.75a9.753 9.753 0 008.657-4.929l-.008-.008-1.339-2.679m0 0l-.952-1.904A2.25 2.25 0 0015.688 9.442l4.474-4.474A9.753 9.753 0 0012 2.25c-2.895 0-5.689 1.173-7.776 3.26l-.008.008z"/>
-                    </svg>
-                    Learn Hebrew
-                </button>
-            </nav>
-        </div>
-    </header>
 
-    <main class="flex-grow container py-8">
-        <div id="messageBoxContainer"></div>
-
-        <div id="homeView" class="view">
-            <div class="card">
-                <h2 class="text-3xl font-bold mb-4 text-center">Welcome to Linguini! <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
-                <p class="text-lg text-center mb-6 text-gray-700">Your go-to resource for Technion course terms, translated into multiple languages.</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button id="showAddCourseFormBtn" class="w-full sm:w-auto">Add New Course</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4">Available Courses</h2>
-                <div id="courseList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
-            </div>
-        </div>
-
-        <div id="searchView" class="view hidden">
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4">Global Term Search <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
-                <div class="relative w-full mb-6">
-                    <input type="text" id="globalSearchInput" placeholder="Search all terms..." class="pr-10">
-                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
-                <p id="noSearchResultsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found matching your search.</p>
-                <button id="clearSearchBtn" class="btn-secondary mt-6">Clear Search</button>
-            </div>
-        </div>
-
-        <div id="addCourseView" class="view hidden">
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-6">Add New Course</h2>
-                <form id="addCourseForm" class="space-y-4">
-                    <div>
-                        <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
-                        <input type="text" id="courseName" placeholder="e.g., Calculus 1" required>
-                    </div>
-                    <div class="flex gap-4">
-                        <button type="submit">Add Course</button>
-                        <button type="button" id="cancelAddCourseBtn" class="btn-secondary">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="courseDetailsView" class="view hidden">
-            <div class="card">
-                <h2 id="courseDetailsTitle" class="text-2xl font-semibold mb-4"></h2>
-                <p class="text-gray-700 mb-6">Terms for this course:</p>
-                <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                    <button id="showAddTermFormBtn" class="w-full sm:w-auto">Add New Term to Course</button>
-                    <div class="relative w-full sm:w-1/2">
-                        <input type="text" id="courseSearchInput" placeholder="Search terms in this course..." class="pr-10">
-                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-                <div id="termList" class="grid grid-cols-1 gap-4">
-                    </div>
-                <p id="noTermsMessage" class="text-gray-500 text-center mt-4 hidden">No terms found for this course. Be the first to add one!</p>
-            </div>
-        </div>
-
-        <div id="addTermView" class="view hidden">
-            <div class="card">
-                <h2 id="addTermFormTitle" class="text-2xl font-semibold mb-6">Add New Term</h2>
-                <form id="addTermForm" class="space-y-4">
-                    <div>
-                        <label for="termHebrew" class="block text-sm font-medium text-gray-700 mb-1">Term (Hebrew) <span class="text-red-500">*</span></label>
-                        <input type="text" id="termHebrew" dir="rtl" placeholder="נגזרת" required>
-                    </div>
-                    <div>
-                        <label for="termDefinition" class="block text-sm font-medium text-gray-700 mb-1">Definition <span class="text-red-500">*</span></label>
-                        <textarea id="termDefinition" rows="3" placeholder="Provide a clear definition..." required></textarea>
-                    </div>
-                    <div>
-                        <label for="termPronunciation" class="block text-sm font-medium text-gray-700 mb-1">Pronunciation (English approximation)</label>
-                        <input type="text" id="termPronunciation" placeholder="e.g., nigzeret">
-                    </div>
-                    <p class="text-sm text-gray-600">Provide translations in other languages (optional):</p>
-                    <div>
-                        <label for="termEnglish" class="block text-sm font-medium text-gray-700 mb-1">Term (English)</label>
-                        <input type="text" id="termEnglish" placeholder="e.g., Derivative">
-                    </div>
-                    <div>
-                        <label for="termRussian" class="block text-sm font-medium text-gray-700 mb-1">Term (Russian)</label>
-                        <input type="text" id="termRussian" placeholder="Производная">
-                    </div>
-                    <div>
-                        <label for="termArabic" class="block text-sm font-medium text-gray-700 mb-1">Term (Arabic)</label>
-                        <input type="text" id="termArabic" dir="rtl" placeholder="مشتقة">
-                    </div>
-                    <div>
-                        <label for="termFrench" class="block text-sm font-medium text-gray-700 mb-1">Term (French)</label>
-                        <input type="text" id="termFrench" placeholder="Dérivée">
-                    </div>
-                    <div>
-                        <label for="termMandarin" class="block text-sm font-medium text-gray-700 mb-1">Term (Mandarin)</label>
-                        <input type="text" id="termMandarin" placeholder="例如：导数">
-                    </div>
-                    <div>
-                        <label for="termSpanish" class="block text-sm font-medium text-gray-700 mb-1">Term (Spanish)</label>
-                        <input type="text" id="termSpanish" placeholder="p. ej., Derivada">
-                    </div>
-                    <div>
-                        <label for="termHindi" class="block text-sm font-medium text-gray-700 mb-1">Term (Hindi)</label>
-                        <input type="text" id="termHindi" placeholder="जैसे, व्युत्पन्न">
-                    </div>
-                    <div class="flex gap-4">
-                        <button type="submit" id="addTermSubmitBtn">Add Term</button>
-                        <button type="button" id="cancelAddTermBtn" class="btn-secondary">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="challengeGameView" class="view hidden">
-            <div class="card text-center">
-                <h2 class="text-3xl font-bold mb-6">Linguini Challenge! <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
-                <div id="challengeGameStartScreen">
-                    <p class="text-lg mb-4 text-gray-700">Choose your native language to start the game:</p>
-                    <select id="challengeGameLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
-                        </select>
-                    <button id="startChallengeGameButton">Start Game</button>
-                </div>
-
-                <div id="challengeGamePlayScreen" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="text-2xl font-semibold">Score: <span id="challengeGameScore">0</span></div>
-                        <div class="text-2xl font-semibold text-red-500">Time: <span id="challengeGameTimer">30</span>s</div>
-                    </div>
-                    <p class="text-4xl font-bold mb-8" id="challengeGameTermDisplay"></p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="challenge-option-button" id="challengeOption1"></button>
-                        <button class="challenge-option-button" id="challengeOption2"></button>
-                    </div>
-                    <p id="challengeGameFeedback" class="text-xl font-semibold mt-6 h-8"></p>
-                </div>
-
-                <div id="challengeGameOverScreen" class="hidden">
-                    <h3 class="text-3xl font-bold mb-4">Game Over!</h3>
-                    <p class="text-xl mb-6">Your final score: <span id="challengeFinalScore" class="font-bold text-emerald-600"></span></p>
-                    <button id="playAgainChallengeButton">Play Again</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="learnHebrewView" class="view hidden">
-            <div class="card text-center">
-                <h2 class="text-3xl font-bold mb-6">Learn Hebrew Vocabulary <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse" class="inline-block remi-mascot ml-2"></h2>
-                <p class="text-lg mb-6 text-gray-700">
-                    This section helps you master essential Hebrew terms for your academic studies at Technion.
-                    Select your native language, and we'll guide you through key vocabulary with interactive games.
-                </p>
-
-                <div id="learnHebrewStartScreen">
-                    <p class="text-lg mb-4 text-gray-700">Choose your native language for learning:</p>
-                    <select id="learnHebrewLanguageSelect" class="mb-6 px-4 py-2 rounded-md border border-gray-300">
-                        </select>
-                    <button id="startLearningButton">Start Learning</button>
-                </div>
-
-                <div id="learnHebrewPlayScreen" class="hidden">
-                    <div class="flex justify-between items-center w-full mb-6">
-                        <div class="text-xl font-semibold">Words Mastered: <span id="masteredWordsCount">0</span></div>
-                        <div class="text-xl font-semibold">Progress: <span id="learningProgress">0/0</span></div>
-                    </div>
-                    <div class="flex flex-col items-center mb-8">
-                        <p class="text-7xl font-bold mb-2" id="hebrewTermDisplay" dir="rtl"></p>
-                        <p class="text-2xl text-gray-600" id="pronunciationDisplay"></p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="learn-hebrew-option-button" id="learnHebrewOption1"></button>
-                        <button class="learn-hebrew-option-button" id="learnHebrewOption2"></button>
-                    </div>
-                    <p id="learnHebrewFeedback" class="text-xl font-semibold mt-6 h-8"></p>
-                    <button id="learnHebrewNextWordButton" class="btn-secondary mt-4 hidden">Next Word</button>
-                </div>
-
-                <div id="learnHebrewEndScreen" class="hidden">
-                    <h3 class="text-3xl font-bold mb-4">Learning Session Complete!</h3>
-                    <p class="text-xl mb-6">You mastered <span id="finalMasteredCount" class="font-bold text-emerald-600"></span> words.</p>
-                    <button id="startNewLearningSessionButton">Start New Session</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div class="container flex justify-between items-center py-4 px-6">
-        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/proxy-image.png" alt="Technion Logo" class="h-20 w-auto">
-        <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/LOGO_WIDE_Heb.png" alt="T-Hub Logo" class="h-20 w-auto">
-    </div>
-
-    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
-        <div class="container footer-content">
-            &copy; 2025 Linguini. All rights reserved.
-            <img src="https://raw.githubusercontent.com/Ethantication/Linguini/main/WhatsApp%20Image%202025-05-19%20at%2019.42.36_a4a2cf4b.jpg" alt="Remi the Mouse Footer" class="remi-mascot ml-2">
-        </div>
-        <div id="debugInfo" class="mt-2">
-            </div>
-    </footer>
-
-    <script>
-        // Global variables for Firebase instances and user ID are declared in the module script
-        // window.firebaseApp, window.db, window.auth, window.userId, window.isFirebaseReady
-        // APP_ID constant is now defined directly from firebaseConfig
         const VALIDATOR_SECRET_KEY = 'V2025'; // Updated validator key
 
         let currentCourseId = null; // Tracks the currently viewed course
@@ -2102,14 +2098,14 @@
 
         // Renders the list of courses
         function renderCourses() {
-            console.log('renderCourses: Started rendering courses. Current appData.courses:', window.appData.courses);
+            console.log('renderCourses: Started rendering courses. Current appData.courses:', appData.courses);
             courseList.innerHTML = '';
-            if (window.appData.courses.length === 0) {
+            if (appData.courses.length === 0) {
                 courseList.innerHTML = '<p class="text-gray-500 text-center col-span-full">No courses added yet. Be the first!</p>';
                 console.log('renderCourses: No courses to display.');
                 return;
             }
-            window.appData.courses.forEach(course => {
+            appData.courses.forEach(course => {
                 const courseCard = document.createElement('div');
                 courseCard.className = 'card cursor-pointer hover:bg-blue-50 transition flex justify-between items-center';
                 courseCard.innerHTML = `
@@ -2142,7 +2138,7 @@
         function renderTerms(courseId, searchTerm = '') {
             console.log('renderTerms: Started rendering terms for course:', courseId, 'Search term:', searchTerm);
             termList.innerHTML = '';
-            const termsForCourse = window.appData.terms.filter(term => term.courseId === courseId);
+            const termsForCourse = appData.terms.filter(term => term.courseId === courseId);
             const filteredTerms = searchTerm
                 ? termsForCourse.filter(term =>
                     // Search across all language texts and definition
@@ -2288,7 +2284,7 @@
                 termCard.innerHTML = `
                     <h3 class="text-lg font-semibold mb-1" dir="rtl">${mainTermDisplay}</h3>
                     <p class="text-gray-700 text-sm mb-2">${term.definition.substring(0, 100)}${term.definition.length > 100 ? '...' : ''}</p>
-                    <p class="text-xs text-gray-500">Course: ${window.appData.courses.find(c => c.id === term.courseId)?.name || 'Unknown'}</p>
+                    <p class="text-xs text-gray-500">Course: ${appData.courses.find(c => c.id === term.courseId)?.name || 'Unknown'}</p>
                     <span class="text-xs ${overallStatusClass}">
                         Overall Status: ${termOverallStatus}
                     </span>
@@ -2303,7 +2299,7 @@
         // Handle validator login/logout
         validatorAuthButton.onclick = () => {
             console.log('validatorAuthButton clicked. isValidatorMode:', isValidatorMode);
-            if (!window.isFirebaseReady) {
+            if (!isFirebaseReady) {
                 showMessageBox("Firebase is not ready. Please wait a moment.", "error");
                 return;
             }
@@ -2346,8 +2342,8 @@
         addCourseForm.onsubmit = async (e) => {
             e.preventDefault();
             console.log('addCourseForm submitted.');
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
-                console.error("addCourseForm: Firebase not ready or user not authenticated. isFirebaseReady:", window.isFirebaseReady, "db:", window.db, "userId:", window.userId);
+            if (!isFirebaseReady || !db || !userId) {
+                console.error("addCourseForm: Firebase not ready or user not authenticated. isFirebaseReady:", isFirebaseReady, "db:", db, "userId:", userId);
                 showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
@@ -2360,7 +2356,7 @@
                 console.log('addCourseForm: Attempting to add course with data:', newCourse);
                 try {
                     // Using addDoc to let Firestore generate a unique ID
-                    const docRef = await addDoc(collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'courses'), newCourse);
+                    const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'courses'), newCourse);
                     console.log('addCourseForm: Course added successfully. Document ID:', docRef.id);
                     showMessageBox('Course added successfully!', 'success', () => {
                         addCourseForm.reset();
@@ -2381,8 +2377,8 @@
         addTermForm.onsubmit = async (e) => {
             e.preventDefault();
             console.log('addTermForm submitted. currentTermId:', currentTermId);
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
-                console.error("addTermForm: Firebase not ready or user not authenticated. isFirebaseReady:", window.isFirebaseReady, "db:", window.db, "userId:", window.userId);
+            if (!isFirebaseReady || !db || !userId) {
+                console.error("addTermForm: Firebase not ready or user not authenticated. isFirebaseReady:", isFirebaseReady, "db:", db, "userId:", userId);
                 showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
@@ -2402,7 +2398,7 @@
             };
 
             // Process all language fields, ensuring status is handled correctly for updates
-            const currentTermInAppData = window.appData.terms.find(t => t.id === currentTermId);
+            const currentTermInAppData = appData.terms.find(t => t.id === currentTermId);
             LANGUAGES.forEach(lang => {
                 const inputElement = document.getElementById(lang.inputId);
                 const newText = inputElement ? inputElement.value.trim() : '';
@@ -2437,7 +2433,7 @@
             try {
                 if (currentTermId) { // Editing an existing term
                     console.log('addTermForm: Attempting to update existing term with ID:', currentTermId);
-                    const termRef = doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', currentTermId);
+                    const termRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'terms', currentTermId);
                     await updateDoc(termRef, termData); // Use updateDoc for partial update
                     console.log('addTermForm: Term updated successfully!');
                     showMessageBox('Term updated successfully!', 'success', () => {
@@ -2448,7 +2444,7 @@
                 } else { // Adding a new term
                     termData.courseId = currentCourseId;
                     console.log('addTermForm: Attempting to add new term:', termData);
-                    const docRef = await addDoc(collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms'), termData); // Use addDoc
+                    const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'terms'), termData); // Use addDoc
                     console.log('addTermForm: New term added successfully. Document ID:', docRef.id);
                     showMessageBox('Term added successfully! Individual translations are pending validation.', 'success', () => {
                         addTermForm.reset();
@@ -2465,13 +2461,13 @@
         // Function to prepare the form for editing a term
         async function editTerm(termId) {
             console.log('editTerm: Called for term ID:', termId);
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
-                console.error("editTerm: Firebase not ready or user not authenticated. isFirebaseReady:", window.isFirebaseReady, "db:", window.db, "userId:", window.userId);
+            if (!isFirebaseReady || !db || !userId) {
+                console.error("editTerm: Firebase not ready or user not authenticated. isFirebaseReady:", isFirebaseReady, "db:", db, "userId:", userId);
                 showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             currentTermId = termId;
-            const termRef = doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId);
+            const termRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId);
             try {
                 console.log('editTerm: Fetching term document from Firestore...');
                 const termDoc = await getDoc(termRef);
@@ -2507,24 +2503,24 @@
         // Validate a term for a specific language using the secret key
         function validateTerm(termId, langKey) {
             console.log(`validateTerm: Called for term ID: ${termId}, language: ${langKey}`);
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
-                console.error("validateTerm: Firebase not ready or user not authenticated. isFirebaseReady:", window.isFirebaseReady, "db:", window.db, "userId:", window.userId);
+            if (!isFirebaseReady || !db || !userId) {
+                console.error("validateTerm: Firebase not ready or user not authenticated. isFirebaseReady:", isFirebaseReady, "db:", db, "userId:", userId);
                 showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             showPromptBox(`Enter validator secret key for ${langKey} translation:`, async (key) => {
                 if (key === VALIDATOR_SECRET_KEY) {
-                    const termRef = doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId);
+                    const termRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId);
                     try {
                         console.log(`validateTerm: Fetching term document to validate ${langKey}...`);
                         const termDoc = await getDoc(termRef);
                         if (termDoc.exists() && termDoc.data()[langKey]) {
                             const updatePath = `${langKey}.status`;
                             const validatedByPath = `${langKey}.validatedBy`;
-                            console.log(`validateTerm: Updating term ID ${termId}, field ${updatePath} to 'Validated' by ${window.userId}`);
+                            console.log(`validateTerm: Updating term ID ${termId}, field ${updatePath} to 'Validated' by ${userId}`);
                             await updateDoc(termRef, {
                                 [updatePath]: 'Validated',
-                                [validatedByPath]: window.userId // Use actual user ID
+                                [validatedByPath]: userId // Use actual user ID
                             });
                             console.log(`validateTerm: ${langKey} translation validated successfully!`);
                             showMessageBox(`${langKey} translation validated successfully!`, 'success', () => {
@@ -2548,8 +2544,8 @@
         // Delete a course
         function deleteCourse(courseId) {
             console.log('deleteCourse: Called for course ID:', courseId);
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
-                console.error("deleteCourse: Firebase not ready or user not authenticated. isFirebaseReady:", window.isFirebaseReady, "db:", window.db, "userId:", window.userId);
+            if (!isFirebaseReady || !db || !userId) {
+                console.error("deleteCourse: Firebase not ready or user not authenticated. isFirebaseReady:", isFirebaseReady, "db:", db, "userId:", userId);
                 showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
@@ -2557,7 +2553,7 @@
                 try {
                     // Delete associated terms first
                     console.log('deleteCourse: Querying terms associated with course ID:', courseId);
-                    const termsQuery = query(collection(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms'), where('courseId', '==', courseId));
+                    const termsQuery = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'terms'), where('courseId', '==', courseId));
                     const termsSnapshot = await getDocs(termsQuery);
                     console.log(`deleteCourse: Found ${termsSnapshot.docs.length} terms to delete.`);
                     const deletePromises = termsSnapshot.docs.map(d => {
@@ -2569,7 +2565,7 @@
 
                     // Then delete course document
                     console.log('deleteCourse: Deleting course document with ID:', courseId);
-                    await deleteDoc(doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'courses', courseId));
+                    await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'courses', courseId));
                     console.log('deleteCourse: Course deleted successfully.');
 
                     showMessageBox('Course and associated terms deleted.', 'info', () => {
@@ -2589,15 +2585,15 @@
         // Delete a term
         function deleteTerm(termId) {
             console.log('deleteTerm: Called for term ID:', termId);
-            if (!window.isFirebaseReady || !window.db || !window.userId) {
-                console.error("deleteTerm: Firebase not ready or user not authenticated. isFirebaseReady:", window.isFirebaseReady, "db:", window.db, "userId:", window.userId);
+            if (!isFirebaseReady || !db || !userId) {
+                console.error("deleteTerm: Firebase not ready or user not authenticated. isFirebaseReady:", isFirebaseReady, "db:", db, "userId:", userId);
                 showMessageBox("Firebase is not ready or user not authenticated. Please wait a moment.", "error");
                 return;
             }
             showConfirmBox('Are you sure you want to delete this term?', async () => {
                 try {
                     console.log('deleteTerm: Deleting term document with ID:', termId);
-                    await deleteDoc(doc(window.db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId));
+                    await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'terms', termId));
                     console.log('deleteTerm: Term deleted successfully.');
                     showMessageBox('Term deleted.', 'info', () => {
                         // renderTerms is called by the onSnapshot listener
@@ -2638,7 +2634,7 @@
             console.log('globalSearchInput onkeyup triggered. Current value:', globalSearchInput.value);
             const queryText = globalSearchInput.value.trim().toLowerCase();
             if (queryText.length > 0) {
-                const results = window.appData.terms.filter(term =>
+                const results = appData.terms.filter(term =>
                     // Search across all language texts and definition
                     LANGUAGES.some(lang =>
                         term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(queryText)
@@ -2706,7 +2702,7 @@
 
             // Filter terms to only include those that have a translation in the selected native language
             // and have at least one other language translation to be the source term.
-            const playableTerms = window.appData.terms.filter(term => {
+            const playableTerms = appData.terms.filter(term => {
                 const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
                     lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
@@ -2759,7 +2755,7 @@
             challengeOption1Button.disabled = false;
             challengeOption2Button.disabled = false;
 
-            const playableTerms = window.appData.terms.filter(term => {
+            const playableTerms = appData.terms.filter(term => {
                 const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
                     lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
@@ -3091,7 +3087,7 @@
         function viewCourseDetails(id) {
             console.log('viewCourseDetails called for ID:', id);
             currentCourseId = id;
-            const course = window.appData.courses.find(c => c.id === id);
+            const course = appData.courses.find(c => c.id === id);
             if (course) {
                 courseDetailsTitle.textContent = course.name;
                 courseSearchInput.value = ''; // Clear course search when navigating
