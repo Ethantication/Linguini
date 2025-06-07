@@ -964,7 +964,7 @@
                     pronunciation: 'protokol',
                     english: { text: 'Protocol', status: 'Pending', validatedBy: null },
                     russian: { text: 'Протокол', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'بروتوكول', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'بروتوكול', status: 'Pending', validatedBy: null },
                     french: { text: 'Protocole', status: 'Pending', validatedBy: null },
                     mandarin: { text: '协议', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Protocolo', status: 'Pending', validatedBy: null },
@@ -2109,7 +2109,7 @@
                 const courseCard = document.createElement('div');
                 courseCard.className = 'card cursor-pointer hover:bg-blue-50 transition flex justify-between items-center';
                 courseCard.innerHTML = `
-                    <h3 class="text-xl font-semibold">${course.name}</h3>
+                    <h3 class="text-xl font-semibold" data-sb-object-id="${course.id}" data-sb-field-path="name">${course.name}</h3>
                     <div class="flex gap-2">
                         ${isValidatorMode ? `<button class="btn-delete px-3 py-1 text-sm" data-course-id="${course.id}">Delete</button>` : ''}
                     </div>
@@ -2176,9 +2176,9 @@
                 termCard.className = 'card';
                 // IMPORTANT: All buttons now include data-term-id for event delegation.
                 termCard.innerHTML = `
-                    <h3 class="text-xl font-semibold mb-2" dir="rtl">${mainHebrewTerm}</h3>
-                    <p class="text-gray-600 mb-2">${mainEnglishPronunciation ? `(${mainEnglishPronunciation})` : ''}</p>
-                    <p class="text-gray-700 mb-4">${mainDefinition}</p>
+                    <h3 class="text-xl font-semibold mb-2" dir="rtl" data-sb-object-id="${term.id}" data-sb-field-path="hebrew.text">${mainHebrewTerm}</h3>
+                    <p class="text-gray-600 mb-2" data-sb-object-id="${term.id}" data-sb-field-path="pronunciation">${mainEnglishPronunciation ? `(${mainEnglishPronunciation})` : ''}</p>
+                    <p class="text-gray-700 mb-4" data-sb-object-id="${term.id}" data-sb-field-path="definition">${mainDefinition}</p>
 
                     <div class="flex justify-between items-center mt-4">
                         <button class="btn-secondary toggle-translations-btn px-4 py-2 text-sm" data-term-id="${term.id}">View Translations</button>
@@ -2204,7 +2204,7 @@
                             <tbody>
                                 <tr>
                                     <td>Pronunciation</td>
-                                    <td>${mainEnglishPronunciation || 'N/A'}</td>
+                                    <td data-sb-object-id="${term.id}" data-sb-field-path="pronunciation">${mainEnglishPronunciation || 'N/A'}</td>
                                     <td class="status-not-provided">N/A</td>
                                     <td></td>
                                 </tr>
@@ -2222,7 +2222,7 @@
                                     return `
                                         <tr>
                                             <td>${lang.name}</td>
-                                            <td ${dirAttribute}>${translationText}</td>
+                                            <td ${dirAttribute} data-sb-object-id="${term.id}" data-sb-field-path="${lang.key}.text">${translationText}</td>
                                             <td class="${statusClass}">${status}</td>
                                             <td>
                                                 ${isValidatorMode && hasText && status === 'Pending' ?
@@ -2282,8 +2282,8 @@
                 const termCard = document.createElement('div');
                 termCard.className = 'card';
                 termCard.innerHTML = `
-                    <h3 class="text-lg font-semibold mb-1" dir="rtl">${mainTermDisplay}</h3>
-                    <p class="text-gray-700 text-sm mb-2">${term.definition.substring(0, 100)}${term.definition.length > 100 ? '...' : ''}</p>
+                    <h3 class="text-lg font-semibold mb-1" dir="rtl" data-sb-object-id="${term.id}" data-sb-field-path="hebrew.text">${mainTermDisplay}</h3>
+                    <p class="text-gray-700 text-sm mb-2" data-sb-object-id="${term.id}" data-sb-field-path="definition">${term.definition.substring(0, 100)}${term.definition.length > 100 ? '...' : ''}</p>
                     <p class="text-xs text-gray-500">Course: ${appData.courses.find(c => c.id === term.courseId)?.name || 'Unknown'}</p>
                     <span class="text-xs ${overallStatusClass}">
                         Overall Status: ${termOverallStatus}
@@ -2990,191 +2990,4 @@
                 { text: correctTranslation, isCorrect: true, key: 'learnHebrewOption1' },
                 { text: incorrectTranslation, isCorrect: false, key: 'learnHebrewOption2' }
             ];
-            shuffleArray(options);
-
-            learnHebrewOption1Button.textContent = options[0].text;
-            learnHebrewOption1Button.dir = LANGUAGES.find(l => l.key === learnHebrewSelectedLanguage).dir;
-            learnHebrewOption1Button.onclick = () => checkLearnHebrewAnswer(options[0].isCorrect, 'learnHebrewOption1');
-
-            learnHebrewOption2Button.textContent = options[1].text;
-            learnHebrewOption2Button.dir = LANGUAGES.find(l => l.key === learnHebrewSelectedLanguage).dir;
-            learnHebrewOption2Button.onclick = () => checkLearnHebrewAnswer(options[1].isCorrect, 'learnHebrewOption2');
-
-            // Store which option is correct for feedback
-            learnHebrewOption1Button.dataset.isCorrect = options[0].isCorrect;
-            learnHebrewOption2Button.dataset.isCorrect = options[1].isCorrect;
-
-            updateLearningProgress();
-        }
-
-        // Update learning progress display
-        function updateLearningProgress() {
-            learningProgressDisplay.textContent = `${currentLearningIndex + 1}/${learningTerms.length}`;
-            if (currentLearningIndex >= learningTerms.length) {
-                 learningProgressDisplay.textContent = `${learningTerms.length}/${learningTerms.length}`;
-            }
-            console.log('updateLearningProgress: Progress:', learningProgressDisplay.textContent);
-        }
-
-        // Check the user's answer for Learn Hebrew game
-        function checkLearnHebrewAnswer(isCorrect, clickedOptionId) {
-            console.log(`checkLearnHebrewAnswer: Clicked option: ${clickedOptionId}, isCorrect: ${isCorrect}`);
-            // Disable buttons to prevent multiple clicks
-            learnHebrewOption1Button.disabled = true;
-            learnHebrewOption2Button.disabled = true;
-
-            const clickedButton = document.getElementById(clickedOptionId);
-
-            if (isCorrect) {
-                masteredWordsCount++;
-                masteredWordsCountDisplay.textContent = masteredWordsCount;
-                learnHebrewFeedbackDisplay.textContent = 'Correct!';
-                learnHebrewFeedbackDisplay.classList.remove('text-red-500');
-                learnHebrewFeedbackDisplay.classList.add('text-emerald-500');
-                correctSynth.triggerAttackRelease('C5', '8n');
-                clickedButton.classList.add('correct');
-                console.log('checkLearnHebrewAnswer: Correct answer. Mastered count:', masteredWordsCount);
-            } else {
-                learnHebrewFeedbackDisplay.textContent = 'Incorrect!';
-                learnHebrewFeedbackDisplay.classList.remove('text-emerald-500');
-                learnHebrewFeedbackDisplay.classList.add('text-red-500');
-                incorrectSynth.triggerAttackRelease('C4', '8n');
-                clickedButton.classList.add('incorrect');
-
-                // Show the correct answer
-                if (learnHebrewOption1Button.dataset.isCorrect === 'true') {
-                    learnHebrewOption1Button.classList.add('correct');
-                } else {
-                    learnHebrewOption2Button.classList.add('correct');
-                }
-                console.log('checkLearnHebrewAnswer: Incorrect answer. Mastered count:', masteredWordsCount);
-            }
-            learnHebrewNextWordButton.classList.remove('hidden'); // Show next button
-        }
-
-        // Move to the next word in Learn Hebrew game
-        learnHebrewNextWordButton.onclick = () => {
-            console.log('learnHebrewNextWordButton clicked.');
-            currentLearningIndex++;
-            displayNextLearningTerm();
-        };
-
-        // End learning session
-        function endLearningSession() {
-            console.log('endLearningSession called.');
-            learnHebrewPlayScreen.classList.add('hidden');
-            learnHebrewEndScreen.classList.remove('hidden');
-            finalMasteredCountDisplay.textContent = masteredWordsCount;
-            console.log('Learning session ended. Final mastered count:', masteredWordsCount);
-        }
-
-        // Start new learning session
-        startNewLearningSessionButton.onclick = () => {
-            console.log('startNewLearningSessionButton clicked.');
-            learnHebrewStartScreen.classList.remove('hidden');
-            learnHebrewPlayScreen.classList.add('hidden');
-            learnHebrewEndScreen.classList.add('hidden');
-            masteredWordsCount = 0;
-            currentLearningIndex = 0;
-            masteredWordsCountDisplay.textContent = masteredWordsCount;
-            learnHebrewLanguageSelect.value = ''; // Reset language selection
-        };
-
-
-        // --- Navigation Logic ---
-
-        // Function to view course details
-        function viewCourseDetails(id) {
-            console.log('viewCourseDetails called for ID:', id);
-            currentCourseId = id;
-            const course = appData.courses.find(c => c.id === id);
-            if (course) {
-                courseDetailsTitle.textContent = course.name;
-                courseSearchInput.value = ''; // Clear course search when navigating
-                renderTerms(id);
-                showView(courseDetailsView);
-            } else {
-                console.warn('viewCourseDetails: Course not found for ID:', id);
-                showMessageBox('Course not found.', 'error', () => {
-                    showView(homeView);
-                    renderCourses();
-                });
-                currentCourseId = null; // Reset current course ID if not found
-            }
-        }
-
-        // Event listeners for navigation buttons
-        homeButton.onclick = () => {
-            console.log('homeButton clicked.');
-            showView(homeView);
-            // renderCourses is called by the onSnapshot listener
-            // Reset search and game states when returning home
-            globalSearchInput.value = '';
-            searchResultsList.innerHTML = '';
-            noSearchResultsMessage.classList.remove('hidden');
-            currentCourseId = null;
-            currentTermId = null;
-            clearInterval(challengeGameTimerInterval); // Stop challenge game timer
-        };
-        showAddCourseFormBtn.onclick = () => {
-            console.log('showAddCourseFormBtn clicked.');
-            showView(addCourseView);
-        };
-        cancelAddCourseBtn.onclick = () => {
-            console.log('cancelAddCourseBtn clicked.');
-            addCourseForm.reset();
-            showView(homeView);
-        };
-        showAddTermFormBtn.onclick = () => {
-            console.log('showAddTermFormBtn clicked.');
-            // Prepare form for adding a new term
-            addTermForm.reset();
-            addTermFormTitle.textContent = 'Add New Term';
-            addTermSubmitBtn.textContent = 'Add Term';
-            currentTermId = null; // Ensure we're in "add new" mode
-            // Clear the new pronunciation input when adding a new term
-            termPronunciationInput.value = '';
-            showView(addTermView);
-        };
-        cancelAddTermBtn.onclick = () => {
-            console.log('cancelAddTermBtn clicked.');
-            addTermForm.reset();
-            currentTermId = null; // Clear editing state
-            if (currentCourseId) {
-                viewCourseDetails(currentCourseId); // Go back to course details if a course was selected
-            } else {
-                showView(homeView); // Otherwise go to home
-            }
-        };
-
-        // "Linguini Challenge" button click handler
-        challengeGameButton.onclick = () => {
-            console.log('challengeGameButton clicked.');
-            showView(challengeGameView);
-            challengeGameStartScreen.classList.remove('hidden');
-            challengeGamePlayScreen.classList.add('hidden');
-            challengeGameOverScreen.classList.add('hidden');
-            populateChallengeGameLanguageSelect(); // Ensure dropdown is fresh
-        };
-
-        // "Search" button click handler
-        searchButton.onclick = () => {
-            console.log('searchButton clicked.');
-            showView(searchView);
-            globalSearchInput.value = ''; // Clear search input when entering search view
-            searchResultsList.innerHTML = '';
-            noSearchResultsMessage.classList.remove('hidden');
-        };
-
-        // "Learn Hebrew" button click handler
-        learnHebrewButton.onclick = () => {
-            console.log('learnHebrewButton clicked.');
-            showView(learnHebrewView);
-            learnHebrewStartScreen.classList.remove('hidden');
-            learnHebrewPlayScreen.classList.add('hidden');
-            learnHebrewEndScreen.classList.add('hidden');
-            populateLearnHebrewLanguageSelect(); // Ensure dropdown is fresh
-        };
-    </script>
-</body>
-</html>
+            shuffleArr
