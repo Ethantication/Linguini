@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linguini - Technion Educational Site</title>
     
+    <!-- Favicon: Added for tab view logo (Request 4) -->
+    <link rel="icon" href="https://raw.githubusercontent.com/Ethantication/Linguini/main/lingimg.jpg" type="image/jpeg">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- PapaParse for CSV parsing (used for potential future CSV uploads, not strictly for download but good to have) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <style>
         /* Base styles */
@@ -164,6 +170,51 @@
             background-color: #F8F9FA; /* Subtle zebra striping */
         }
 
+        /* Mobile adjustment for tables (Request 2) */
+        @media (max-width: 768px) {
+            .term-table, .term-table thead, .term-table tbody, .term-table th, .term-table td, .term-table tr {
+                display: block;
+            }
+            .term-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            .term-table tr {
+                border: 1px solid #E9ECEF;
+                margin-bottom: 0.625rem; /* Add some space between rows */
+                border-radius: 0.5rem;
+                overflow: hidden;
+            }
+            .term-table td {
+                border: none; /* Remove individual cell borders */
+                border-bottom: 1px solid #E9ECEF; /* Keep bottom border for separation within a "row" */
+                position: relative;
+                padding-left: 50%; /* Make space for the pseudo-element label */
+                text-align: right;
+                word-wrap: break-word; /* Allow long words to break */
+                white-space: normal; /* Allow text to wrap */
+            }
+            .term-table td:before {
+                position: absolute;
+                top: 0;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: 600;
+                color: #6C757D;
+                content: attr(data-label); /* Use data-label for content */
+            }
+            /* Specific labels for mobile table cells */
+            .term-table td:nth-of-type(1):before { content: "Language"; }
+            .term-table td:nth-of-type(2):before { content: "Translation"; }
+            .term-table td:nth-of-type(3):before { content: "Status"; }
+            .term-table td:nth-of-type(4):before { content: "Actions"; }
+        }
+
+
         /* Custom header background color */
         .bg-header-custom {
             background-color: #faeddb;
@@ -243,6 +294,33 @@
         #debugInfo span {
             font-weight: bold;
             color: #E0E0E0;
+        }
+
+        /* Added for mobile responsiveness: Ensure header elements stack on small screens (Request 2) */
+        @media (max-width: 767px) {
+            .bg-header-custom .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .bg-header-custom nav {
+                flex-direction: column;
+                width: 100%;
+            }
+            .bg-header-custom nav button {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            .bg-header-custom .flex.justify-center.md\:justify-start {
+                width: 100%;
+                justify-content: center;
+            }
+            .footer-content {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .footer-content img {
+                margin-top: 0.5rem; /* Space between text and mascots on mobile */
+            }
         }
     </style>
 </head>
@@ -351,10 +429,18 @@
                 <p class="text-gray-700 mb-6">Terms for this course:</p>
                 <div class="flex flex-col sm:flex-row gap-4 mb-6">
                     <button id="showAddTermFormBtn" class="w-full sm:w-auto">Add New Term to Course</button>
+                    <!-- Search option within each course (Request 1) -->
                     <div class="relative w-full sm:w-1/2">
                         <input type="text" id="courseSearchInput" placeholder="Search terms in this course..." class="pr-10">
                         <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
+                    <!-- Download Excel file option (Request 3) -->
+                    <button id="downloadTermsCsvBtn" class="w-full sm:w-auto btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m0 0l-3-3m3 3l3-3m2.75 0H19.5a2.25 2.25 0 012.25 2.25v2.75A2.25 2.25 0 0119.5 19.5H4.5a2.25 2.25 0 01-2.25-2.25v-2.75A2.25 2.25 0 014.5 14H6.25"/>
+                        </svg>
+                        Download All Terms (CSV)
+                    </button>
                 </div>
                 <div id="termList" class="grid grid-cols-1 gap-4">
                     </div>
@@ -1051,7 +1137,7 @@
                     english: { text: 'Displacement', status: 'Pending', validatedBy: null },
                     russian: { text: 'Смещение', status: 'Pending', validatedBy: null },
                     arabic: { text: 'إزاحة', status: 'Pending', validatedBy: null },
-                    french: { text: 'Déplacement', status: 'Pending', validatedTo: null },
+                    french: { text: 'Déplacement', status: 'Pending', validatedBy: null },
                     mandarin: { text: '位移', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Desplazamiento', status: 'Pending', validatedBy: null },
                     hindi: { text: 'विस्थापन', status: 'Pending', validatedBy: null }
@@ -1722,10 +1808,13 @@
         const searchResultsList = document.getElementById('searchResultsList');
         const noSearchResultsMessage = document.getElementById('noSearchResultsMessage'); // New message for search
         const clearSearchBtn = document.getElementById('clearSearchBtn');
-        const courseSearchInput = document.getElementById('courseSearchInput');
+        const courseSearchInput = document.getElementById('courseSearchInput'); // Element for course-specific search
 
         // New pronunciation input element
         const termPronunciationInput = document.getElementById('termPronunciation');
+
+        // New: Download CSV Button (Request 3)
+        const downloadTermsCsvBtn = document.getElementById('downloadTermsCsvBtn');
 
 
         // Linguini Challenge Game UI Elements
@@ -2134,7 +2223,7 @@
             console.log('renderCourses: Finished rendering courses.');
         }
 
-        // Renders the list of terms for a specific course
+        // Renders the list of terms for a specific course (Modified for mobile table display - Request 2)
         function renderTerms(courseId, searchTerm = '') {
             console.log('renderTerms: Started rendering terms for course:', courseId, 'Search term:', searchTerm);
             termList.innerHTML = '';
@@ -2144,7 +2233,8 @@
                     // Search across all language texts and definition
                     LANGUAGES.some(lang =>
                         term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(searchTerm.toLowerCase())
-                    ) || (term.definition && term.definition.toLowerCase().includes(searchTerm.toLowerCase()))
+                    ) || (term.definition && term.definition.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (term.pronunciation && term.pronunciation.toLowerCase().includes(searchTerm.toLowerCase())) // Include pronunciation in search
                 )
                 : termsForCourse;
 
@@ -2180,7 +2270,7 @@
                     <p class="text-gray-600 mb-2">${mainEnglishPronunciation ? `(${mainEnglishPronunciation})` : ''}</p>
                     <p class="text-gray-700 mb-4">${mainDefinition}</p>
 
-                    <div class="flex justify-between items-center mt-4">
+                    <div class="flex flex-wrap justify-between items-center mt-4 gap-2">
                         <button class="btn-secondary toggle-translations-btn px-4 py-2 text-sm" data-term-id="${term.id}">View Translations</button>
                         <span class="text-sm ${overallStatusClass}">
                             Overall Status: ${termOverallStatus}
@@ -2203,10 +2293,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Pronunciation</td>
-                                    <td>${mainEnglishPronunciation || 'N/A'}</td>
-                                    <td class="status-not-provided">N/A</td>
-                                    <td></td>
+                                    <td data-label="Language">Pronunciation</td>
+                                    <td data-label="Translation">${mainEnglishPronunciation || 'N/A'}</td>
+                                    <td data-label="Status" class="status-not-provided">N/A</td>
+                                    <td data-label="Actions"></td>
                                 </tr>
                                 ${LANGUAGES.map(lang => {
                                     if (lang.key === 'hebrew') return ''; // Hebrew term is already displayed
@@ -2221,10 +2311,10 @@
 
                                     return `
                                         <tr>
-                                            <td>${lang.name}</td>
-                                            <td ${dirAttribute}>${translationText}</td>
-                                            <td class="${statusClass}">${status}</td>
-                                            <td>
+                                            <td data-label="Language">${lang.name}</td>
+                                            <td data-label="Translation" ${dirAttribute}>${translationText}</td>
+                                            <td data-label="Status" class="${statusClass}">${status}</td>
+                                            <td data-label="Actions">
                                                 ${isValidatorMode && hasText && status === 'Pending' ?
                                                     `<button class="btn-validate px-3 py-1 text-xs" data-term-id="${term.id}" data-lang-key="${lang.key}">Validate</button>` : ''}
                                             </td>
@@ -2635,10 +2725,11 @@
             const queryText = globalSearchInput.value.trim().toLowerCase();
             if (queryText.length > 0) {
                 const results = appData.terms.filter(term =>
-                    // Search across all language texts and definition
+                    // Search across all language texts, pronunciation, and definition
                     LANGUAGES.some(lang =>
                         term[lang.key] && term[lang.key].text && term[lang.key].text.toLowerCase().includes(queryText)
-                    ) || (term.definition && term.definition.toLowerCase().includes(queryText))
+                    ) || (term.definition && term.definition.toLowerCase().includes(queryText)) ||
+                    (term.pronunciation && term.pronunciation.toLowerCase().includes(queryText))
                 );
                 renderSearchResults(results);
             } else {
@@ -2655,10 +2746,70 @@
             noSearchResultsMessage.classList.remove('hidden');
         };
 
-        // Course-specific search functionality
+        // Course-specific search functionality (Request 1)
         courseSearchInput.onkeyup = () => {
             console.log('courseSearchInput onkeyup triggered. Current value:', courseSearchInput.value);
             renderTerms(currentCourseId, courseSearchInput.value.trim());
+        };
+
+        // Download Terms as CSV (Request 3)
+        downloadTermsCsvBtn.onclick = () => {
+            console.log('downloadTermsCsvBtn clicked.');
+            if (!currentCourseId) {
+                showMessageBox('Please select a course first to download its terms.', 'error');
+                return;
+            }
+
+            const course = appData.courses.find(c => c.id === currentCourseId);
+            if (!course) {
+                showMessageBox('Course not found.', 'error');
+                return;
+            }
+
+            const termsToDownload = appData.terms.filter(term => term.courseId === currentCourseId);
+
+            if (termsToDownload.length === 0) {
+                showMessageBox('No terms available for this course to download.', 'info');
+                return;
+            }
+
+            // Define CSV headers
+            const headers = ['Hebrew Term', 'Pronunciation', 'Definition'];
+            LANGUAGES.filter(lang => lang.key !== 'hebrew').forEach(lang => {
+                headers.push(`${lang.name} Translation`);
+                headers.push(`${lang.name} Status`);
+            });
+
+            const csvRows = [];
+            csvRows.push(headers.join(',')); // Add header row
+
+            termsToDownload.forEach(term => {
+                const row = [];
+                // Main Hebrew term, pronunciation, and definition
+                row.push(`"${(term.hebrew && term.hebrew.text) ? term.hebrew.text.replace(/"/g, '""') : ''}"`);
+                row.push(`"${term.pronunciation ? term.pronunciation.replace(/"/g, '""') : ''}"`);
+                row.push(`"${term.definition ? term.definition.replace(/"/g, '""') : ''}"`);
+
+                // Other translations and their statuses
+                LANGUAGES.filter(lang => lang.key !== 'hebrew').forEach(lang => {
+                    const translationText = (term[lang.key] && term[lang.key].text) ? term[lang.key].text : '';
+                    const status = (term[lang.key] && term[lang.key].status) ? term[lang.key].status : 'Not Provided';
+                    row.push(`"${translationText.replace(/"/g, '""')}"`);
+                    row.push(`"${status.replace(/"/g, '""')}"`);
+                });
+                csvRows.push(row.join(','));
+            });
+
+            const csvString = csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${course.name.replace(/\s+/g, '_')}_terms.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showMessageBox('Terms downloaded successfully as CSV!', 'success');
+            console.log('CSV download initiated.');
         };
 
 
@@ -2705,7 +2856,7 @@
             const playableTerms = appData.terms.filter(term => {
                 const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
-                    lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
+                    lang.key !== 'hebrew' && lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
                 );
                 return hasNativeTranslation && hasOtherLanguageTranslation;
             });
@@ -2758,7 +2909,7 @@
             const playableTerms = appData.terms.filter(term => {
                 const hasNativeTranslation = term[challengeGameSelectedLanguage] && term[challengeGameSelectedLanguage].text;
                 const hasOtherLanguageTranslation = LANGUAGES.some(lang =>
-                    lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
+                    lang.key !== 'hebrew' && lang.key !== challengeGameSelectedLanguage && term[lang.key] && term[lang.key].text
                 );
                 return hasNativeTranslation && hasOtherLanguageTranslation;
             });
@@ -2774,17 +2925,24 @@
             challengeGameCurrentTerm = randomTerm;
             console.log('generateChallengeQuestion: Selected random term:', challengeGameCurrentTerm);
 
-            // Pick a random source language for the displayed term (not the native language)
-            const sourceLang = getRandomElement(LANGUAGES.filter(lang => lang.key !== challengeGameSelectedLanguage && challengeGameCurrentTerm[lang.key] && challengeGameCurrentTerm[lang.key].text));
+            // Pick a random source language for the displayed term (not the native language and not Hebrew)
+            const sourceLang = getRandomElement(LANGUAGES.filter(lang => lang.key !== challengeGameSelectedLanguage && lang.key !== 'hebrew' && challengeGameCurrentTerm[lang.key] && challengeGameCurrentTerm[lang.key].text));
             if (!sourceLang) {
-                console.error('generateChallengeQuestion: No source language found for the selected term.');
-                endChallengeGame('Game ended: Could not find a source language for the term.');
-                return;
+                console.error('generateChallengeQuestion: No suitable source language found for the selected term.');
+                // Fallback to definition if no other language translation is available for the source
+                if (challengeGameCurrentTerm.definition) {
+                    challengeGameTermDisplay.textContent = challengeGameCurrentTerm.definition;
+                    challengeGameTermDisplay.dir = 'ltr'; // Assuming definitions are LTR
+                    console.log('generateChallengeQuestion: Displaying definition as fallback source.');
+                } else {
+                    endChallengeGame('Game ended: Could not find a suitable source term or definition.');
+                    return;
+                }
+            } else {
+                challengeGameTermDisplay.textContent = challengeGameCurrentTerm[sourceLang.key].text;
+                challengeGameTermDisplay.dir = sourceLang.dir; // Set text direction
+                console.log(`generateChallengeQuestion: Displaying term: "${challengeGameTermDisplay.textContent}" in ${sourceLang.name}`);
             }
-
-            challengeGameTermDisplay.textContent = challengeGameCurrentTerm[sourceLang.key].text;
-            challengeGameTermDisplay.dir = sourceLang.dir; // Set text direction
-            console.log(`generateChallengeQuestion: Displaying term: "${challengeGameTermDisplay.textContent}" in ${sourceLang.name}`);
 
             const correctTranslation = challengeGameCurrentTerm[challengeGameSelectedLanguage].text;
 
