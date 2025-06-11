@@ -2528,7 +2528,7 @@
 
         // NEW JAVASCRIPT: Handle "Become a Validator" button click
         // This REPLACES your previous `becomeValidator.onclick` block.
-           becomeValidator.onclick = async () => {
+          becomeValidator.onclick = async () => {
     console.log('BecomeValidator button clicked.');
 
     const languageToValidate = prompt("Which language do you want to validate? (e.g., English, Russian, Arabic, Spanish, Mandarin, French, Hindi)");
@@ -2565,9 +2565,9 @@
                 await setDoc(userRef, {
                     isValidator: true,
                     validatorLanguages: {
-                        [languageToValidate.toLowerCase()]: proficiencyLevel // Store language in lowercase for consistency
+                        [languageToValidate.toLowerCase()]: proficiencyLevel
                     }
-                }, { merge: true }); // Use merge to avoid overwriting other user data
+                }, { merge: true });
 
                 // Directly show the secret key after successful update
                 showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
