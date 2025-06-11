@@ -715,7 +715,6 @@
             appId: "1:363537478736:web:a62c9290a9574f969d8d55",
             measurementId: "G-0D0KLF5W1V"
         };
-	const VALIDATOR_SECRET_KEY = "V2025";
 
         // Define a constant for the app ID, prioritizing __app_id from Canvas environment
         const APP_ID = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.appId;
@@ -2569,7 +2568,7 @@
                         [languageToValidate.toLowerCase()]: proficiencyLevel
                     }
                 }, { merge: true });
-		
+		 const VALIDATOR_SECRET_KEY = "V2025";
 
                 // Directly show the secret key after successful update
                 showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
