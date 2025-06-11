@@ -344,6 +344,7 @@
                     </svg>
                     Validator Login
                 </button>
+		    
                <button id="becomeValidator">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -2419,13 +2420,105 @@
         };
 
 		// Handle "Become a Validator" button click
-		becomeValidator.onclick = () => {
-            console.log('BecomeValidator button clicked.');
-			const agreementText = "By becoming a validator, you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?";
-			showConfirmBox(agreementText, () => {
-				showMessageBox(`Thank you for your commitment! The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
-			});
-		};
+		// --- Make sure these functions are defined somewhere in your script ---
+// Placeholder for showMessageBox (use your actual implementation if you have one)
+function showMessageBox(message, type) {
+    alert(`${type.toUpperCase()}: ${message}`);
+}
+
+// Placeholder for showConfirmBox (use your actual implementation if you have one)
+function showConfirmBox(message, callback) {
+    if (confirm(message)) {
+        callback();
+    }
+}
+// --- End of placeholder functions ---
+
+// Handle "Become a Validator" button click (THIS REPLACES YOUR OLD BLOCK)
+document.getElementById('becomeValidator').onclick = () => {
+    console.log('BecomeValidator button clicked.');
+    const agreementText = "By becoming a validator, you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?";
+    
+    // Show the confirmation box first
+    showConfirmBox(agreementText, () => {
+        // If the user accepts, display the language proficiency modal
+        document.getElementById('languageProficiencyModal').style.display = 'block';
+    });
+};
+
+// Handle submission from the language proficiency modal
+document.getElementById('submitValidatorApplication').onclick = async () => {
+    const selectedLanguage = document.getElementById('validatorLanguage').value;
+    const proficiency = parseInt(document.getElementById('languageProficiency').value, 10);
+
+    // Client-side validation for inputs
+    if (!selectedLanguage) {
+        showMessageBox('Please select a language.', 'error');
+        return;
+    }
+
+    if (isNaN(proficiency) || proficiency < 1 || proficiency > 5) {
+        showMessageBox('Please enter a valid proficiency level between 1 and 5.', 'error');
+        return;
+    }
+
+    // Deny request if proficiency is below 4
+    if (proficiency < 4) {
+        showMessageBox('Your proficiency level is too low to become a validator at this time. We require a minimum proficiency of 4.', 'error');
+        document.getElementById('languageProficiencyModal').style.display = 'none'; // Hide the modal
+        return;
+    }
+
+    // If validation passes, send data to your backend for review
+    try {
+        // IMPORTANT: Replace '/api/applyValidator' with the actual URL of your backend endpoint.
+        // If your backend requires user authentication (e.g., a JWT token),
+        // include it in the 'Authorization' header.
+        const response = await fetch('/api/applyValidator', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Example for an authorization token:
+                // 'Authorization': `Bearer ${localStorage.getItem('authToken')}` 
+            },
+            body: JSON.stringify({
+                language: selectedLanguage,
+                proficiency: proficiency
+                // You might also include the user's ID here if your backend doesn't infer it
+                // from a session or authentication token.
+            })
+        });
+
+        const data = await response.json(); // Assuming your backend responds with JSON
+
+        if (response.ok) { // Check for HTTP status codes 200-299
+            showMessageBox(`Thank you for your commitment! Your application for ${selectedLanguage} validation has been submitted. We will review it shortly.`, 'info');
+            // Since your VALIDATOR_SECRET_KEY is handled by the backend,
+            // the client-side should NOT display it here.
+            // Your backend will securely communicate the key upon approval (e.g., via email or a user dashboard).
+        } else {
+            // Handle specific error messages from your backend
+            showMessageBox(data.message || 'There was an issue with your application. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Error submitting validator application:', error);
+        showMessageBox('An error occurred while submitting your application. Please try again later.', 'error');
+    } finally {
+        // Always hide the modal after the submission attempt
+        document.getElementById('languageProficiencyModal').style.display = 'none';
+    }
+};
+
+// Handle cancellation from the language proficiency modal
+document.getElementById('cancelValidatorApplication').onclick = () => {
+    document.getElementById('languageProficiencyModal').style.display = 'none'; // Hide the modal
+};
+
+// IMPORTANT SECURITY NOTE:
+// The `VALIDATOR_SECRET_KEY` should NOT be defined or used directly in your client-side JavaScript.
+// It's a sensitive credential that should be generated and managed exclusively on your backend.
+// Your backend will be responsible for issuing it securely once a validator application is approved.
+// Ensure you remove any client-side code that defines or uses `VALIDATOR_SECRET_KEY` directly.
 
 
         // Handle adding a new course
