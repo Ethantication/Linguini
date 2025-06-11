@@ -2528,81 +2528,58 @@
 
         // NEW JAVASCRIPT: Handle "Become a Validator" button click
         // This REPLACES your previous `becomeValidator.onclick` block.
-        document.getElementById('becomeValidator').onclick = () => {
-            console.log('BecomeValidator button clicked.');
-            const agreementText = "By becoming a validator, you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?";
-            
-            // Show the confirmation box first
-            showConfirmBox(agreementText, () => {
-                // If the user accepts, display the language proficiency modal
-                document.getElementById('languageProficiencyModal').style.display = 'block';
-            });
-        };
+           becomeValidator.onclick = async () => {
+    console.log('BecomeValidator button clicked.');
 
-        // NEW JAVASCRIPT: Handle submission from the language proficiency modal
-        document.getElementById('submitValidatorApplication').onclick = async () => {
-            const selectedLanguage = document.getElementById('validatorLanguage').value;
-            const proficiency = parseInt(document.getElementById('languageProficiency').value, 10);
+    const languageToValidate = prompt("Which language do you want to validate? (e.g., English, Russian, Arabic, Spanish, Mandarin, French, Hindi)");
+    if (!languageToValidate) {
+        showMessageBox("Validator request cancelled. Please specify a language.", 'error');
+        return;
+    }
 
-            // Client-side validation for inputs
-            if (!selectedLanguage) {
-                showMessageBox('Please select a language.', 'error');
-                return;
+    let proficiencyLevel = prompt(`On a scale of 1 to 5, how would you rank your control in ${languageToValidate}? (1=Beginner, 5=Native/Expert)`);
+    proficiencyLevel = parseInt(proficiencyLevel, 10);
+
+    if (isNaN(proficiencyLevel) || proficiencyLevel < 1 || proficiencyLevel > 5) {
+        showMessageBox("Invalid proficiency level. Please enter a number between 1 and 5.", 'error');
+        return;
+    }
+
+    if (proficiencyLevel < 4) {
+        showMessageBox(`Your proficiency level (${proficiencyLevel}) in ${languageToValidate} is too low to become a validator. A level of 4 or higher is required.`, 'error');
+        return;
+    }
+
+    const agreementText = `By becoming a validator for ${languageToValidate} (Proficiency: ${proficiencyLevel}), you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?`;
+
+    // Assuming showConfirmBox is a function you have defined elsewhere
+    showConfirmBox(agreementText, async () => {
+        // User accepted, now store their validator status and language proficiency in Firestore
+        try {
+            const user = auth.currentUser;
+            if (user) {
+                // Assuming 'db' is your Firestore instance and 'doc', 'setDoc' are imported
+                const userRef = doc(db, "users", user.uid);
+
+                // Update user's profile with validation language and proficiency
+                await setDoc(userRef, {
+                    isValidator: true,
+                    validatorLanguages: {
+                        [languageToValidate.toLowerCase()]: proficiencyLevel // Store language in lowercase for consistency
+                    }
+                }, { merge: true }); // Use merge to avoid overwriting other user data
+
+                // Directly show the secret key after successful update
+                showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
+            } else {
+                showMessageBox("You must be logged in to become a validator.", 'error');
             }
-
-            if (isNaN(proficiency) || proficiency < 1 || proficiency > 5) {
-                showMessageBox('Please enter a valid proficiency level between 1 and 5.', 'error');
-                return;
-            }
-
-            // Deny request if proficiency is below 4
-            if (proficiency < 4) {
-                showMessageBox('Your proficiency level is too low to become a validator at this time. We require a minimum proficiency of 4.', 'error');
-                document.getElementById('languageProficiencyModal').style.display = 'none'; // Hide the modal
-                return;
-            }
-
-            // If validation passes, send data to your backend for review
-            try {
-                // IMPORTANT: Replace '/api/applyValidator' with the actual URL of your backend endpoint.
-                // This is a conceptual API call. Your backend needs to handle this.
-                const response = await fetch('/api/applyValidator', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Include authorization token if your backend requires it for the current user
-                        // 'Authorization': `Bearer ${auth.currentUser.accessToken}` 
-                    },
-                    body: JSON.stringify({
-                        language: selectedLanguage,
-                        proficiency: proficiency,
-                        userId: userId // Send the current user's ID
-                    })
-                });
-
-                const data = await response.json(); // Assuming your backend responds with JSON
-
-                if (response.ok) { // Check for HTTP status codes 200-299
-                    showMessageBox(`Thank you for your commitment! Your application for ${selectedLanguage} validation has been submitted. We will review it shortly.`, 'info');
-                    // The VALIDATOR_SECRET_KEY is for login, not for application.
-                    // Your backend will handle securely granting validator status and any related keys.
-                } else {
-                    // Handle specific error messages from your backend
-                    showMessageBox(data.message || 'There was an issue with your application. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Error submitting validator application:', error);
-                showMessageBox('An error occurred while submitting your application. Please try again later.', 'error');
-            } finally {
-                // Always hide the modal after the submission attempt
-                document.getElementById('languageProficiencyModal').style.display = 'none';
-            }
-        };
-
-        // NEW JAVASCRIPT: Handle cancellation from the language proficiency modal
-        document.getElementById('cancelValidatorApplication').onclick = () => {
-            document.getElementById('languageProficiencyModal').style.display = 'none'; // Hide the modal
-        };
+        } catch (error) {
+            console.error("Error setting validator status:", error);
+            showMessageBox("Failed to set validator status. Please try again.", 'error');
+        }
+    });
+};
 
 
         // Handle adding a new course
