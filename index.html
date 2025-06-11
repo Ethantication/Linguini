@@ -46,7 +46,7 @@
         }
 
         /* Input and textarea styling - refined borders, clear focus */
-        input[type="text"], textarea, select {
+        input[type="text"], textarea, select, input[type="number"] { /* Added input[type="number"] */
             border: 1px solid #CED4DA; /* Lighter gray border */
             border-radius: 0.5rem; /* Slightly more rounded */
             padding: 0.75rem 1rem;
@@ -56,10 +56,19 @@
             background-color: #ffffff;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        input[type="text"]:focus, textarea:focus, select:focus {
+        input[type="text"]:focus, textarea:focus, select:focus, input[type="number"]:focus { /* Added input[type="number"] */
             outline: none;
             border-color: #4CAF50; /* Accent green for focus */
             box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25); /* Green shadow for focus */
+        }
+        /* Specific style for number input arrows */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
         }
 
         /* Button styling - primary accent color, subtle hover effects */
@@ -118,7 +127,7 @@
         .status-overall-partially-validated { color: #FFC107; font-weight: 600; }
         .status-overall-pending { color: #DC3545; font-weight: 600; }
 
-        /* Message box styling */
+        /* Message box styling (used for custom prompts as well) */
         .message-box {
             position: fixed;
             top: 50%;
@@ -242,16 +251,32 @@
 
         /* Game specific styles (Linguini Challenge and Learn Hebrew) */
         .game-option-button, .learn-hebrew-option-button {
-            @apply bg-4CAF50 text-white py-4 px-6 rounded-lg text-2xl font-bold w-full transition-all duration-200 ease-in-out shadow-md; /* Larger text, more padding, shadow */
+            /* Using @apply for Tailwind classes within custom CSS is not directly supported in plain HTML,
+               but the styles below mimic what Tailwind would do if compiled.
+               For actual Tailwind use, these should be applied directly in HTML class attributes. */
+            background-color: #4CAF50; /* bg-4CAF50 */
+            color: white; /* text-white */
+            padding-top: 1rem; /* py-4 */
+            padding-bottom: 1rem; /* py-4 */
+            padding-left: 1.5rem; /* px-6 */
+            padding-right: 1.5rem; /* px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            width: 100%; /* w-full */
+            transition: all 0.2s ease-in-out; /* transition-all duration-200 ease-in-out */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
         }
         .game-option-button:hover, .learn-hebrew-option-button:hover {
-            @apply bg-43A047 transform scale-102 shadow-lg; /* Darker green, slight scale, deeper shadow */
+            background-color: #43A047; /* bg-43A047 */
+            transform: scale(1.02); /* transform scale-102 */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* shadow-lg */
         }
         .game-option-button.correct, .learn-hebrew-option-button.correct {
-            @apply bg-28A745; /* Success green */
+            background-color: #28A745; /* bg-28A745 */
         }
         .game-option-button.incorrect, .learn-hebrew-option-button.incorrect {
-            @apply bg-DC3545; /* Danger red */
+            background-color: #DC3545; /* bg-DC3545 */
         }
 
         /* Learn Hebrew specific styles */
@@ -322,6 +347,66 @@
                 margin-top: 0.5rem; /* Space between text and mascots on mobile */
             }
         }
+
+        /* Styles for the new language proficiency modal */
+        #languageProficiencyModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border: 1px solid #ccc;
+            z-index: 1000; /* Ensure it's on top of other content */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-sizing: border-box;
+            display: none; /* Initially hidden */
+        }
+
+        #languageProficiencyModal h2 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #languageProficiencyModal p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        #languageProficiencyModal div.button-group { /* Specific class for modal buttons div */
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px; /* Space above buttons */
+        }
+
+        /* Ensure modal buttons use general button styles or apply custom ones */
+        #languageProficiencyModal button {
+             padding: 10px 20px;
+             border-radius: 5px;
+             font-size: 16px;
+             box-shadow: none; /* Remove default button shadow for cleaner modal buttons */
+        }
+        #languageProficiencyModal #submitValidatorApplication {
+            background-color: #28a745; /* Success green */
+            color: white;
+        }
+        #languageProficiencyModal #submitValidatorApplication:hover {
+            background-color: #218838;
+        }
+        #languageProficiencyModal #cancelValidatorApplication {
+            background-color: #f44336; /* Danger red */
+            color: white;
+        }
+        #languageProficiencyModal #cancelValidatorApplication:hover {
+            background-color: #c82333;
+        }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -344,6 +429,7 @@
                     </svg>
                     Validator Login
                 </button>
+		    
                <button id="becomeValidator">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -586,6 +672,28 @@
         <div id="debugInfo" class="mt-2">
             </div>
     </footer>
+
+    <!-- NEW HTML: The Language Proficiency Modal (Hidden by default) -->
+    <div id="languageProficiencyModal">
+        <h2>Become a Validator</h2>
+        <p>Which language would you like to validate?</p>
+        <select id="validatorLanguage">
+            <option value="">--Select Language--</option>
+            <option value="english">English</option>
+            <option value="russian">Russian</option>
+            <option value="arabic">Arabic</option>
+            <option value="spanish">Spanish</option>
+            <option value="mandarin">Mandarin</option>
+            <option value="french">French</option>
+            <option value="hindi">Hindi</option>
+        </select>
+        <p>On a scale of 1 to 5, how would you rate your proficiency in this language? (1 = Beginner, 5 = Native/Expert)</p>
+        <input type="number" id="languageProficiency" min="1" max="5" placeholder="Enter 1-5">
+        <div class="button-group">
+            <button id="submitValidatorApplication">Submit Application</button>
+            <button id="cancelValidatorApplication">Cancel</button>
+        </div>
+    </div>
 
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -1314,7 +1422,7 @@
                 },
                 {
                     id: 't_c5_9', courseId: 'c5', definition: 'A type of chemical bond that involves the sharing of electron pairs between atoms.',
-                    hebrew: { text: 'קשר קוולנטי', status: 'Pending', validatedBy: null },
+                    hebrew: { text: 'קשר קوולנטי', status: 'Pending', validatedBy: null },
                     pronunciation: 'kesher kovalenti',
                     english: { text: 'Covalent Bond', status: 'Pending', validatedBy: null },
                     russian: { text: 'Ковалентная связь', status: 'Pending', validatedBy: null },
@@ -1892,7 +2000,7 @@
                 french: 'peut-être',
                 mandarin: '可能',
                 spanish: 'quizás',
-                hindi: 'शायד'
+                hindi: 'शायद'
             },
             {
                 hebrew: 'ייתכן',
@@ -2040,7 +2148,7 @@
         ];
 
 
-        // --- Utility Functions ---
+        // --- Utility Functions (Already present in your working code) ---
 
         // Function to show a custom message box
         function showMessageBox(message, type = 'info', callback = null) {
@@ -2418,14 +2526,83 @@
             }
         };
 
-		// Handle "Become a Validator" button click
-		becomeValidator.onclick = () => {
+        // NEW JAVASCRIPT: Handle "Become a Validator" button click
+        // This REPLACES your previous `becomeValidator.onclick` block.
+        document.getElementById('becomeValidator').onclick = () => {
             console.log('BecomeValidator button clicked.');
-			const agreementText = "By becoming a validator, you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?";
-			showConfirmBox(agreementText, () => {
-				showMessageBox(`Thank you for your commitment! The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
-			});
-		};
+            const agreementText = "By becoming a validator, you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?";
+            
+            // Show the confirmation box first
+            showConfirmBox(agreementText, () => {
+                // If the user accepts, display the language proficiency modal
+                document.getElementById('languageProficiencyModal').style.display = 'block';
+            });
+        };
+
+        // NEW JAVASCRIPT: Handle submission from the language proficiency modal
+        document.getElementById('submitValidatorApplication').onclick = async () => {
+            const selectedLanguage = document.getElementById('validatorLanguage').value;
+            const proficiency = parseInt(document.getElementById('languageProficiency').value, 10);
+
+            // Client-side validation for inputs
+            if (!selectedLanguage) {
+                showMessageBox('Please select a language.', 'error');
+                return;
+            }
+
+            if (isNaN(proficiency) || proficiency < 1 || proficiency > 5) {
+                showMessageBox('Please enter a valid proficiency level between 1 and 5.', 'error');
+                return;
+            }
+
+            // Deny request if proficiency is below 4
+            if (proficiency < 4) {
+                showMessageBox('Your proficiency level is too low to become a validator at this time. We require a minimum proficiency of 4.', 'error');
+                document.getElementById('languageProficiencyModal').style.display = 'none'; // Hide the modal
+                return;
+            }
+
+            // If validation passes, send data to your backend for review
+            try {
+                // IMPORTANT: Replace '/api/applyValidator' with the actual URL of your backend endpoint.
+                // This is a conceptual API call. Your backend needs to handle this.
+                const response = await fetch('/api/applyValidator', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Include authorization token if your backend requires it for the current user
+                        // 'Authorization': `Bearer ${auth.currentUser.accessToken}` 
+                    },
+                    body: JSON.stringify({
+                        language: selectedLanguage,
+                        proficiency: proficiency,
+                        userId: userId // Send the current user's ID
+                    })
+                });
+
+                const data = await response.json(); // Assuming your backend responds with JSON
+
+                if (response.ok) { // Check for HTTP status codes 200-299
+                    showMessageBox(`Thank you for your commitment! Your application for ${selectedLanguage} validation has been submitted. We will review it shortly.`, 'info');
+                    // The VALIDATOR_SECRET_KEY is for login, not for application.
+                    // Your backend will handle securely granting validator status and any related keys.
+                } else {
+                    // Handle specific error messages from your backend
+                    showMessageBox(data.message || 'There was an issue with your application. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting validator application:', error);
+                showMessageBox('An error occurred while submitting your application. Please try again later.', 'error');
+            } finally {
+                // Always hide the modal after the submission attempt
+                document.getElementById('languageProficiencyModal').style.display = 'none';
+            }
+        };
+
+        // NEW JAVASCRIPT: Handle cancellation from the language proficiency modal
+        document.getElementById('cancelValidatorApplication').onclick = () => {
+            document.getElementById('languageProficiencyModal').style.display = 'none'; // Hide the modal
+        };
 
 
         // Handle adding a new course
