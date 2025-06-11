@@ -2568,9 +2568,10 @@
                         [languageToValidate.toLowerCase()]: proficiencyLevel
                     }
                 }, { merge: true });
+		 const VALIDATOR_SECRET_KEY = "V2025";
 
                 // Directly show the secret key after successful update
-                showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: V2025`, 'info');
+                showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
             } else {
                 showMessageBox("You must be logged in to become a validator.", 'error');
             }
