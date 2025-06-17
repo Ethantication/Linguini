@@ -2527,58 +2527,31 @@
         };
 
         // NEW JAVASCRIPT: Handle "Become a Validator" button click
-        // This REPLACES your previous `becomeValidator.onclick` block.
-          becomeValidator.onclick = async () => {
-    console.log('BecomeValidator button clicked.');
 
+becomeValidator.onclick = async () => {
+    console.log('BecomeValidator button clicked.');
     const languageToValidate = prompt("Which language do you want to validate? (e.g., English, Russian, Arabic, Spanish, Mandarin, French, Hindi)");
     if (!languageToValidate) {
         showMessageBox("Validator request cancelled. Please specify a language.", 'error');
         return;
     }
-
     let proficiencyLevel = prompt(`On a scale of 1 to 5, how would you rank your control in ${languageToValidate}? (1=Beginner, 5=Native/Expert)`);
     proficiencyLevel = parseInt(proficiencyLevel, 10);
-
     if (isNaN(proficiencyLevel) || proficiencyLevel < 1 || proficiencyLevel > 5) {
         showMessageBox("Invalid proficiency level. Please enter a number between 1 and 5.", 'error');
         return;
     }
-
     if (proficiencyLevel < 4) {
         showMessageBox(`Your proficiency level (${proficiencyLevel}) in ${languageToValidate} is too low to become a validator. A level of 4 or higher is required.`, 'error');
         return;
     }
-
     const agreementText = `By becoming a validator for ${languageToValidate} (Proficiency: ${proficiencyLevel}), you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?`;
-
-    // Assuming showConfirmBox is a function you have defined elsewhere
+    
     showConfirmBox(agreementText, async () => {
-        // User accepted, now store their validator status and language proficiency in Firestore
-        try {
-            const user = auth.currentUser;
-            if (user) {
-                // Assuming 'db' is your Firestore instance and 'doc', 'setDoc' are imported
-                const userRef = doc(db, "users", user.uid);
-
-                // Update user's profile with validation language and proficiency
-                await setDoc(userRef, {
-                    isValidator: true,
-                    validatorLanguages: {
-                        [languageToValidate.toLowerCase()]: proficiencyLevel
-                    }
-                }, { merge: true });
-		 const VALIDATOR_SECRET_KEY = "V2025";
-
-                // Directly show the secret key after successful update
-                showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
-            } else {
-                showMessageBox("You must be logged in to become a validator.", 'error');
-            }
-        } catch (error) {
-            console.error("Error setting validator status:", error);
-            showMessageBox("Failed to set validator status. Please try again.", 'error');
-        }
+        // User accepted
+        const VALIDATOR_SECRET_KEY = "V2025";
+        // Directly show the secret key after successful update
+        showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
     });
 };
 
