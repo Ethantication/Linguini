@@ -674,7 +674,7 @@
     </footer>
 
     <!-- NEW HTML: The Language Proficiency Modal (Hidden by default) -->
-    <div id="languageProficiencyModal">
+    <div id="languageProficiencyModal" class="hidden">
         <h2>Become a Validator</h2>
         <p>Which language would you like to validate?</p>
         <select id="validatorLanguage">
@@ -952,7 +952,7 @@
                     pronunciation: 'hofchi',
                     english: { text: 'Reciprocal', status: 'Pending', validatedBy: null },
                     russian: { text: 'Взаимный', status: 'Pending', validatedBy: null },
-                    arabic: { text: 'מقلوب', status: 'Pending', validatedBy: null },
+                    arabic: { text: 'مقلوب', status: 'Pending', validatedBy: null },
                     french: { text: 'Inverse', status: 'Pending', validatedBy: null },
                     mandarin: { text: '倒数', status: 'Pending', validatedBy: null },
                     spanish: { text: 'Recíproco', status: 'Pending', validatedBy: null },
@@ -1041,7 +1041,7 @@
                     arabic: { text: 'متغير', status: 'Pending', validatedBy: null },
                     french: { text: 'Variable', status: 'Pending', validatedBy: null },
                     mandarin: { text: '变量', status: 'Pending', validatedBy: null },
-                    spanish: { text: 'Variable', status: 'Pending', validatedBy: null },
+                    spanish: { text: 'Cadena', status: 'Pending', validatedBy: null },
                     hindi: { text: 'चर', status: 'Pending', validatedBy: null }
                 },
                 {
@@ -1422,7 +1422,7 @@
                 },
                 {
                     id: 't_c5_9', courseId: 'c5', definition: 'A type of chemical bond that involves the sharing of electron pairs between atoms.',
-                    hebrew: { text: 'קשר קوולנטי', status: 'Pending', validatedBy: null },
+                    hebrew: { text: 'קשר קוולנטי', status: 'Pending', validatedBy: null },
                     pronunciation: 'kesher kovalenti',
                     english: { text: 'Covalent Bond', status: 'Pending', validatedBy: null },
                     russian: { text: 'Ковалентная связь', status: 'Pending', validatedBy: null },
@@ -2526,62 +2526,102 @@
             }
         };
 
-        // NEW JAVASCRIPT: Handle "Become a Validator" button click
-        // This REPLACES your previous `becomeValidator.onclick` block.
-          becomeValidator.onclick = async () => {
-    console.log('BecomeValidator button clicked.');
+        // --- NEW: Elements for the Language Proficiency Modal ---
+        const languageProficiencyModal = document.getElementById('languageProficiencyModal');
+        const validatorLanguageSelect = document.getElementById('validatorLanguage');
+        const languageProficiencyInput = document.getElementById('languageProficiency');
+        const submitValidatorApplicationButton = document.getElementById('submitValidatorApplication');
+        const cancelValidatorApplicationButton = document.getElementById('cancelValidatorApplication');
 
-    const languageToValidate = prompt("Which language do you want to validate? (e.g., English, Russian, Arabic, Spanish, Mandarin, French, Hindi)");
-    if (!languageToValidate) {
-        showMessageBox("Validator request cancelled. Please specify a language.", 'error');
-        return;
-    }
-
-    let proficiencyLevel = prompt(`On a scale of 1 to 5, how would you rank your control in ${languageToValidate}? (1=Beginner, 5=Native/Expert)`);
-    proficiencyLevel = parseInt(proficiencyLevel, 10);
-
-    if (isNaN(proficiencyLevel) || proficiencyLevel < 1 || proficiencyLevel > 5) {
-        showMessageBox("Invalid proficiency level. Please enter a number between 1 and 5.", 'error');
-        return;
-    }
-
-    if (proficiencyLevel < 4) {
-        showMessageBox(`Your proficiency level (${proficiencyLevel}) in ${languageToValidate} is too low to become a validator. A level of 4 or higher is required.`, 'error');
-        return;
-    }
-
-    const agreementText = `By becoming a validator for ${languageToValidate} (Proficiency: ${proficiencyLevel}), you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?`;
-
-    // Assuming showConfirmBox is a function you have defined elsewhere
-    showConfirmBox(agreementText, async () => {
-        // User accepted, now store their validator status and language proficiency in Firestore
-        try {
-            const user = auth.currentUser;
-            if (user) {
-                // Assuming 'db' is your Firestore instance and 'doc', 'setDoc' are imported
-                const userRef = doc(db, "users", user.uid);
-
-                // Update user's profile with validation language and proficiency
-                await setDoc(userRef, {
-                    isValidator: true,
-                    validatorLanguages: {
-                        [languageToValidate.toLowerCase()]: proficiencyLevel
-                    }
-                }, { merge: true });
-		 const VALIDATOR_SECRET_KEY = "V2025";
-
-                // Directly show the secret key after successful update
-                showMessageBox(`Thank you for your commitment! You are now a validator for ${languageToValidate}. The validator secret key is: ${VALIDATOR_SECRET_KEY}`, 'info');
-            } else {
-                showMessageBox("You must be logged in to become a validator.", 'error');
-            }
-        } catch (error) {
-            console.error("Error setting validator status:", error);
-            showMessageBox("Failed to set validator status. Please try again.", 'error');
+        // Helper functions to show/hide the language proficiency modal
+        function showLanguageProficiencyModal() {
+            languageProficiencyModal.classList.remove('hidden');
+            // Reset fields when showing the modal
+            validatorLanguageSelect.value = '';
+            languageProficiencyInput.value = '';
         }
-    });
-};
 
+        function hideLanguageProficiencyModal() {
+            languageProficiencyModal.classList.add('hidden');
+        }
+
+        // Handle "Become a Validator" button click - now opens the modal
+        becomeValidator.onclick = () => {
+            console.log('BecomeValidator button clicked. Showing proficiency modal.');
+            showLanguageProficiencyModal();
+        };
+
+        // Handle submission from the Language Proficiency Modal
+        submitValidatorApplicationButton.onclick = async () => {
+            console.log('Submit Validator Application button clicked.');
+            const selectedLanguage = validatorLanguageSelect.value;
+            const proficiencyLevel = parseInt(languageProficiencyInput.value, 10);
+
+            // Client-side validation for selected language
+            if (selectedLanguage === "") {
+                showMessageBox("Please select a language you wish to validate.", 'error');
+                return;
+            }
+
+            // Client-side validation for proficiency level
+            if (isNaN(proficiencyLevel) || proficiencyLevel < 1 || proficiencyLevel > 5) {
+                showMessageBox("Invalid proficiency level. Please enter a number between 1 and 5.", 'error');
+                return;
+            }
+
+            if (proficiencyLevel >= 4) {
+                // Proficiency is 4 or 5, show confirmation
+                const languageName = LANGUAGES.find(l => l.key === selectedLanguage)?.name || selectedLanguage;
+                const agreementText = `By becoming a validator for ${languageName} (Proficiency: ${proficiencyLevel}), you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?`;
+                
+                showConfirmBox(agreementText, () => {
+                    // User confirmed. Simulate fetching validator key (as no backend).
+                    hideLanguageProficiencyModal(); // Hide modal before showing success message
+                    showMessageBox("Congrats! The secret key is \"V2025\", use it wisely !", 'success');
+
+                    // If you were to have a backend, this is where you'd send
+                    // the user's language and proficiency to update their
+                    // validator status in your Firestore 'users' collection.
+                    // Example (commented out as per user request for no backend interaction here):
+                    /*
+                    try {
+                        const user = auth.currentUser;
+                        if (user) {
+                            const userRef = doc(db, "users", user.uid);
+                            await setDoc(userRef, {
+                                isValidator: true,
+                                validatorLanguages: {
+                                    [selectedLanguage.toLowerCase()]: proficiencyLevel
+                                }
+                            }, { merge: true });
+                            console.log("Validator status updated in Firestore.");
+                        } else {
+                            console.warn("User not authenticated for Firestore update.");
+                        }
+                    } catch (error) {
+                        console.error("Error updating validator status in Firestore:", error);
+                    }
+                    */
+
+                }, () => {
+                    // User cancelled the confirmation
+                    hideLanguageProficiencyModal();
+                    showMessageBox("Validator application cancelled.", 'info');
+                });
+            } else {
+                // Proficiency too low, show immediate error and hide modal
+                hideLanguageProficiencyModal();
+                const languageName = LANGUAGES.find(l => l.key === selectedLanguage)?.name || selectedLanguage;
+                showMessageBox(`Your proficiency level (${proficiencyLevel}) in ${languageName} is too low to become a validator. A level of 4 or higher is required.`, 'error');
+            }
+        };
+
+        // Handle cancellation from the Language Proficiency Modal
+        cancelValidatorApplicationButton.onclick = () => {
+            console.log('Cancel Validator Application button clicked.');
+            hideLanguageProficiencyModal();
+            showMessageBox("Validator application cancelled.", 'info');
+        };
 
         // Handle adding a new course
         addCourseForm.onsubmit = async (e) => {
