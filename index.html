@@ -430,7 +430,7 @@
                     Validator Login
                 </button>
 		    
-               <button id="becomeValidatorButton">
+               <button id="becomeValidator">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -2526,89 +2526,103 @@
             }
         };
 
-       // --- NEW: Elements for the Language Proficiency Modal ---
-const languageProficiencyModal = document.getElementById('languageProficiencyModal');
-const validatorLanguageSelect = document.getElementById('validatorLanguage');
-const languageProficiencyInput = document.getElementById('languageProficiency');
-const submitValidatorApplicationButton = document.getElementById('submitValidatorApplication');
-const cancelValidatorApplicationButton = document.getElementById('cancelValidatorApplication');
+        // --- NEW: Elements for the Language Proficiency Modal ---
+        const languageProficiencyModal = document.getElementById('languageProficiencyModal');
+        const validatorLanguageSelect = document.getElementById('validatorLanguage');
+        const languageProficiencyInput = document.getElementById('languageProficiency');
+        const submitValidatorApplicationButton = document.getElementById('submitValidatorApplication');
+        const cancelValidatorApplicationButton = document.getElementById('cancelValidatorApplication');
 
-// **MODIFICATION START**
-// Ensure 'becomeValidator' is correctly linked to your button element.
-// Assuming your "Become a Validator" button has an id like 'becomeValidatorButton'
-const becomeValidator = document.getElementById('becomeValidatorButton');
-// **MODIFICATION END**
+        // Helper functions to show/hide the language proficiency modal
+        function showLanguageProficiencyModal() {
+            languageProficiencyModal.classList.remove('hidden');
+            // Reset fields when showing the modal
+            validatorLanguageSelect.value = '';
+            languageProficiencyInput.value = '';
+        }
 
-// Helper functions to show/hide the language proficiency modal
-function showLanguageProficiencyModal() {
-    languageProficiencyModal.classList.remove('hidden');
-    // Reset fields when showing the modal
-    validatorLanguageSelect.value = '';
-    languageProficiencyInput.value = '';
-}
+        function hideLanguageProficiencyModal() {
+            languageProficiencyModal.classList.add('hidden');
+        }
 
-function hideLanguageProficiencyModal() {
-    languageProficiencyModal.classList.add('hidden');
-}
+        // Handle "Become a Validator" button click - now opens the modal
+        becomeValidator.onclick = () => {
+            console.log('BecomeValidator button clicked. Showing proficiency modal.');
+            showLanguageProficiencyModal();
+        };
 
-// Handle "Become a Validator" button click - now opens the modal
-if (becomeValidator) { // Add a check to ensure the element exists
-    becomeValidator.onclick = () => {
-        console.log('BecomeValidator button clicked. Showing proficiency modal.');
-        showLanguageProficiencyModal();
-    };
-} else {
-    console.error("Error: 'becomeValidatorButton' element not found. Please ensure your 'Become a Validator' button has the ID 'becomeValidatorButton' in your HTML.");
-}
+        // Handle submission from the Language Proficiency Modal
+        submitValidatorApplicationButton.onclick = async () => {
+            console.log('Submit Validator Application button clicked.');
+            const selectedLanguage = validatorLanguageSelect.value;
+            const proficiencyLevel = parseInt(languageProficiencyInput.value, 10);
 
+            // Client-side validation for selected language
+            if (selectedLanguage === "") {
+                showMessageBox("Please select a language you wish to validate.", 'error');
+                return;
+            }
 
-// Handle submission from the Language Proficiency Modal
-submitValidatorApplicationButton.onclick = async () => {
-    console.log('Submit Validator Application button clicked.');
-    const selectedLanguage = validatorLanguageSelect.value;
-    const proficiencyLevel = parseInt(languageProficiencyInput.value, 10);
+            // Client-side validation for proficiency level
+            if (isNaN(proficiencyLevel) || proficiencyLevel < 1 || proficiencyLevel > 5) {
+                showMessageBox("Invalid proficiency level. Please enter a number between 1 and 5.", 'error');
+                return;
+            }
 
-    // Client-side validation for selected language
-    if (selectedLanguage === "") {
-        showMessageBox("Please select a language you wish to validate.", 'error');
-        return;
-    }
+            if (proficiencyLevel >= 4) {
+                // Proficiency is 4 or 5, show confirmation
+                const languageName = LANGUAGES.find(l => l.key === selectedLanguage)?.name || selectedLanguage;
+                const agreementText = `By becoming a validator for ${languageName} (Proficiency: ${proficiencyLevel}), you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?`;
+                
+                showConfirmBox(agreementText, () => {
+                    // User confirmed. Simulate fetching validator key (as no backend).
+                    hideLanguageProficiencyModal(); // Hide modal before showing success message
+                    showMessageBox("Congrats! The secret key is \"V2025\", use it wisely !", 'success');
 
-    // Client-side validation for proficiency level
-    if (isNaN(proficiencyLevel) || proficiencyLevel < 1 || proficiencyLevel > 5) {
-        showMessageBox("Invalid proficiency level. Please enter a number between 1 and 5.", 'error');
-        return;
-    }
+                    // If you were to have a backend, this is where you'd send
+                    // the user's language and proficiency to update their
+                    // validator status in your Firestore 'users' collection.
+                    // Example (commented out as per user request for no backend interaction here):
+                    /*
+                    try {
+                        const user = auth.currentUser;
+                        if (user) {
+                            const userRef = doc(db, "users", user.uid);
+                            await setDoc(userRef, {
+                                isValidator: true,
+                                validatorLanguages: {
+                                    [selectedLanguage.toLowerCase()]: proficiencyLevel
+                                }
+                            }, { merge: true });
+                            console.log("Validator status updated in Firestore.");
+                        } else {
+                            console.warn("User not authenticated for Firestore update.");
+                        }
+                    } catch (error) {
+                        console.error("Error updating validator status in Firestore:", error);
+                    }
+                    */
 
-    if (proficiencyLevel >= 4) {
-        // Proficiency is 4 or 5, show confirmation
-        const languageName = LANGUAGES.find(l => l.key === selectedLanguage)?.name || selectedLanguage;
-        const agreementText = `By becoming a validator for ${languageName} (Proficiency: ${proficiencyLevel}), you agree to provide accurate and truthful translations. Your contributions help maintain the integrity of our educational platform. Do you accept this responsibility?`;
+                }, () => {
+                    // User cancelled the confirmation
+                    hideLanguageProficiencyModal();
+                    showMessageBox("Validator application cancelled.", 'info');
+                });
+            } else {
+                // Proficiency too low, show immediate error and hide modal
+                hideLanguageProficiencyModal();
+                const languageName = LANGUAGES.find(l => l.key === selectedLanguage)?.name || selectedLanguage;
+                showMessageBox(`Your proficiency level (${proficiencyLevel}) in ${languageName} is too low to become a validator. A level of 4 or higher is required.`, 'error');
+            }
+        };
 
-        showConfirmBox(agreementText, () => {
-            // User confirmed. Simulate fetching validator key (as no backend).
-            hideLanguageProficiencyModal(); // Hide modal before showing success message
-            showMessageBox("Congrats! The secret key is \"V2025\", use it wisely !", 'success');
-
-        }, () => {
-            // User cancelled the confirmation
+        // Handle cancellation from the Language Proficiency Modal
+        cancelValidatorApplicationButton.onclick = () => {
+            console.log('Cancel Validator Application button clicked.');
             hideLanguageProficiencyModal();
             showMessageBox("Validator application cancelled.", 'info');
-        });
-    } else {
-        // Proficiency too low, show immediate error and hide modal
-        hideLanguageProficiencyModal();
-        const languageName = LANGUAGES.find(l => l.key === selectedLanguage)?.name || selectedLanguage;
-        showMessageBox(`Your proficiency level (${proficiencyLevel}) in ${languageName} is too low to become a validator. A level of 4 or higher is required.`, 'error');
-    }
-};
+        };
 
-// Handle cancellation from the Language Proficiency Modal
-cancelValidatorApplicationButton.onclick = () => {
-    console.log('Cancel Validator Application button clicked.');
-    hideLanguageProficiencyModal();
-    showMessageBox("Validator application cancelled.", 'info');
-};
         // Handle adding a new course
         addCourseForm.onsubmit = async (e) => {
             e.preventDefault();
